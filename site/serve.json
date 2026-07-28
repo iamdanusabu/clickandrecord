@@ -2,6 +2,7 @@
   "cleanUrls": false,
   "directoryListing": false,
   "rewrites": [
-    { "source": "/", "destination": "/index.html" }
+    { "source": "/", "destination": "/index.html" },
+    { "source": "/privacy", "destination": "/privacy/index.html" }
   ]
 }

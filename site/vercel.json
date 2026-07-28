@@ -1,6 +1,9 @@
 {
   "cleanUrls": false,
   "trailingSlash": false,
+  "rewrites": [
+    { "source": "/privacy", "destination": "/privacy/index.html" }
+  ],
   "headers": [
     {
       "source": "/vendor/(.*)",

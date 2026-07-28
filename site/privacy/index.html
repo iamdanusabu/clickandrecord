@@ -1,0 +1,504 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<title>Privacy Policy — Click &amp; Record</title>
+<meta name="description" content="How Click & Record handles data: recordings, subtitles and logs stay in your browser, nothing is uploaded unless you choose to, and nothing is tracked." />
+<link rel="canonical" href="https://clickandrecord.tech/privacy" />
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+<meta name="theme-color" content="#ffffff" />
+<meta name="color-scheme" content="light dark" />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Click &amp; Record" />
+<meta property="og:url" content="https://clickandrecord.tech/privacy" />
+<meta property="og:title" content="Privacy Policy — Click &amp; Record" />
+<meta property="og:description" content="Recordings, subtitles and logs stay in your browser. Nothing is uploaded unless you choose to. Nothing is tracked." />
+<meta property="og:image" content="https://clickandrecord.tech/og-image.png" />
+<meta property="og:image:alt" content="Click &amp; Record" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Privacy Policy — Click &amp; Record" />
+<meta name="twitter:description" content="Recordings, subtitles and logs stay in your browser. Nothing is uploaded unless you choose to. Nothing is tracked." />
+<meta name="twitter:image" content="https://clickandrecord.tech/og-image.png" />
+
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<link rel="preload" href="/fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin />
+
+<script>
+(function(){try{var t=localStorage.getItem('cr-theme');
+if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
+</script>
+
+<style>
+@font-face{font-family:'Archivo';font-style:normal;font-weight:400 700;font-stretch:75% 125%;
+  font-display:swap;src:url('/fonts/archivo-latin.woff2') format('woff2');
+  unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Inter';font-style:normal;font-weight:400 700;font-display:swap;
+  src:url('/fonts/inter-latin.woff2') format('woff2');
+  unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+2074,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+
+:root{
+  --void:#ffffff;
+  --sunk:#f4f5f8;
+  --surface:#f7f8fa;
+  --raise:#eceef3;
+  --edge:#e5e7ee;
+  --edge-soft:#d8dbe4;
+  --edge-strong:#c7ccd8;
+
+  --ink:#14161c;
+  --mute:#5c6371;
+  --faint:#8d939f;
+
+  --rec:#e5484d;
+  --zoom:#9a6605;
+  --zoom-mark:#d28300;
+  --cue:#137f5c;
+  --link:#5b5bd6;
+
+  --btn-face:#14161c;
+  --btn-label:#ffffff;
+  --btn-face-hot:#000000;
+
+  --hover:rgba(20,22,28,.038);
+  --mast-bg:rgba(255,255,255,.86);
+  --wash-zoom:rgba(154,102,5,.08);
+  --line-zoom:rgba(154,102,5,.34);
+  --wash-rec:rgba(229,72,77,.07);
+
+  --glow-neutral:rgba(93,99,113,.16);
+  --glow-rec:rgba(229,72,77,.2);
+  --glow-zoom:rgba(154,102,5,.24);
+  --glow-cue:rgba(19,127,92,.22);
+  --glow-link:rgba(91,91,214,.2);
+
+  --display:'Archivo','Archivo Expanded',Impact,sans-serif;
+  --body:'Inter','Segoe UI Variable Text','Segoe UI',-apple-system,Roboto,sans-serif;
+  --mono:ui-monospace,'Cascadia Code','SF Mono',Consolas,monospace;
+
+  --rail:clamp(48px,6vw,92px);
+  --wrap:1180px;
+  --gut:clamp(20px,4vw,48px);
+  color-scheme:light;
+}
+
+:root[data-theme="dark"]{
+  --void:#0c0e13;
+  --sunk:#090a0e;
+  --surface:#14171f;
+  --raise:#1b1f29;
+  --edge:#232734;
+  --edge-soft:#2e3342;
+  --edge-strong:#3a4054;
+
+  --ink:#eef0f5;
+  --mute:#949bab;
+  --faint:#666d7d;
+
+  --rec:#ef4b52;
+  --zoom:#ffc247;
+  --zoom-mark:#ffc247;
+  --cue:#45dba0;
+  --link:#9a9aff;
+
+  --btn-face:#eef0f5;
+  --btn-label:#0c0e13;
+  --btn-face-hot:#ffffff;
+
+  --hover:rgba(255,255,255,.032);
+  --mast-bg:rgba(12,14,19,.82);
+  --wash-zoom:rgba(255,194,71,.05);
+  --line-zoom:rgba(255,194,71,.18);
+  --wash-rec:rgba(239,75,82,.09);
+
+  --glow-neutral:rgba(148,155,171,.13);
+  --glow-rec:rgba(239,75,82,.17);
+  --glow-zoom:rgba(255,194,71,.17);
+  --glow-cue:rgba(69,219,160,.17);
+  --glow-link:rgba(154,154,255,.17);
+  color-scheme:dark;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--void);color:var(--ink);
+  font-family:var(--body);font-size:16.5px;line-height:1.62;letter-spacing:-.008em;
+  -webkit-font-smoothing:antialiased;
+}
+img,svg{max-width:100%;height:auto;display:block}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--link);outline-offset:3px;border-radius:2px}
+
+.shell{max-width:var(--wrap);margin:0 auto;padding-left:var(--rail);padding-right:var(--gut);position:relative}
+.shell::before{content:'';position:absolute;left:0;top:0;bottom:0;width:1px;background:var(--edge)}
+@media(max-width:820px){
+  :root{--rail:0px}
+  .shell{padding-left:var(--gut)}
+  .shell::before{display:none}
+}
+
+.tc{
+  font-family:var(--mono);font-size:11.5px;font-weight:500;letter-spacing:.1em;
+  color:var(--faint);font-variant-numeric:tabular-nums;text-transform:uppercase;
+  display:inline-flex;align-items:center;gap:10px;margin-bottom:22px;
+}
+.tc::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--edge-soft);flex:none}
+.tc[data-mark="link"]::before{background:var(--link)}
+
+h1,h2,h3{font-family:var(--display);font-weight:600;margin:0;text-wrap:balance}
+h1{font-size:clamp(2.3rem,5vw,3.6rem);line-height:1.02;letter-spacing:-.03em;font-stretch:112%;font-weight:650}
+h2{font-size:clamp(1.4rem,2.4vw,1.8rem);line-height:1.15;letter-spacing:-.024em;font-stretch:108%;margin-bottom:16px}
+h3{font-size:1.02rem;line-height:1.3;letter-spacing:-.014em;font-stretch:105%;font-weight:600;margin-bottom:8px}
+p{margin:0 0 18px}
+p:last-child{margin-bottom:0}
+.lede{font-size:clamp(1.02rem,1.5vw,1.18rem);color:var(--mute);max-width:66ch;line-height:1.6}
+
+/* ═══ BUTTONS ═══ */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;
+  font-family:var(--body);font-size:.95rem;font-weight:600;letter-spacing:-.01em;
+  padding:13px 22px;border-radius:7px;border:1px solid transparent;cursor:pointer;
+  transition:background .16s ease,border-color .16s ease,color .16s ease,transform .16s ease}
+.btn-solid{background:var(--btn-face);color:var(--btn-label);border-color:var(--btn-face)}
+.btn-solid:hover{background:var(--btn-face-hot);border-color:var(--btn-face-hot);transform:translateY(-1px)}
+.dotrec{width:8px;height:8px;border-radius:50%;background:var(--rec);flex:none}
+
+/* ═══ MASTHEAD ═══ */
+.mast{position:sticky;top:0;z-index:60;background:var(--mast-bg);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--edge)}
+.mast .shell{display:flex;align-items:center;justify-content:space-between;gap:20px;height:64px;padding-top:0;padding-bottom:0}
+.wordmark{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:650;
+  font-size:1rem;letter-spacing:-.02em;font-stretch:108%}
+.mast nav{display:flex;align-items:center;gap:26px;font-size:.875rem;color:var(--mute)}
+.mast nav a:not(.btn){position:relative;transition:color .2s ease}
+.mast nav a:not(.btn):hover{color:var(--ink)}
+.mast .btn{padding:9px 16px;font-size:.85rem}
+.themer{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;
+  border-radius:8px;border:1px solid var(--edge);background:transparent;color:var(--mute);
+  cursor:pointer;flex:none;transition:color .16s ease,border-color .16s ease,background .16s ease}
+.themer:hover{color:var(--ink);border-color:var(--edge-strong);background:var(--hover)}
+.themer .ico-moon{display:block}
+.themer .ico-sun{display:none}
+:root[data-theme="dark"] .themer .ico-moon{display:none}
+:root[data-theme="dark"] .themer .ico-sun{display:block}
+@media(max-width:900px){.mast nav a:not(.btn){display:none}}
+
+/* ═══ DOC LAYOUT ═══ */
+.doc-head{padding:clamp(52px,7vw,84px) 0 clamp(36px,5vw,52px)}
+.doc-head .updated{margin-top:18px;font-size:.86rem;color:var(--faint)}
+.doc-head .lede{margin-top:20px}
+
+.toc{border-top:1px solid var(--edge);border-bottom:1px solid var(--edge);
+  padding:22px 0;margin:36px 0 0;display:flex;flex-wrap:wrap;gap:10px 28px}
+.toc a{font-size:.86rem;color:var(--mute);white-space:nowrap}
+.toc a::before{content:'→ ';color:var(--faint)}
+.toc a:hover{color:var(--ink)}
+
+.doc section{max-width:76ch;padding:clamp(40px,6vw,60px) 0;border-bottom:1px solid var(--edge)}
+.doc section:last-of-type{border-bottom:none}
+.doc section > .wide{max-width:none}
+.doc p,.doc li{color:var(--mute);font-size:.98rem}
+.doc strong{color:var(--ink);font-weight:600}
+.doc a.inline{color:var(--link);text-underline-offset:3px;text-decoration:underline}
+.doc a.inline:hover{color:var(--ink)}
+
+.points{list-style:none;margin:22px 0 0;padding:0;border-top:1px solid var(--edge)}
+.points li{padding:14px 0;border-bottom:1px solid var(--edge);font-size:.96rem}
+.points b{color:var(--ink);font-weight:600}
+
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+  gap:0 clamp(24px,4vw,48px);margin:8px 0 0;border-top:1px solid var(--edge)}
+.facts > div{padding:16px 0;border-bottom:1px solid var(--edge)}
+.facts dt{font-family:var(--mono);font-size:.68rem;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--faint);margin-bottom:6px}
+.facts dd{margin:0;font-size:.94rem;color:var(--ink);font-weight:500;line-height:1.45}
+
+.ledger{border-top:1px solid var(--edge);margin-top:8px}
+.entry{display:grid;grid-template-columns:minmax(0,.3fr) minmax(0,.7fr);gap:clamp(16px,3vw,40px);
+  padding:20px 0;border-bottom:1px solid var(--edge);align-items:start}
+@media(max-width:640px){.entry{grid-template-columns:1fr;gap:6px;padding:16px 0}}
+.entry p{margin:0;font-size:.94rem}
+.entry .k{font-family:var(--mono);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin-top:3px}
+
+.sheet{overflow-x:auto;border:1px solid var(--edge);border-radius:10px;background:var(--surface);margin-top:8px}
+table{border-collapse:collapse;width:100%;min-width:560px;font-size:.87rem}
+caption{caption-side:bottom;text-align:left;padding:14px 18px;color:var(--faint);font-size:.78rem;line-height:1.5;border-top:1px solid var(--edge)}
+th,td{padding:13px 16px;text-align:left;border-bottom:1px solid var(--edge);vertical-align:top}
+thead th{font-family:var(--mono);font-size:.64rem;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--faint);font-weight:500;background:var(--raise)}
+tbody th{font-weight:500;color:var(--ink);font-size:.87rem}
+td{color:var(--mute)}
+tbody tr:last-child th,tbody tr:last-child td{border-bottom:none}
+
+/* ═══ FOOTER ═══ */
+footer{padding:52px 0 46px;font-size:.86rem;color:var(--faint)}
+.fcols{display:grid;grid-template-columns:1.6fr repeat(3,1fr);gap:34px;margin-bottom:38px}
+@media(max-width:760px){.fcols{grid-template-columns:1fr 1fr}}
+footer h3{font-family:var(--mono);font-size:.66rem;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--faint);font-weight:500;margin-bottom:14px}
+footer ul{list-style:none;margin:0;padding:0}
+footer li{margin-bottom:10px}
+footer a{color:var(--mute)}
+footer a:hover{color:var(--ink)}
+.rule{border-top:1px solid var(--edge);padding-top:22px;display:flex;flex-wrap:wrap;gap:14px;justify-content:space-between}
+
+.skip{position:absolute;left:-9999px;background:var(--ink);color:var(--void);padding:11px 18px;z-index:100}
+.skip:focus{left:0;top:0}
+</style>
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="mast">
+  <div class="shell">
+    <a class="wordmark" href="/"><span class="dotrec" aria-hidden="true"></span> Click&nbsp;&amp;&nbsp;Record</a>
+    <nav aria-label="Primary">
+      <a href="/#zoom">Zoom</a>
+      <a href="/#subtitles">Subtitles</a>
+      <a href="/#evidence">Evidence</a>
+      <a href="/#compare">Compare</a>
+      <a href="/#faq">FAQ</a>
+      <a href="/editor/editor.html">Editor</a>
+      <button class="themer" id="themer" type="button" aria-pressed="false"
+              aria-label="Switch to dark theme" title="Switch theme">
+        <svg class="ico-sun" viewBox="0 0 20 20" width="16" height="16" fill="none" aria-hidden="true">
+          <circle cx="10" cy="10" r="3.6" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M10 1.8v2.1M10 16.1v2.1M18.2 10h-2.1M3.9 10H1.8M15.8 4.2l-1.5 1.5M5.7 14.3l-1.5 1.5M15.8 15.8l-1.5-1.5M5.7 5.7L4.2 4.2"
+                stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <svg class="ico-moon" viewBox="0 0 20 20" width="16" height="16" fill="none" aria-hidden="true">
+          <path d="M16.5 12.4A7 7 0 017.6 3.5a7 7 0 108.9 8.9z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <a class="btn btn-solid" href="/#get">Add to Chrome</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <div class="shell doc-head">
+    <span class="tc" data-mark="link">Legal</span>
+    <h1>Privacy Policy</h1>
+    <p class="updated">Effective and last updated <strong style="color:var(--ink)">July 28, 2026</strong>.</p>
+    <p class="lede">
+      Click &amp; Record is built so your recordings never have to leave your computer.
+      This page explains, plainly, what the extension and this website store, where it
+      stays, and the two specific, user-initiated cases where anything crosses the network.
+    </p>
+
+    <nav class="toc" aria-label="On this page">
+      <a href="#inventory">What's stored, and where</a>
+      <a href="#not">What we don't do</a>
+      <a href="#transcription">Transcription</a>
+      <a href="#drive">Google Drive</a>
+      <a href="#permissions">Permissions</a>
+      <a href="#retention">Retention &amp; deletion</a>
+      <a href="#children">Children</a>
+      <a href="#changes">Changes</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </div>
+
+  <div class="shell doc">
+
+    <section id="summary">
+      <h2>In short</h2>
+      <dl class="facts">
+        <div><dt>Recordings</dt><dd>Stay on your device, in the browser's local storage.</dd></div>
+        <div><dt>Transcription</dt><dd>Runs on-device. Audio is never sent anywhere for it.</dd></div>
+        <div><dt>Analytics</dt><dd>None. No trackers, no cookies, no telemetry.</dd></div>
+        <div><dt>Account</dt><dd>Not required. Nothing to sign up for.</dd></div>
+        <div><dt>Sync</dt><dd><code>chrome.storage.sync</code> is never used.</dd></div>
+        <div><dt>Cloud copy</dt><dd>Only if you explicitly click "Save to Drive."</dd></div>
+      </dl>
+    </section>
+
+    <section id="inventory">
+      <h2>What's stored, and where</h2>
+      <p>
+        Everything Click &amp; Record creates is stored locally, inside your browser
+        profile, using standard web storage — the same storage any website uses, just
+        scoped to the extension. Nothing here is synced by Chrome, and nothing is sent
+        to a server we operate, because we don't operate one.
+      </p>
+      <div class="wide sheet">
+        <table>
+          <caption>"Leaves your device?" means by default — not counting the export or Save-to-Drive actions you trigger yourself.</caption>
+          <thead>
+            <tr><th>Data</th><th>Stored in</th><th>Leaves your device?</th></tr>
+          </thead>
+          <tbody>
+            <tr><th>Recording video/audio (screen, tab or window, plus mic and webcam if enabled)</th><td>IndexedDB (<code>demo-recorder</code> database)</td><td>No</td></tr>
+            <tr><th>Click positions and timestamps (drive the automatic zoom)</th><td>IndexedDB, inside the recording record</td><td>No</td></tr>
+            <tr><th>Subtitles (on-device transcription output)</th><td>IndexedDB, inside the recording record</td><td>No</td></tr>
+            <tr><th>Network requests &amp; console messages (optional QA capture, off by default)</th><td>IndexedDB, separate log store</td><td>No</td></tr>
+            <tr><th>Webcam overlay clip (if enabled)</th><td>IndexedDB, separate store</td><td>No</td></tr>
+            <tr><th>Recording name, subtitle model choice, other preferences</th><td><code>localStorage</code></td><td>No</td></tr>
+            <tr><th>In-progress recording &amp; permission state</th><td><code>chrome.storage.session</code> / <code>chrome.storage.local</code></td><td>No</td></tr>
+            <tr><th>Light/dark theme choice for this website</th><td><code>localStorage</code>, scoped to clickandrecord.tech only</td><td>No</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="not">
+      <h2>What we don't do</h2>
+      <ul class="points">
+        <li><b>No analytics or telemetry.</b> Nothing about how you use the extension is measured, logged, or transmitted anywhere.</li>
+        <li><b>No cookies</b> — on the extension or on this website.</li>
+        <li><b>No account, sign-up, or login.</b> There's no server that identifies you as a user.</li>
+        <li><b>No server-side copy of your recordings.</b> There is no backend that ever receives your video, audio, clicks, or transcripts.</li>
+        <li><b>No third-party requests from this website.</b> Fonts, styles and scripts are all self-hosted; nothing loads from an ad network, analytics provider, or CDN.</li>
+      </ul>
+    </section>
+
+    <section id="transcription">
+      <h2>Transcription happens on your machine</h2>
+      <p>
+        Subtitles are generated by a Whisper speech-to-text model running inside the
+        browser via WebAssembly (ONNX Runtime). The model is configured with remote
+        model loading disabled, so once the model files are cached locally, transcribing
+        a recording involves no network request at all — your audio is never uploaded
+        anywhere, including to us, to generate captions.
+      </p>
+    </section>
+
+    <section id="drive">
+      <h2>Saving to Google Drive (optional)</h2>
+      <p>
+        If you click <b>Save to Drive</b>, Click &amp; Record asks you to sign in with
+        Google and requests the <code>drive.file</code> scope — the narrowest scope
+        Google offers. It only grants access to files the extension itself creates; it
+        cannot see, list, or modify anything else already in your Drive. The upload goes
+        directly from your browser to Google — we don't operate a server in the middle
+        and never see the file ourselves. Once a recording is in your Drive, Google's own
+        privacy policy governs it from there.
+      </p>
+      <p>
+        Click &amp; Record's use and transfer of information received from Google APIs
+        adheres to the
+        <a class="inline" href="https://developers.google.com/terms/api-services-user-data-policy" target="_blank" rel="noopener">Google API Services User Data Policy</a>,
+        including the Limited Use requirements.
+      </p>
+    </section>
+
+    <section id="permissions">
+      <h2>Permissions this extension asks for</h2>
+      <p>Chrome requires every extension to declare, up front, everything it can access. Here's what each one is for.</p>
+      <div class="ledger">
+        <div class="entry"><p class="k">tabCapture</p><p>Captures the tab, window, or screen once you start a recording. Only active while recording.</p></div>
+        <div class="entry"><p class="k">scripting</p><p>Injects the click listener into the page you're recording, so a click can trigger a zoom. Runs only on tabs you're actively recording.</p></div>
+        <div class="entry"><p class="k">webRequest</p><p>Powers the optional network-log feature used for bug reports. Off by default — nothing is read unless you turn on QA capture.</p></div>
+        <div class="entry"><p class="k">storage</p><p>Lets recordings, logs, and preferences persist in the browser instead of memory that disappears when a tab closes.</p></div>
+        <div class="entry"><p class="k">offscreen</p><p>Runs the recording, compositing, and transcription pipeline in a hidden document — Chrome doesn't allow that work directly in the background service worker.</p></div>
+        <div class="entry"><p class="k">identity</p><p>Used only if you click "Save to Drive." Otherwise it's never invoked.</p></div>
+        <div class="entry"><p class="k">Access to all sites</p><p>Required by Chrome for <code>tabCapture</code>, <code>scripting</code>, and <code>webRequest</code> to work on whichever page you choose to record — there's no fixed list, since you can record anything.</p></div>
+      </div>
+    </section>
+
+    <section id="retention">
+      <h2>Retention &amp; deletion</h2>
+      <p>
+        Recordings and logs stay in your browser's local storage until you remove
+        them — by deleting the recording in the editor, clearing the extension's site
+        data in Chrome, or uninstalling the extension. There's no cloud copy for us to
+        separately retain or delete, because we never receive one. If you saved a copy
+        to Google Drive, deleting it there is handled through Drive itself.
+      </p>
+    </section>
+
+    <section id="children">
+      <h2>Children's privacy</h2>
+      <p>
+        Click &amp; Record is not directed at children under 13, and we do not knowingly
+        collect information from them. Since the extension doesn't collect information
+        from anyone in the first place, this is largely academic — but we state it plainly.
+      </p>
+    </section>
+
+    <section id="changes">
+      <h2>Changes to this policy</h2>
+      <p>
+        If this policy changes, we'll update the date at the top of this page. Material
+        changes — anything that changes what's collected or where it goes — will be
+        reflected here before they take effect.
+      </p>
+    </section>
+
+    <section id="contact">
+      <h2>Contact</h2>
+      <p>
+        Questions about this policy or how Click &amp; Record handles data can go to
+        <a class="inline" href="mailto:privacy@clickandrecord.tech">privacy@clickandrecord.tech</a>.
+      </p>
+    </section>
+
+  </div>
+</main>
+
+<footer>
+  <div class="shell">
+    <div class="fcols">
+      <div>
+        <a class="wordmark" href="/"><span class="dotrec" aria-hidden="true"></span> Click&nbsp;&amp;&nbsp;Record</a>
+        <p style="margin-top:14px;max-width:32ch;color:var(--faint)">
+          The screen recorder that pushes in on every click — and can prove what the app was doing.
+        </p>
+      </div>
+      <div><h3>Product</h3><ul>
+        <li><a href="/#zoom">Automatic zoom</a></li>
+        <li><a href="/#subtitles">Subtitles</a></li>
+        <li><a href="/#evidence">Network &amp; console</a></li>
+        <li><a href="/editor/editor.html">Open the editor</a></li>
+      </ul></div>
+      <div><h3>Uses</h3><ul>
+        <li><a href="/#zoom">Product demos</a></li>
+        <li><a href="/#subtitles">Tutorials</a></li>
+        <li><a href="/#evidence">Bug reports</a></li>
+        <li><a href="/editor/editor.html">Support replies</a></li>
+      </ul></div>
+      <div><h3>More</h3><ul>
+        <li><a href="/#compare">Comparison</a></li>
+        <li><a href="/#faq">FAQ</a></li>
+        <li><a href="/privacy">Privacy</a></li>
+        <li><a href="/terms">Terms</a></li>
+      </ul></div>
+    </div>
+    <div class="rule">
+      <span>© 2026 Click &amp; Record</span>
+      <span>Built for people who make demos.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var root = document.documentElement;
+  var btn = document.getElementById('themer');
+  if (!btn) return;
+
+  function sync() {
+    var dark = root.getAttribute('data-theme') === 'dark';
+    btn.setAttribute('aria-pressed', String(dark));
+    btn.setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme');
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', dark ? '#0c0e13' : '#ffffff');
+  }
+
+  btn.addEventListener('click', function () {
+    var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('cr-theme', next); } catch (e) {}
+    sync();
+  });
+
+  sync();
+})();
+</script>
+
+</body>
+</html>
