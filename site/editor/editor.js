@@ -2716,7 +2716,9 @@ document.getElementById('btn-add-video').addEventListener('click', () => {
 document.getElementById('file-input').addEventListener('change', async (e) => {
   const file = e.target.files[0];
   e.target.value = '';
-  if (file) await addVideoFile(file);
+  // Shared by "Choose a video…" (nothing loaded yet) and "Add clip" (something
+  // already is) — same distinction the drop handler below makes.
+  if (file) await addVideoFile(file, { primary: !isLoaded() });
 });
 
 // Turns a file into a source on the timeline. Shared by "Add clip" and by the
