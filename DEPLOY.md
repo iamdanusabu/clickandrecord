@@ -58,7 +58,7 @@ Three GitHub-specific facts, all already handled but worth knowing:
   transcription is the Fast model; Accurate remains available in a bundled build.
 - The Fast decoder is 54 MB, which is over GitHub's 50 MB *warning* threshold — the
   push prints a complaint but succeeds.
-- `site/CNAME` contains `clickandrecord.com`, which is how Pages binds the custom
+- `site/CNAME` contains `clickandrecord.tech`, which is how Pages binds the custom
   domain. **The site must be served at a domain root** (custom domain or
   `username.github.io`), because `index.html` uses root-relative asset paths — as a
   project page under `/repo-name/` the fonts would 404.
@@ -82,7 +82,7 @@ Three ways, in increasing order of effort:
    `site/editor/editor.js`:
 
    ```js
-   const MODEL_BASE_URL = 'https://models.clickandrecord.com/';  // trailing slash
+   const MODEL_BASE_URL = 'https://models.clickandrecord.tech/';  // trailing slash
    ```
 
    The availability probe and the worker both use it, so "Accurate" reappears the

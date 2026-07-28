@@ -26,9 +26,9 @@ const COUNTDOWN_MS = 3000;
 // Change this to your deployed domain when you have one; the origin must also be
 // added to the manifest's web_accessible_resources matches AND to
 // ALLOWED_PARENT_ORIGINS in bridge.js. Override at runtime without editing code:
-//   chrome.storage.local.set({ editorBaseUrl: 'https://editor.example.com' })
+//   chrome.storage.local.set({ editorBaseUrl: 'http://localhost:3000' })   // local dev
 // Set it to '' to fall back to the copy bundled inside the extension.
-const DEFAULT_EDITOR_BASE_URL = 'http://localhost:3000';
+const DEFAULT_EDITOR_BASE_URL = 'https://clickandrecord.tech';
 
 async function buildEditorUrl(sessionId) {
   // No session is legitimate: the editor also opens on its own, so you can drop in

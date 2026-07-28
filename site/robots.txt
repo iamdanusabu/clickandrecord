@@ -1,4 +1,4 @@
-# https://clickandrecord.com/robots.txt
+# https://clickandrecord.tech/robots.txt
 # Everything is public — there is nothing here worth hiding from a crawler, and a
 # needlessly restrictive robots.txt is a common own-goal.
 
@@ -58,4 +58,4 @@ Allow: /
 User-agent: CCBot
 Allow: /
 
-Sitemap: https://clickandrecord.com/sitemap.xml
+Sitemap: https://clickandrecord.tech/sitemap.xml

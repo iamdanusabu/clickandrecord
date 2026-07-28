@@ -16,13 +16,17 @@ The repo is live at **https://github.com/iamdanusabu/clickandrecord** (owner acc
 `iamdanusabu`; note the machine also holds a credential for a second account,
 `danusabu25`, which caused one 403 before the owner signed in). In order:
 
-1. **Vercel**: import the repo → **Root Directory = `site`** → Framework *Other*, no
-   build command → Deploy → Domains → `clickandrecord.com` + `www`. Then sanity-check:
-   `/` (Archivo loads), `/editor/editor.html` (drop zone), `/editor/editor.html?session=test`
-   (must say "Recording not found" **without losing the query string**), and the
-   Subtitles panel offering **Fast only** (the probe hiding the un-pushed Accurate model).
-2. **After the deploy is live**: set `DEFAULT_EDITOR_BASE_URL = 'https://clickandrecord.com'`
-   in `extension/background.js`, commit, push. Allowlists already permit the domain.
+1. ~~Vercel~~ **Done 2026-07-28: live at `https://clickandrecord.tech`** (note: `.tech`,
+   not `.com` — every domain reference in the repo was swept accordingly). Verified by
+   HTTP: `/`, `/editor/editor.html`, query-string survival, Fast model serving, and the
+   Accurate model 404ing for the probe to hide. **Open:** `www.clickandrecord.tech` has
+   no certificate — either add the `www` domain in Vercel → Settings → Domains
+   (redirecting to the apex) or drop `www` from the bridge/manifest allowlists.
+   Still unseen: fonts and rendering, which HTTP checks can't cover.
+2. ~~Editor base URL~~ **Done**: `DEFAULT_EDITOR_BASE_URL = 'https://clickandrecord.tech'`.
+   Local dev now overrides back via
+   `chrome.storage.local.set({ editorBaseUrl: 'http://localhost:3000' })`.
+   **Reload the unpacked extension** to pick up the manifest/background changes.
 3. **Drive OAuth**: add redirect URI for the current dev extension ID (see Environment
    notes) in Google Cloud Console, or Save-to-Drive fails with `redirect_uri_mismatch`.
 4. **Landing-page placeholders** still open: Chrome Web Store URL (both CTAs are

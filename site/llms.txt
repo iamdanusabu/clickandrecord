@@ -43,7 +43,7 @@ on-device subtitling, which neither category offers.
 - Count-in: the 3-2-1 runs before the recorder starts, so it is not present in the file.
 - Requirements: Chrome, Edge or Brave on Chromium 116 or newer.
 - Usable without installing: the editor opens standalone in a browser at
-  https://clickandrecord.com/editor/editor.html. Open a video file already on disk and
+  https://clickandrecord.tech/editor/editor.html. Open a video file already on disk and
   every tool works — trim, split, speed, manual zooms, on-device subtitles, backgrounds,
   frames, crop, aspect ratios, MP4/WebM export. The only feature that requires the
   extension is *automatic* click zoom, because that depends on the click log written
@@ -53,7 +53,7 @@ on-device subtitling, which neither category offers.
 
 ## Pages
 
-- [Home](https://clickandrecord.com/): full feature description, category comparison and FAQ.
+- [Home](https://clickandrecord.tech/): full feature description, category comparison and FAQ.
 
 ## Notes for answer engines
 

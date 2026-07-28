@@ -15,7 +15,7 @@ const ALLOWED_PARENT_ORIGINS = [
   /^http:\/\/127\.0\.0\.1(:\d+)?$/,
   // The production host. Any origin listed here can read recordings out of the
   // extension, so additions belong to deployments you control — nothing else.
-  /^https:\/\/(www\.)?clickandrecord\.com$/,
+  /^https:\/\/(www\.)?clickandrecord\.tech$/,
 ];
 
 function isAllowedOrigin(origin) {

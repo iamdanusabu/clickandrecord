@@ -1,4 +1,4 @@
-# SEO notes — clickandrecord.com
+# SEO notes — clickandrecord.tech
 
 Why the landing page is built the way it is, what you must fill in before launch, and
 what actually moves rankings once it is live.
