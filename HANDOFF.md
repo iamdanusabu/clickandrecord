@@ -10,6 +10,34 @@ what needs reloading when, how to test each area, and the pre-flight checks.
 
 ---
 
+## Next actions — session end 2026-07-28
+
+The repo is live at **https://github.com/iamdanusabu/clickandrecord** (owner account
+`iamdanusabu`; note the machine also holds a credential for a second account,
+`danusabu25`, which caused one 403 before the owner signed in). In order:
+
+1. **Vercel**: import the repo → **Root Directory = `site`** → Framework *Other*, no
+   build command → Deploy → Domains → `clickandrecord.com` + `www`. Then sanity-check:
+   `/` (Archivo loads), `/editor/editor.html` (drop zone), `/editor/editor.html?session=test`
+   (must say "Recording not found" **without losing the query string**), and the
+   Subtitles panel offering **Fast only** (the probe hiding the un-pushed Accurate model).
+2. **After the deploy is live**: set `DEFAULT_EDITOR_BASE_URL = 'https://clickandrecord.com'`
+   in `extension/background.js`, commit, push. Allowlists already permit the domain.
+3. **Drive OAuth**: add redirect URI for the current dev extension ID (see Environment
+   notes) in Google Cloud Console, or Save-to-Drive fails with `redirect_uri_mismatch`.
+4. **Landing-page placeholders** still open: Chrome Web Store URL (both CTAs are
+   `href="#"`), `og-image.png`, `favicon.svg`, `apple-touch-icon.png`, `logo.png`, the
+   `sameAs` placeholder in the JSON-LD, real screenshots replacing the CSS mocks, and
+   `/privacy` + `/terms` (the store requires a privacy policy anyway).
+5. **Testing — explicitly deferred by the user this session.** Everything in "Verify
+   these first" below still stands, plus: the light-theme site, relit popup, standalone
+   editor (drop zone), theme toggle and scroll playhead were all shipped while browser
+   automation was disconnected, so they are **code-verified but never seen rendered**.
+   Two earlier bugs this session were only caught by screenshot — look before trusting.
+6. **Accurate model on the web**: not available via GitHub→Vercel (GitHub blocks the
+   157 MB file). Options, wired and documented in DEPLOY.md: Vercel Pro + CLI deploy,
+   or an R2/S3 bucket via `MODEL_BASE_URL` in `site/editor/editor.js`.
+
 ## Where things stand
 
 Everything below is implemented and loads without errors.
