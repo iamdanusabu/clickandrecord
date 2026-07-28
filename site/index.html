@@ -213,7 +213,7 @@ section{padding:clamp(72px,9vw,124px) 0;border-bottom:1px solid var(--edge)}
 
 /* ═══ BUTTONS ════════════════════════════════════════════════════════════════ */
 .btn{
-  display:inline-flex;align-items:center;justify-content:center;gap:9px;
+  display:inline-flex;align-items:center;justify-content:center;gap:9px;white-space:nowrap;
   font-family:var(--body);font-size:.95rem;font-weight:600;letter-spacing:-.01em;
   padding:13px 22px;border-radius:7px;border:1px solid transparent;cursor:pointer;
   transition:background .16s ease,border-color .16s ease,color .16s ease,transform .16s ease;
@@ -242,7 +242,17 @@ section{padding:clamp(72px,9vw,124px) 0;border-bottom:1px solid var(--edge)}
 .themer .ico-sun{display:none}
 :root[data-theme="dark"] .themer .ico-moon{display:none}
 :root[data-theme="dark"] .themer .ico-sun{display:block}
-@media(max-width:900px){.mast nav a:not(.btn){display:none}}
+@media(max-width:900px){
+  .mast nav a:not(.btn){display:none}
+  .mast .shell{gap:10px}
+  .mast nav{gap:10px}
+  .mast .btn{padding:8px 13px;font-size:.8rem;gap:6px}
+  .wordmark{gap:8px}
+}
+@media(max-width:400px){
+  .wordmark{font-size:.92rem}
+  .mast .btn{padding:8px 11px;font-size:.75rem}
+}
 
 /* ═══ HERO ═══════════════════════════════════════════════════════════════════ */
 .hero{padding-top:clamp(56px,7vw,92px);padding-bottom:0;border-bottom:none}
