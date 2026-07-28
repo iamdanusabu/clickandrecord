@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Update <lastmod> whenever the page content meaningfully changes. Leaving a stale
+  date is worse than omitting it: Google learns to distrust the signal.
+  Add a <url> block for each page as the site grows (/vs-cursorful, /blog/..., etc).
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://clickandrecord.com/</loc>
+    <lastmod>2026-07-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>

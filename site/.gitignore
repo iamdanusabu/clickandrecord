@@ -1,0 +1,16 @@
+# The "Accurate" speech model cannot be hosted from GitHub at all: GitHub rejects
+# any file over 100 MB outright (this decoder is 157 MB), and GitHub Pages cannot
+# serve Git LFS content — LFS-tracked files come back as tiny pointer files, which
+# would break transcription far more confusingly than absence does.
+#
+# The editor probes for each model at startup and simply doesn't offer "Accurate"
+# when the files are missing, so pushing without this folder degrades cleanly to
+# the Fast model. To offer Accurate on the web, host this folder on infrastructure
+# without a per-file limit and delete this rule.
+#
+# (The Fast model's 54 MB decoder is over GitHub's 50 MB *warning* threshold — the
+# push prints a complaint but succeeds.)
+vendor/models/whisper-small.en-timestamped/
+
+node_modules/
+.vercel/

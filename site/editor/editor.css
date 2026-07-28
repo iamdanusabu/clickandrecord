@@ -1,0 +1,1325 @@
+/* Click & Record — editor UI.
+   Light, minimal, three regions: top bar, centre stage (preview → transport →
+   timeline), right rail of tabbed styling controls.
+
+   Class names here are load-bearing: editor.js builds clips, swatches, segmented
+   options, subtitle rows and the QA rows in JS with these exact classes, so
+   renaming one silently unstyles a feature. */
+
+/* Inter, vendored under /fonts rather than fetched from a CDN — see fonts/README.md.
+   One variable file per subset covers the whole 400–700 range. */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('../fonts/inter-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('../fonts/inter-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+:root {
+  --font-ui: 'Inter', 'Segoe UI Variable Text', 'Segoe UI', -apple-system, Roboto, sans-serif;
+  --font-mono: ui-monospace, 'Cascadia Code', 'SF Mono', Consolas, monospace;
+
+  --bg: #f4f5f8;
+  --panel: #ffffff;
+  --panel-2: #f7f8fa;
+  --surface: #eceef3;
+  --border: #e5e7ee;
+  --border-soft: #d8dbe4;
+  --text: #14161c;
+  --text-dim: #5c6371;
+  --text-faint: #8d939f;
+
+  --accent: #5b5bd6;
+  --accent-hover: #4f4fc4;
+  --accent-soft: #eeeefc;
+  --accent-line: #c8c8f2;
+
+  --rec: #e5484d;
+  --amber: #e08c00;
+  --amber-soft: rgba(240, 169, 42, 0.22);
+  --amber-line: rgba(200, 130, 0, 0.55);
+  --green: #17936b;
+
+  --radius: 12px;
+  --radius-sm: 9px;
+  --radius-xs: 6px;
+
+  --shadow-sm: 0 1px 2px rgba(20, 22, 28, 0.05);
+  --shadow-md: 0 2px 8px rgba(20, 22, 28, 0.07), 0 1px 2px rgba(20, 22, 28, 0.05);
+  --shadow-lg: 0 12px 32px rgba(20, 22, 28, 0.12), 0 2px 6px rgba(20, 22, 28, 0.06);
+
+  --rail-w: 340px;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  /* Inter is drawn a touch wide for UI sizes; the negative tracking is what makes it
+     read like an app rather than a document. Applied once here so every panel
+     inherits it. */
+  letter-spacing: -0.006em;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.hidden { display: none !important; }
+/* editor.js hides #webcam-row and #trim-bars-wrap with the `hidden` attribute, and
+   the UA's `[hidden] { display: none }` loses to any author `display` rule — which
+   these both pick up as flex containers. Make the attribute win. */
+[hidden] { display: none !important; }
+
+/* Thin, quiet scrollbars — the panels scroll a lot and chunky bars dominate a
+   light UI. */
+* { scrollbar-width: thin; scrollbar-color: #cdd1da transparent; }
+*::-webkit-scrollbar { width: 9px; height: 9px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb { background: #cdd1da; border-radius: 999px; border: 2px solid transparent; background-clip: content-box; }
+*::-webkit-scrollbar-thumb:hover { background: #b6bbc7; background-clip: content-box; }
+
+/* ============================== app shell ============================== */
+
+.app { height: 100%; display: flex; flex-direction: column; }
+
+.topbar {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  height: 56px;
+  padding: 0 18px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  z-index: 10;
+}
+.brand { display: flex; align-items: center; gap: 9px; min-width: 0; flex: 1 1 auto; }
+
+/* Reads as a title until you interact with it, then reveals itself as a field. A visible
+   input box sitting in the top bar would compete with the video for attention; a title
+   that gives no hint it's editable would never get clicked. */
+.recording-name {
+  flex: 0 1 420px;
+  min-width: 0;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-xs);
+  padding: 5px 8px;
+  margin-left: -8px; /* keeps the text optically aligned with the logo dot */
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 650;
+  letter-spacing: -0.012em;
+  color: var(--text);
+  text-overflow: ellipsis;
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+.recording-name::placeholder { color: var(--text-faint); font-weight: 600; }
+.recording-name:hover { background: var(--panel-2); border-color: var(--border); }
+.recording-name:focus {
+  outline: none;
+  background: var(--panel);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+  text-overflow: clip;
+}
+.logo-dot {
+  width: 11px; height: 11px;
+  border-radius: 50%;
+  background: var(--rec);
+  box-shadow: 0 0 0 3px rgba(229, 72, 77, 0.14);
+}
+.topbar-right { display: flex; align-items: center; gap: 10px; }
+/* This is the editor's primary error surface (window.onerror routes here), so it
+   wraps to a second line rather than ellipsising a message away. */
+.status-text {
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--text-dim);
+  max-width: 420px;
+  text-align: right;
+}
+
+/* Grid, not flex: the rail is a fixed width and the stage takes the rest without
+   ever being pushed past the viewport by a wide timeline. */
+.workspace {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--rail-w);
+}
+
+.stage-col {
+  min-width: 0;
+  overflow-y: auto;
+  padding: 18px 22px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ============================== buttons ============================== */
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: inherit;
+  transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease, box-shadow 0.12s ease;
+}
+button:disabled { cursor: default; }
+button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+.primary {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: var(--accent);
+  color: #fff;
+  padding: 9px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: var(--shadow-sm);
+}
+.primary:hover { background: var(--accent-hover); }
+
+.secondary {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: var(--panel);
+  color: var(--text);
+  padding: 8px 13px;
+  font-size: 13px;
+  font-weight: 600;
+  border: 1px solid var(--border-soft);
+}
+.secondary:hover { background: var(--panel-2); border-color: #c7ccd8; }
+
+.ghost {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--panel);
+  color: var(--text-dim);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-xs);
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.ghost:hover { background: var(--panel-2); color: var(--text); border-color: #c7ccd8; }
+.ghost.active {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-color: var(--accent-line);
+}
+.ghost.wide { width: 100%; justify-content: center; }
+.ghost svg { flex-shrink: 0; }
+
+.danger-ghost { color: #c2373b; border-color: #f0cdce; }
+.danger-ghost:hover { background: #fdf1f1; color: #ad2f33; border-color: #e4b4b6; }
+
+.round-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  box-shadow: var(--shadow-sm);
+  flex-shrink: 0;
+}
+.round-btn:hover { background: var(--accent-hover); }
+
+/* ============================== empty state ============================== */
+
+/* Until a video exists there is nothing to preview, scrub or trim, so the stage
+   collapses to a single invitation rather than showing three empty chrome panels. */
+.dropzone { display: none; }
+body.no-video .dropzone { display: flex; }
+body.no-video .preview-wrap,
+body.no-video .transport,
+body.no-video .timeline-panel,
+body.no-video .clip-panel,
+body.no-video .tip { display: none !important; }
+
+.dropzone {
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  border: 1.5px dashed var(--border-soft);
+  border-radius: var(--radius);
+  background: var(--panel);
+  transition: border-color 0.16s ease, background 0.16s ease;
+}
+/* Applied while a file is over the window, so the target is obvious before the drop. */
+body.dragging .dropzone { border-color: var(--accent); background: var(--accent-soft); }
+
+.dz-card { text-align: center; max-width: 46ch; padding: 32px 28px; }
+.dz-card svg { color: var(--text-faint); margin: 0 auto 18px; }
+body.dragging .dz-card svg { color: var(--accent); }
+.dz-card h2 { margin: 0 0 8px; font-size: 19px; font-weight: 650; letter-spacing: -0.02em; }
+.dz-card p { margin: 0 0 20px; font-size: 13px; color: var(--text-dim); line-height: 1.6; }
+.dz-card .primary { padding: 10px 20px; font-size: 13.5px; }
+.dz-hint { margin: 14px 0 0 !important; font-size: 12px; color: var(--text-faint); }
+
+/* ============================== preview ============================== */
+
+.preview-wrap {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+}
+/* Wraps the canvas tightly so overlays can be absolutely positioned against it. */
+.preview-stage {
+  position: relative;
+  line-height: 0;
+  max-width: 100%;
+  /* Not clipped: the zoom crosshair must stay whole when it targets an edge. */
+  overflow: visible;
+}
+#preview-canvas {
+  display: block;
+  /* Both constraints together keep the aspect ratio and fit the frame in the
+     column whatever the output ratio is — 9:16 included. */
+  max-width: 100%;
+  max-height: 46vh;
+  width: auto;
+  height: auto;
+  background: #0e1014;
+  border-radius: 12px;
+  box-shadow: var(--shadow-lg);
+}
+#preview-canvas.grabbing { cursor: grabbing; }
+
+.crop-clip {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 12px;
+  pointer-events: none; /* handles opt back in */
+}
+
+.transport {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+#time-label {
+  font-size: 12px;
+  color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+}
+
+/* Zoom target crosshair over the preview. Absolute inside .preview-stage — with
+   position:fixed it drifted away from the video as soon as the page scrolled. */
+.zoom-target {
+  position: absolute;
+  width: 26px; height: 26px;
+  margin: -13px 0 0 -13px;
+  border: 2px solid #ffd23f;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.4), 0 0 10px rgba(255, 210, 63, 0.6);
+  cursor: grab;
+  z-index: 40;
+  visibility: hidden;
+}
+.zoom-target.visible { visibility: visible; }
+.zoom-target::before,
+.zoom-target::after { content: ''; position: absolute; background: #ffd23f; }
+.zoom-target::before { left: 50%; top: 4px; bottom: 4px; width: 1px; margin-left: -0.5px; }
+.zoom-target::after { top: 50%; left: 4px; right: 4px; height: 1px; margin-top: -0.5px; }
+.zoom-target:active { cursor: grabbing; }
+
+.crop-overlay {
+  position: absolute;
+  z-index: 39;
+  visibility: hidden;
+  box-shadow: 0 0 0 9999px rgba(10, 12, 16, 0.5);
+  outline: 1px solid rgba(255, 255, 255, 0.95);
+}
+.crop-overlay.visible { visibility: visible; }
+.crop-handle {
+  position: absolute;
+  background: #fff;
+  border-radius: 3px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35);
+  pointer-events: auto; /* .crop-clip disables pointer events for its subtree */
+}
+.crop-handle.top, .crop-handle.bottom {
+  left: 50%; margin-left: -18px;
+  width: 36px; height: 6px;
+  cursor: ns-resize;
+}
+.crop-handle.top { top: -3px; }
+.crop-handle.bottom { bottom: -3px; }
+.crop-handle.left, .crop-handle.right {
+  top: 50%; margin-top: -18px;
+  width: 6px; height: 36px;
+  cursor: ew-resize;
+}
+.crop-handle.left { left: -3px; }
+.crop-handle.right { right: -3px; }
+
+/* ============================== timeline ============================== */
+
+.timeline-panel {
+  flex: 0 0 auto;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 14px 14px;
+  box-shadow: var(--shadow-sm);
+}
+
+.timeline-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.toolbar-spacer { flex: 1 1 auto; }
+.toolbar-sep { width: 1px; height: 18px; background: var(--border); margin: 0 3px; }
+.toolbar-label {
+  font-size: 11px;
+  font-weight: 650;
+  color: var(--text-faint);
+  letter-spacing: 0.01em;
+}
+
+/* Clips are sized in percentages so the track always fits — nothing here needs to
+   scroll. Hidden rather than auto because playhead decorations (the triangle head,
+   the drag target) sit slightly outside the line and would otherwise poke past the
+   right edge and summon a phantom scrollbar when the playhead is at the end. */
+.timeline-scroll { overflow: hidden; }
+.timeline-body { position: relative; width: 100%; }
+
+/* ---------- ruler ---------- */
+
+.ruler {
+  position: relative;
+  height: 18px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 8px;
+  cursor: ew-resize;
+  /* Absolutely-positioned ticks near the right edge would otherwise widen
+     scrollWidth and force a phantom horizontal scrollbar. */
+  overflow: hidden;
+}
+.ruler-tick {
+  position: absolute;
+  bottom: 3px;
+  padding-left: 4px;
+  font-size: 10px;
+  color: var(--text-faint);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  border-left: 1px solid var(--border-soft);
+  line-height: 1;
+}
+/* The last label would hang off the end; put it to the left of its tick. */
+.ruler-tick.flip {
+  padding-left: 0;
+  padding-right: 4px;
+  transform: translateX(-100%);
+  border-left: none;
+  border-right: 1px solid var(--border-soft);
+}
+.ruler-tick.minor {
+  bottom: 0;
+  height: 5px;
+  padding: 0;
+  border-left-color: #eceef3;
+}
+
+/* ---------- track ---------- */
+
+.timeline-track {
+  position: relative;
+  display: flex;
+  height: 78px;
+  width: 100%;
+}
+
+.clip {
+  position: relative;
+  height: 100%;
+  min-width: 20px;
+  border-radius: 7px;
+}
+/* The visual gap between clips comes from insetting the body, not from a flex
+   `gap` — the clips' flex-basis percentages already sum to 100%, so any gap
+   would push the track wider than its container and force a scrollbar. */
+.clip-body {
+  position: absolute;
+  inset: 0 1.5px;
+  overflow: hidden;
+  border-radius: 7px;
+  display: flex;
+  flex-direction: column;
+  background: var(--panel-2);
+  border: 1px solid var(--border-soft);
+  transition: border-color 0.12s ease, box-shadow 0.12s ease;
+}
+.clip:hover .clip-body { border-color: #c3c8d4; }
+.clip.selected .clip-body {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+.clip-lane { position: relative; overflow: hidden; }
+/* Video takes the larger share; audio is a slim lane beneath it. */
+.clip-lane-video { flex: 1 1 auto; min-height: 0; }
+.clip-lane-audio {
+  flex: 0 0 24px;
+  background: #eef0f5;
+  border-top: 1px solid var(--border);
+}
+.clip-thumbs, .clip-waveform {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.clip-label {
+  position: absolute;
+  top: 5px; left: 6px;
+  font-size: 10px;
+  font-weight: 650;
+  color: #fff;
+  background: rgba(16, 18, 24, 0.62);
+  padding: 2px 6px;
+  border-radius: 4px;
+  z-index: 4;
+  pointer-events: none;
+  white-space: nowrap;
+  max-width: calc(100% - 36px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.clip-speed {
+  position: absolute;
+  bottom: 30px; left: 6px; /* sits above the audio lane */
+  font-size: 10px;
+  font-weight: 700;
+  color: #3b2a00;
+  background: #ffd23f;
+  padding: 1px 5px;
+  border-radius: 4px;
+  z-index: 4;
+  pointer-events: none;
+}
+.clip-remove {
+  position: absolute;
+  top: 5px; right: 5px;
+  width: 18px; height: 18px;
+  border-radius: 5px;
+  background: rgba(16, 18, 24, 0.62);
+  color: #fff;
+  font-size: 11px;
+  line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 5;
+  opacity: 0;
+  transition: opacity 0.12s ease, background 0.12s ease;
+}
+.clip:hover .clip-remove, .clip.selected .clip-remove { opacity: 1; }
+.clip-remove:hover { background: var(--rec); }
+
+/* Trim grips: hidden until the clip is hovered or selected, so they read as
+   handles rather than as scrollbar arrows sitting in the timeline. */
+.trim-handle {
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 12px;
+  cursor: ew-resize;
+  z-index: 6;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+}
+.clip:hover .trim-handle, .clip.selected .trim-handle, .trim-handle.dragging { opacity: 1; }
+.trim-handle::before {
+  content: '';
+  position: absolute;
+  top: 6px; bottom: 6px;
+  left: 3px;
+  width: 6px;
+  border-radius: 3px;
+  background: #fff;
+  box-shadow: 0 0 0 1px rgba(20, 22, 28, 0.28), var(--shadow-sm);
+}
+.trim-handle:hover::before, .trim-handle.dragging::before { background: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+.trim-handle.left { left: 0; }
+.trim-handle.right { right: 0; }
+
+/* ---------- zoom / marker lane ---------- */
+
+.zoom-lane {
+  position: relative;
+  height: 20px;
+  margin-top: 6px;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  overflow: hidden; /* same reason as the ruler */
+}
+.zoom-bar {
+  position: absolute;
+  top: 3px; bottom: 3px;
+  background: var(--amber-soft);
+  border: 1px solid var(--amber-line);
+  border-radius: 3px;
+  cursor: pointer;
+  z-index: 2;
+}
+.zoom-bar:hover { background: rgba(240, 169, 42, 0.36); }
+.zoom-bar.manual {
+  background: rgba(91, 91, 214, 0.16);
+  border-color: rgba(91, 91, 214, 0.55);
+}
+.zoom-bar.manual:hover { background: rgba(91, 91, 214, 0.26); }
+.zoom-bar.selected { box-shadow: 0 0 0 2px var(--accent); }
+
+.click-dot {
+  position: absolute;
+  top: 50%;
+  width: 8px; height: 8px;
+  margin-left: -4px; margin-top: -4px;
+  border-radius: 50%;
+  background: #b3b8c4;
+  cursor: pointer;
+  z-index: 3;
+  transition: background 0.12s ease, box-shadow 0.12s ease;
+}
+.click-dot:hover { background: #8d939f; }
+.click-dot.active {
+  background: #f0a92a;
+  box-shadow: 0 0 0 2px rgba(240, 169, 42, 0.3);
+}
+
+.caption-lane {
+  position: relative;
+  height: 13px;
+  margin-top: 5px;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.caption-bar {
+  position: absolute;
+  top: 2px; bottom: 2px;
+  background: rgba(23, 147, 107, 0.22);
+  border: 1px solid rgba(23, 147, 107, 0.5);
+  border-radius: 2px;
+  cursor: pointer;
+}
+.caption-bar:hover { background: rgba(23, 147, 107, 0.36); }
+
+/* ---------- playhead ---------- */
+
+.playhead {
+  position: absolute;
+  top: 12px;
+  bottom: 0;
+  width: 1.5px;
+  background: var(--rec);
+  z-index: 8;
+  pointer-events: none; /* the grab handle below opts back in */
+  visibility: hidden;
+}
+.playhead.visible { visibility: visible; }
+.playhead::before {
+  content: '';
+  position: absolute;
+  top: -6px; left: 50%;
+  transform: translateX(-50%);
+  width: 0; height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 7px solid var(--rec);
+}
+/* A wide invisible target, since a 1px line is impossible to grab. */
+.playhead-grab {
+  position: absolute;
+  top: -8px;
+  bottom: 0;
+  left: -7px;
+  width: 15px;
+  cursor: ew-resize;
+  pointer-events: auto;
+}
+/* Keep the cursor and prevent text selection anywhere on the page mid-drag. */
+body.scrubbing, body.scrubbing * { cursor: ew-resize !important; user-select: none; }
+
+.drag-tooltip {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #16181d;
+  color: #fff;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  padding: 3px 7px;
+  border-radius: 5px;
+  white-space: nowrap;
+  z-index: 9;
+  pointer-events: none;
+}
+
+.hover-preview {
+  position: fixed;
+  z-index: 50;
+  pointer-events: none;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 5px;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.08s ease;
+}
+.hover-preview.visible { visibility: visible; opacity: 1; }
+.hover-preview canvas { border-radius: 5px; display: block; background: #0e1014; }
+.hover-preview span { font-size: 11px; color: var(--text-dim); font-variant-numeric: tabular-nums; }
+
+/* ---------- contextual panels under the timeline ---------- */
+
+/* Injected by editor.js immediately after .timeline-panel when a zoom is selected. */
+.zoom-settings {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  color: var(--text-dim);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-line);
+  border-radius: var(--radius-sm);
+  padding: 9px 13px;
+}
+.zoom-settings label { display: flex; align-items: center; gap: 7px; }
+.zoom-settings input[type=range] { width: 110px; accent-color: var(--accent); }
+.zoom-settings .kf-val { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; min-width: 34px; }
+.zoom-settings .del-kf {
+  margin-left: auto;
+  background: transparent;
+  color: #c2373b;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 8px;
+}
+.zoom-settings .del-kf:hover { background: rgba(194, 55, 59, 0.09); }
+
+.clip-panel {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 9px 13px;
+  font-size: 12px;
+  color: var(--text-dim);
+  box-shadow: var(--shadow-sm);
+}
+.clip-panel-name { font-weight: 650; color: var(--text); }
+.clip-panel-time { color: var(--text-faint); font-variant-numeric: tabular-nums; }
+.clip-panel-cam { color: var(--text-dim); }
+.clip-panel-cam input { accent-color: var(--accent); width: 14px; height: 14px; }
+.clip-panel-speeds { display: flex; gap: 4px; margin-left: auto; }
+.clip-panel-speeds .speed-opt { padding: 4px 9px; font-size: 11px; }
+
+.tip {
+  flex: 0 0 auto;
+  margin: 0;
+  font-size: 11.5px;
+  color: var(--text-faint);
+  line-height: 1.5;
+}
+
+/* ============================== right rail ============================== */
+
+.rail {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--panel);
+  border-left: 1px solid var(--border);
+}
+
+.rail-tabs {
+  flex: 0 0 auto;
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  padding: 0 4px;
+}
+.rail-tab {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 2px 8px;
+  background: transparent;
+  border-radius: 0;
+  border-bottom: 2px solid transparent;
+  color: var(--text-faint);
+  position: relative;
+}
+.rail-tab span {
+  font-size: 9.5px;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+.rail-tab:hover:not(:disabled) { color: var(--text); }
+.rail-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.rail-tab:disabled, .rail-tab.unavailable { color: #c2c6d0; }
+/* Data arriving in a tab nobody's looking at gets a dot rather than stealing focus. */
+.rail-tab.has-data::after {
+  content: '';
+  position: absolute;
+  top: 8px; right: 50%;
+  margin-right: -13px;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.rail-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 16px 16px 26px;
+}
+/* Display for .rail-page is set with the field rhythm further down, so the active
+   page is a gapped flex column rather than a plain block. */
+
+.rail-empty {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--text-faint);
+}
+.rail-empty strong { color: var(--text-dim); font-weight: 600; }
+
+/* ---------- rail fields ---------- */
+
+/* Vertical rhythm comes from `gap`, never from margins on the children.
+   Two reasons it has to be this way: a wrapped segmented control has no bottom
+   margin of its own, so the control below it ended up flush against the second row
+   (zero pixels between "Browser · Windows" and "Light chrome"); and a child hidden
+   with `[hidden]` — #trim-bars-wrap, #webcam-row — collapses out of a gapped stack
+   cleanly instead of leaving its neighbour's margin behind. */
+.rail-page { display: flex; flex-direction: column; gap: 24px; }
+.rail-page:not(.active) { display: none; }
+.field-group,
+.subs-head,
+.debug-head {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: stretch;
+}
+.field-title {
+  margin: 0;
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-faint);
+}
+/* A sub-label belongs to the control under it, so it sits closer to that than to
+   whatever is above — the group gap minus this is the visual pairing. */
+.field-sub {
+  margin: 4px 0 -4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-dim);
+}
+.field {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+.field-label { flex: 0 0 52px; }
+.field input[type=range] { flex: 1 1 auto; min-width: 0; accent-color: var(--accent); }
+.kf-val {
+  flex: 0 0 38px;
+  text-align: right;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-faint);
+}
+.field-actions { display: flex; gap: 6px; flex-wrap: wrap; margin: 0; }
+.field-actions .ghost { flex: 1 1 auto; justify-content: center; }
+.field-hint { margin: 0; font-size: 11px; line-height: 1.55; color: var(--text-faint); }
+.field-hint strong { color: var(--text-dim); font-weight: 600; }
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-dim);
+  cursor: pointer;
+}
+.check input[type=checkbox] { accent-color: var(--accent); width: 14px; height: 14px; margin: 0; cursor: pointer; }
+.check-row { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; margin: 0; }
+
+/* Segmented control. editor.js emits `frame-option ghost` for every one of these
+   groups: window frames, webcam corners/shapes, aspect ratios, subtitle
+   styles/positions. Options grow to fill their row, so a group never leaves a ragged
+   gap of dead space at the end of a line. */
+.frame-options {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+.frame-option {
+  flex: 1 1 auto;
+  justify-content: center;
+  padding: 5px 10px;
+  font-size: 11.5px;
+  font-weight: 600;
+  border-radius: var(--radius-xs);
+  white-space: nowrap;
+}
+/* Four options, two of them long enough to wrap on their own — an explicit 2×2 grid
+   beats letting them flow into 3-then-1. */
+#frame-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+.frame-option.active {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-color: var(--accent-line);
+}
+
+.swatches { display: flex; gap: 7px; flex-wrap: wrap; }
+.swatch {
+  width: 30px; height: 30px;
+  border-radius: 8px;
+  border: 1px solid rgba(20, 22, 28, 0.12);
+  padding: 0;
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.swatch:hover { transform: scale(1.07); }
+.swatch.active { box-shadow: 0 0 0 2px var(--panel), 0 0 0 4px var(--accent); }
+
+.url-label { display: block; }
+.frame-url-input {
+  width: 100%;
+  background: var(--panel);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-xs);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 12px;
+  padding: 7px 9px;
+}
+.frame-url-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+
+.colour {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+.colour input[type=color] {
+  width: 28px; height: 24px;
+  padding: 0;
+  border: 1px solid var(--border-soft);
+  border-radius: 5px;
+  background: none;
+  cursor: pointer;
+}
+
+/* ============================== subtitles ============================== */
+
+/* The subtitles page is one gapped column like the others: the panel, its head and
+   the cue list all inherit the same rhythm. */
+.subs-panel { display: flex; flex-direction: column; gap: 14px; font-size: 12px; }
+.subs-head input[type=range] { accent-color: var(--accent); }
+
+.subs-hint { margin: 0; font-size: 11px; color: var(--text-faint); line-height: 1.55; }
+
+.subs-progress {
+  padding: 10px 11px;
+  font-size: 11px;
+  color: var(--text-dim);
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+.subs-progress-top { display: flex; align-items: center; gap: 8px; }
+#sub-progress-label { color: var(--text); font-weight: 650; font-size: 12px; }
+.subs-detail { color: var(--text-faint); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.subs-elapsed { margin-left: auto; font-variant-numeric: tabular-nums; color: var(--text-faint); }
+.subs-note { margin: 8px 0 0; font-size: 10px; color: var(--text-faint); line-height: 1.5; }
+
+/* Always-spinning, so it's obvious work is ongoing even when the bar can't move. */
+.subs-spinner {
+  width: 13px; height: 13px;
+  flex-shrink: 0;
+  border: 2px solid var(--border-soft);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+.subs-bar {
+  margin-top: 9px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--surface);
+  overflow: hidden;
+}
+.subs-bar-fill {
+  height: 100%;
+  width: 0;
+  background: var(--accent);
+  transition: width 0.2s ease;
+}
+/* Whisper reports no progress while decoding, so rather than parking the bar at a
+   made-up percentage it sweeps — honest about being unmeasured, still clearly alive. */
+.subs-bar-fill.indeterminate {
+  width: 35%;
+  transition: none;
+  animation: sweep 1.4s ease-in-out infinite;
+}
+@keyframes sweep {
+  0% { margin-left: -35%; }
+  100% { margin-left: 100%; }
+}
+
+/* Header for the cue list: what's there, and how to add to it. */
+.subs-list-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 4px;
+  border-top: 1px solid var(--border);
+}
+.subs-list-head .ghost { padding: 4px 9px; font-size: 11.5px; }
+
+.subs-list { max-height: 300px; overflow-y: auto; }
+.subs-list:empty { display: none; }
+.sub-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 0;
+}
+.sub-row.current .sub-text { border-color: var(--accent); background: var(--accent-soft); }
+.sub-time {
+  background: none;
+  color: var(--text-faint);
+  font-size: 10.5px;
+  font-variant-numeric: tabular-nums;
+  padding: 3px 4px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+.sub-time:hover { background: var(--surface); color: var(--text); }
+.sub-text {
+  flex: 1;
+  min-width: 0;
+  background: var(--panel);
+  border: 1px solid var(--border-soft);
+  border-radius: 5px;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 12px;
+  padding: 5px 7px;
+}
+.sub-text:focus { outline: none; border-color: var(--accent); }
+.sub-del {
+  background: none;
+  color: var(--text-faint);
+  font-size: 11px;
+  padding: 3px 5px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+.sub-del:hover { background: rgba(194, 55, 59, 0.1); color: #c2373b; }
+
+/* ============================== QA capture ============================== */
+
+.debug-panel { display: flex; flex-direction: column; gap: 12px; font-size: 12px; }
+
+.debug-head { display: block; }
+.debug-tabs {
+  display: flex;
+  gap: 3px;
+  padding: 3px;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+}
+.debug-tab {
+  flex: 1 1 0;
+  background: transparent;
+  color: var(--text-dim);
+  font-size: 11.5px;
+  font-weight: 650;
+  padding: 5px 8px;
+  border-radius: 5px;
+}
+.debug-tab:hover { color: var(--text); }
+.debug-tab.active { color: var(--text); background: var(--panel); box-shadow: var(--shadow-sm); }
+.debug-tab .count {
+  display: inline-block;
+  margin-left: 4px;
+  font-size: 10px;
+  padding: 1px 5px;
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text-faint);
+}
+.debug-tab.active .count { background: var(--accent-soft); color: var(--accent); }
+
+.debug-filter {
+  width: 100%;
+  background: var(--panel);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-xs);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 12px;
+  padding: 6px 9px;
+}
+.debug-filter:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.follow-check { font-size: 11px; color: var(--text-dim); }
+.follow-check input { accent-color: var(--accent); width: 13px; height: 13px; }
+
+.debug-note {
+  margin: 0;
+  padding: 8px 10px;
+  font-size: 11px;
+  line-height: 1.5;
+  color: #8a5a00;
+  background: #fff8e8;
+  border: 1px solid #f2e0b8;
+  border-radius: var(--radius-xs);
+}
+
+.debug-list {
+  max-height: 46vh;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+.debug-empty { padding: 16px 12px; font-size: 12px; color: var(--text-faint); margin: 0; }
+
+.debug-row { border-bottom: 1px solid var(--border); }
+.debug-row:last-child { border-bottom: none; }
+.debug-row.current { background: var(--accent-soft); }
+/* The rail is narrow, so a summary wraps: identity on the first line, the URL or
+   message on its own line beneath, rather than everything ellipsised to nothing. */
+.debug-summary {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+  padding: 7px 10px;
+  font-size: 11px;
+  cursor: pointer;
+  font-family: var(--font-mono);
+}
+.debug-summary:hover { background: var(--panel-2); }
+.debug-time { color: var(--text-faint); font-variant-numeric: tabular-nums; flex-shrink: 0; }
+.debug-method { color: var(--accent); font-weight: 600; flex-shrink: 0; }
+.debug-status { flex-shrink: 0; font-weight: 600; }
+.debug-status.ok { color: var(--green); }
+.debug-status.warn { color: #a86a00; }
+.debug-status.bad { color: #c2373b; }
+.debug-url {
+  flex: 1 1 100%;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text);
+}
+.debug-type { color: var(--text-faint); font-size: 10px; flex-shrink: 0; }
+.debug-level { flex-shrink: 0; text-transform: uppercase; font-size: 10px; font-weight: 700; }
+.debug-level.error { color: #c2373b; }
+.debug-level.warn { color: #a86a00; }
+.debug-level.info, .debug-level.log, .debug-level.debug { color: var(--text-faint); }
+.debug-text {
+  flex: 1 1 100%;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text);
+}
+
+.debug-detail {
+  padding: 2px 10px 12px;
+  background: var(--panel-2);
+  border-top: 1px solid var(--border);
+  font-size: 11px;
+}
+.debug-actions { display: flex; gap: 6px; padding-top: 10px; flex-wrap: wrap; }
+.debug-actions .ghost { padding: 4px 8px; font-size: 11px; }
+.debug-detail section { margin-top: 12px; }
+.debug-detail h4 {
+  margin: 0 0 5px;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-faint);
+}
+.debug-detail .hdr {
+  display: flex;
+  gap: 8px;
+  padding: 2px 0;
+  font-family: var(--font-mono);
+}
+.debug-detail .hdr span:first-child { color: var(--text-faint); flex: 0 0 92px; word-break: break-all; }
+.debug-detail .hdr span:last-child { color: var(--text); word-break: break-all; }
+.debug-detail pre {
+  margin: 0;
+  padding: 8px 10px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  max-height: 220px;
+  overflow: auto;
+  font-size: 10.5px;
+  line-height: 1.5;
+  color: var(--text);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.debug-detail .muted { color: var(--text-faint); margin: 0; font-style: italic; }
+
+/* ============================== modal ============================== */
+
+.modal {
+  position: fixed; inset: 0;
+  background: rgba(20, 22, 28, 0.32);
+  backdrop-filter: blur(2px);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 120;
+  padding: 20px;
+}
+.modal-box {
+  width: 100%;
+  max-width: 380px;
+  max-height: 100%;
+  overflow-y: auto;
+  padding: 20px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  /* Same gapped-column rhythm as the rail, so .field-group needs no special casing. */
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+.modal-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 650;
+  letter-spacing: -0.015em;
+}
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 2px;
+}
+.modal-actions .ghost { padding: 9px 14px; font-size: 13px; }
+
+/* ============================== export overlay ============================== */
+
+.export-overlay {
+  position: fixed; inset: 0;
+  background: rgba(244, 245, 248, 0.9);
+  backdrop-filter: blur(3px);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 100;
+}
+.export-box {
+  text-align: center;
+  max-width: 340px;
+  padding: 28px 30px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+}
+.export-box p { margin: 0 0 6px; font-size: 13px; font-weight: 600; }
+.export-box .hint { margin: 0; font-size: 12px; font-weight: 400; color: var(--text-dim); line-height: 1.5; }
+.export-box .hint.warn {
+  margin-top: 10px;
+  padding: 8px 10px;
+  background: #fff8e8;
+  border: 1px solid #f2e0b8;
+  border-radius: var(--radius-xs);
+  color: #8a5a00;
+}
+.export-box .hint.warn strong { color: #6f4800; font-weight: 650; }
+#btn-export-cancel { margin-top: 14px; padding: 8px 16px; font-size: 12.5px; }
+.spinner {
+  width: 30px; height: 30px; margin: 0 auto 16px;
+  border: 3px solid var(--surface);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ============================== narrow windows ============================== */
+
+/* Below this the rail would squeeze the preview to nothing, so it drops under the
+   stage and the whole page scrolls as one column instead. */
+@media (max-width: 940px) {
+  .workspace { grid-template-columns: minmax(0, 1fr); overflow-y: auto; }
+  .stage-col { overflow: visible; }
+  .rail { border-left: none; border-top: 1px solid var(--border); }
+  .rail-body { overflow: visible; }
+  #preview-canvas { max-height: 44vh; }
+}

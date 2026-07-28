@@ -1,0 +1,133 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Click &amp; Record</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="logo-dot"></div>
+      <h1>Click &amp; Record</h1>
+    </header>
+
+    <div id="view-idle" class="view">
+      <div class="cam-wrap hidden" id="cam-wrap">
+        <video id="cam-preview" autoplay muted playsinline></video>
+        <span class="cam-caption">This is how you'll look</span>
+      </div>
+
+      <!-- What to record. Tab is first and default: it's the only source where the
+           extension can see inside what it's filming, which is what click-to-zoom and
+           QA capture depend on. -->
+      <div class="source-picker" id="source-picker">
+        <button type="button" class="source-opt active" data-source="tab">
+          <svg viewBox="0 0 20 20" width="17" height="17" fill="none" aria-hidden="true"><rect x="2.4" y="3.6" width="15.2" height="12.8" rx="2.2" stroke="currentColor" stroke-width="1.4"/><path d="M2.4 7.4h15.2" stroke="currentColor" stroke-width="1.4"/><path d="M5.6 5.5h3.2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          <span>Tab</span>
+        </button>
+        <button type="button" class="source-opt" data-source="window">
+          <svg viewBox="0 0 20 20" width="17" height="17" fill="none" aria-hidden="true"><rect x="1.8" y="2.8" width="12" height="10" rx="1.8" stroke="currentColor" stroke-width="1.4"/><path d="M6.2 15.6h10a1.8 1.8 0 001.8-1.8v-8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          <span>Window</span>
+        </button>
+        <button type="button" class="source-opt" data-source="screen">
+          <svg viewBox="0 0 20 20" width="17" height="17" fill="none" aria-hidden="true"><rect x="2.2" y="3.4" width="15.6" height="10.4" rx="1.8" stroke="currentColor" stroke-width="1.4"/><path d="M7 16.6h6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          <span>Screen</span>
+        </button>
+      </div>
+
+      <!-- One card, divided rows: the same "grouped settings" shape as the editor's
+           right rail, at popup scale. -->
+      <div class="options">
+        <label class="row toggle-row">
+          <span class="row-main">
+            <svg class="row-icon" viewBox="0 0 20 20" width="17" height="17" fill="none" aria-hidden="true"><circle cx="10" cy="8" r="3.1" stroke="currentColor" stroke-width="1.4"/><path d="M3.6 16.8c.9-2.9 3.4-4.4 6.4-4.4s5.5 1.5 6.4 4.4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+            <span>Webcam</span>
+          </span>
+          <span class="switch"><input type="checkbox" id="opt-webcam" checked /><span class="slider"></span></span>
+        </label>
+
+        <label class="row toggle-row">
+          <span class="row-main">
+            <svg class="row-icon" viewBox="0 0 20 20" width="17" height="17" fill="none" aria-hidden="true"><path d="M10 2.8a2.3 2.3 0 012.3 2.3v4.3a2.3 2.3 0 11-4.6 0V5.1A2.3 2.3 0 0110 2.8z" stroke="currentColor" stroke-width="1.4"/><path d="M5 9.2a5 5 0 0010 0M10 14.4v2.8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+            <span>Microphone</span>
+          </span>
+          <span class="switch"><input type="checkbox" id="opt-mic" checked /><span class="slider"></span></span>
+        </label>
+
+        <label class="row toggle-row" id="row-clicks">
+          <span class="row-main">
+            <svg class="row-icon" viewBox="0 0 20 20" width="17" height="17" fill="none" aria-hidden="true"><circle cx="9" cy="9" r="5.4" stroke="currentColor" stroke-width="1.4"/><path d="M9 6.9v4.2M6.9 9h4.2M13 13l4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+            <span>Zoom in on clicks</span>
+          </span>
+          <span class="switch"><input type="checkbox" id="opt-clicks" checked /><span class="slider"></span></span>
+        </label>
+
+        <label class="row toggle-row" id="row-capture">
+          <span class="row-main">
+            <svg class="row-icon" viewBox="0 0 20 20" width="17" height="17" fill="none" aria-hidden="true"><path d="M2.4 10.6h3.2l2-5.2 3 10.2 2.2-6.4 1.3 1.4h3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span>Network &amp; console <span class="tag">QA</span></span>
+          </span>
+          <span class="switch"><input type="checkbox" id="opt-capture" /><span class="slider"></span></span>
+        </label>
+      </div>
+
+      <p class="hint source-note hidden" id="source-note"></p>
+
+      <!-- popup.js reassigns this button's textContent while Chrome is asking, so it
+           stays text-only — an icon here would be wiped on the first click. -->
+      <div id="perm-notice" class="notice hidden">
+        <button id="btn-grant" class="secondary">Allow camera &amp; mic</button>
+      </div>
+
+      <button id="btn-start" class="primary">
+        <svg viewBox="0 0 20 20" width="11" height="11" fill="currentColor" aria-hidden="true"><circle cx="10" cy="10" r="6"/></svg>
+        Start Recording
+      </button>
+      <p class="hint"><span id="source-summary">Your current tab is recorded.</span> The webcam is saved as a separate track, so you can position, resize and restyle the bubble in the editor afterwards.</p>
+
+      <!-- The editor is useful without recording anything: open a video you already
+           have and trim, zoom, caption and export it with the same tools. -->
+      <button id="btn-open-editor" class="linkish">
+        <svg viewBox="0 0 20 20" width="14" height="14" fill="none" aria-hidden="true">
+          <rect x="2.4" y="4.6" width="10.4" height="10.8" rx="2" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M17.6 7.2v5.6l-4.2-2.3v-1l4.2-2.3z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+        </svg>
+        Edit a video I already have
+      </button>
+    </div>
+
+    <div id="view-countdown" class="view hidden">
+      <div class="countdown" id="countdown-num">3</div>
+      <p class="hint center">Get ready…</p>
+    </div>
+
+    <div id="view-recording" class="view hidden">
+      <div class="rec-indicator">
+        <span class="rec-dot"></span>
+        <span id="rec-timer">00:00</span>
+      </div>
+      <p class="hint center" id="click-count">0 clicks detected</p>
+      <div class="btn-row">
+        <button id="btn-pause" class="secondary">Pause</button>
+        <button id="btn-stop" class="danger">
+          <svg viewBox="0 0 20 20" width="11" height="11" fill="currentColor" aria-hidden="true"><rect x="5" y="5" width="10" height="10" rx="1.5"/></svg>
+          Stop &amp; Edit
+        </button>
+      </div>
+      <p class="hint">Reopen this popup any time to stop — or press <strong>Alt+Shift+S</strong>. The toolbar icon shows <strong>REC</strong> while recording.</p>
+    </div>
+
+    <div id="view-processing" class="view hidden">
+      <div class="spinner"></div>
+      <p class="hint center">Preparing your recording…</p>
+    </div>
+
+    <div id="view-error" class="view hidden">
+      <p class="error-msg" id="error-msg">Something went wrong.</p>
+      <button id="btn-retry" class="secondary">Back</button>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,1125 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<title>Screen Recorder with Auto Zoom &amp; Subtitles — Click &amp; Record</title>
+<meta name="description" content="Free Chrome screen recorder that zooms into every click, writes subtitles offline, and captures network + console logs for bug reports. Nothing is uploaded." />
+<link rel="canonical" href="https://clickandrecord.com/" />
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+<meta name="theme-color" content="#ffffff" />
+<meta name="color-scheme" content="light dark" />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Click &amp; Record" />
+<meta property="og:url" content="https://clickandrecord.com/" />
+<meta property="og:title" content="Screen Recorder with Auto Zoom &amp; Subtitles — Click &amp; Record" />
+<meta property="og:description" content="Record a tab, window or your whole screen. Every click becomes a smooth zoom. Subtitles are transcribed on your machine. Nothing is uploaded." />
+<meta property="og:image" content="https://clickandrecord.com/og-image.png" />
+<meta property="og:image:alt" content="The Click &amp; Record editor: a screen recording with zoom keyframes on the timeline." />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Screen Recorder with Auto Zoom &amp; Subtitles — Click &amp; Record" />
+<meta name="twitter:description" content="Every click becomes a smooth zoom. Subtitles transcribed on-device. Network and console logs captured for bug reports." />
+<meta name="twitter:image" content="https://clickandrecord.com/og-image.png" />
+
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<link rel="preload" href="/fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin />
+
+<script>
+// Ahead of the stylesheet on purpose: reading the saved theme after paint would
+// flash the light page at anyone who chose dark.
+(function(){try{var t=localStorage.getItem('cr-theme');
+if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
+</script>
+
+<style>
+/* ═══ TYPE ═══════════════════════════════════════════════════════════════════
+   Archivo carries the page's voice — a grotesque with a real width axis, set
+   expanded and tight at display sizes. Inter is kept for running text because
+   the product's own interface is set in it, so the site and the app share a
+   reading texture without the site sounding like the app.
+   Both are self-hosted: no third-party request on the critical path.          */
+@font-face{font-family:'Archivo';font-style:normal;font-weight:400 700;font-stretch:75% 125%;
+  font-display:swap;src:url('/fonts/archivo-latin.woff2') format('woff2');
+  unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Inter';font-style:normal;font-weight:400 700;font-display:swap;
+  src:url('/fonts/inter-latin.woff2') format('woff2');
+  unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+2074,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+
+/* ═══ TOKENS ═════════════════════════════════════════════════════════════════
+   Light is the design; dark is the alternate. Both are defined at token level and
+   nothing below this block references a raw colour, so a theme swap is a variable
+   swap rather than a second stylesheet fighting the first.
+
+   The accents are not decoration in either theme: they are the exact semantic
+   colours the editor's timeline uses — red for the record state, amber for zoom
+   keyframes, green for caption bars, indigo for selection — so the site is
+   coloured in the product's own language. The light values are the editor's
+   literal tokens, which is what makes the site and the extension read as one
+   thing. Amber is the one that cannot simply carry over: #ffc247 is unreadable on
+   white, so light gets a darkened cut for text and keeps the brighter one for
+   marks and fills, where it sits on a wash rather than on paper.
+
+   prefers-color-scheme is deliberately NOT wired to this. The brand is light, and
+   a visitor whose OS is dark should still land on the page as designed; dark is a
+   choice they make with the toggle, and it persists. To honour the OS instead,
+   add a `@media (prefers-color-scheme: dark)` block that sets the same tokens as
+   [data-theme="dark"] and let the attribute keep overriding it.               */
+:root{
+  --void:#ffffff;
+  --sunk:#f4f5f8;
+  --surface:#f7f8fa;
+  --raise:#eceef3;
+  --edge:#e5e7ee;
+  --edge-soft:#d8dbe4;
+  --edge-strong:#c7ccd8;
+
+  --ink:#14161c;
+  --mute:#5c6371;
+  --faint:#8d939f;
+
+  --rec:#e5484d;
+  --zoom:#9a6605;        /* 4.9:1 on paper, 4.5:1 on the wash it sits over */
+  --zoom-mark:#d28300;   /* dots, fills, rules — 3:1, the floor for a graphic */
+  --cue:#137f5c;
+  --link:#5b5bd6;
+
+  --btn-face:#14161c;
+  --btn-label:#ffffff;
+  --btn-face-hot:#000000;
+
+  --hover:rgba(20,22,28,.038);
+  --mast-bg:rgba(255,255,255,.86);
+  --wash-zoom:rgba(154,102,5,.08);
+  --line-zoom:rgba(154,102,5,.34);
+  --wash-rec:rgba(229,72,77,.07);
+
+  --glow-neutral:rgba(93,99,113,.16);
+  --glow-rec:rgba(229,72,77,.2);
+  --glow-zoom:rgba(154,102,5,.24);
+  --glow-cue:rgba(19,127,92,.22);
+  --glow-link:rgba(91,91,214,.2);
+
+  --demo-shadow:0 24px 60px -26px rgba(20,22,28,.34);
+  --head-glow:0 0 0 4px rgba(229,72,77,.16);
+
+  --display:'Archivo','Archivo Expanded',Impact,sans-serif;
+  --body:'Inter','Segoe UI Variable Text','Segoe UI',-apple-system,Roboto,sans-serif;
+  --mono:ui-monospace,'Cascadia Code','SF Mono',Consolas,monospace;
+
+  --rail:clamp(48px,6vw,92px);
+  --wrap:1180px;
+  --gut:clamp(20px,4vw,48px);
+  color-scheme:light;
+}
+
+:root[data-theme="dark"]{
+  --void:#0c0e13;
+  --sunk:#090a0e;
+  --surface:#14171f;
+  --raise:#1b1f29;
+  --edge:#232734;
+  --edge-soft:#2e3342;
+  --edge-strong:#3a4054;
+
+  --ink:#eef0f5;
+  --mute:#949bab;
+  --faint:#666d7d;
+
+  --rec:#ef4b52;
+  --zoom:#ffc247;
+  --zoom-mark:#ffc247;
+  --cue:#45dba0;
+  --link:#9a9aff;
+
+  --btn-face:#eef0f5;
+  --btn-label:#0c0e13;
+  --btn-face-hot:#ffffff;
+
+  --hover:rgba(255,255,255,.032);
+  --mast-bg:rgba(12,14,19,.82);
+  --wash-zoom:rgba(255,194,71,.05);
+  --line-zoom:rgba(255,194,71,.18);
+  --wash-rec:rgba(239,75,82,.09);
+
+  --glow-neutral:rgba(148,155,171,.13);
+  --glow-rec:rgba(239,75,82,.17);
+  --glow-zoom:rgba(255,194,71,.17);
+  --glow-cue:rgba(69,219,160,.17);
+  --glow-link:rgba(154,154,255,.17);
+
+  --demo-shadow:0 32px 80px -28px rgba(0,0,0,.9);
+  --head-glow:0 0 0 4px rgba(239,75,82,.14),0 0 14px rgba(239,75,82,.5);
+  color-scheme:dark;
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:var(--void);color:var(--ink);
+  font-family:var(--body);font-size:16.5px;line-height:1.62;letter-spacing:-.008em;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;
+}
+img,svg,canvas{max-width:100%;height:auto;display:block}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--link);outline-offset:3px;border-radius:2px}
+
+/* ═══ SHELL ══════════════════════════════════════════════════════════════════
+   A ruler rail pinned to the left edge, carrying timecodes. The page is a
+   timeline because the product is one, and because a demo is a thing that
+   happens in sequence — the marks encode position, they aren't ornament.      */
+.shell{max-width:var(--wrap);margin:0 auto;padding-left:var(--rail);padding-right:var(--gut);position:relative}
+/* The rule sits at the outer edge of the rail, so the full --rail width becomes
+   breathing room between it and the text. Anchoring it at `--rail - 1px` instead
+   left a single pixel of air and read as an accidental underline. */
+.shell::before{content:'';position:absolute;left:0;top:0;bottom:0;width:1px;background:var(--edge)}
+@media(max-width:820px){
+  :root{--rail:0px}
+  .shell{padding-left:var(--gut)}
+  .shell::before{display:none}
+}
+
+.tc{
+  font-family:var(--mono);font-size:11.5px;font-weight:500;letter-spacing:.1em;
+  color:var(--faint);font-variant-numeric:tabular-nums;text-transform:uppercase;
+  display:inline-flex;align-items:center;gap:10px;margin-bottom:22px;
+}
+.tc::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--edge-soft);flex:none}
+.tc[data-mark="rec"]::before{background:var(--rec)}
+.tc[data-mark="zoom"]::before{background:var(--zoom-mark)}
+.tc[data-mark="cue"]::before{background:var(--cue)}
+.tc[data-mark="link"]::before{background:var(--link)}
+
+/* ═══ TYPE SCALE ═════════════════════════════════════════════════════════════ */
+h1,h2,h3{font-family:var(--display);font-weight:600;margin:0;text-wrap:balance}
+h1{
+  font-size:clamp(2.6rem,6.4vw,5.1rem);line-height:.98;letter-spacing:-.035em;
+  font-stretch:112%;font-weight:650;
+}
+h2{
+  font-size:clamp(1.85rem,3.6vw,3rem);line-height:1.04;letter-spacing:-.03em;
+  font-stretch:110%;margin-bottom:20px;
+}
+h3{font-size:1.12rem;line-height:1.3;letter-spacing:-.018em;font-stretch:105%;font-weight:600;margin-bottom:9px}
+p{margin:0 0 18px}
+p:last-child{margin-bottom:0}
+.lede{font-size:clamp(1.05rem,1.7vw,1.28rem);color:var(--mute);max-width:60ch;line-height:1.58}
+.note{font-size:.85rem;color:var(--faint);line-height:1.55}
+
+section{padding:clamp(72px,9vw,124px) 0;border-bottom:1px solid var(--edge)}
+
+/* ═══ BUTTONS ════════════════════════════════════════════════════════════════ */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:9px;
+  font-family:var(--body);font-size:.95rem;font-weight:600;letter-spacing:-.01em;
+  padding:13px 22px;border-radius:7px;border:1px solid transparent;cursor:pointer;
+  transition:background .16s ease,border-color .16s ease,color .16s ease,transform .16s ease;
+}
+.btn-solid{background:var(--btn-face);color:var(--btn-label);border-color:var(--btn-face)}
+.btn-solid:hover{background:var(--btn-face-hot);border-color:var(--btn-face-hot);transform:translateY(-1px)}
+.btn-line{background:transparent;color:var(--ink);border-color:var(--edge-soft)}
+.btn-line:hover{border-color:var(--mute);background:var(--hover)}
+.dotrec{width:8px;height:8px;border-radius:50%;background:var(--rec);flex:none}
+
+/* ═══ MASTHEAD ═══════════════════════════════════════════════════════════════ */
+.mast{position:sticky;top:0;z-index:60;background:var(--mast-bg);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--edge)}
+.mast .shell{display:flex;align-items:center;justify-content:space-between;gap:20px;height:64px;padding-top:0;padding-bottom:0}
+.wordmark{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:650;
+  font-size:1rem;letter-spacing:-.02em;font-stretch:108%}
+.mast nav{display:flex;align-items:center;gap:26px;font-size:.875rem;color:var(--mute)}
+.mast nav a:not(.btn):hover{color:var(--ink)}
+.mast .btn{padding:9px 16px;font-size:.85rem}
+.themer{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;
+  border-radius:8px;border:1px solid var(--edge);background:transparent;color:var(--mute);
+  cursor:pointer;flex:none;transition:color .16s ease,border-color .16s ease,background .16s ease}
+.themer:hover{color:var(--ink);border-color:var(--edge-strong);background:var(--hover)}
+/* Show the theme you would switch *to*, which is what the control does. */
+.themer .ico-moon{display:block}
+.themer .ico-sun{display:none}
+:root[data-theme="dark"] .themer .ico-moon{display:none}
+:root[data-theme="dark"] .themer .ico-sun{display:block}
+@media(max-width:900px){.mast nav a:not(.btn){display:none}}
+
+/* ═══ HERO ═══════════════════════════════════════════════════════════════════ */
+.hero{padding-top:clamp(56px,7vw,92px);padding-bottom:0;border-bottom:none}
+.hero-grid{display:grid;grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr);gap:clamp(32px,5vw,72px);align-items:center}
+@media(max-width:980px){.hero-grid{grid-template-columns:1fr;gap:44px}}
+.hero h1 em{font-style:normal;color:var(--zoom)}
+.hero .lede{margin:26px 0 32px}
+.actions{display:flex;flex-wrap:wrap;gap:11px;align-items:center}
+
+.specs{display:flex;flex-wrap:wrap;gap:0;margin:44px 0 0;padding:0;list-style:none;
+  border-top:1px solid var(--edge)}
+.specs li{padding:16px 26px 0 0;margin-right:26px;font-family:var(--mono);font-size:.72rem;
+  letter-spacing:.07em;text-transform:uppercase;color:var(--mute)}
+.specs b{display:block;font-family:var(--display);font-size:1.32rem;font-weight:600;
+  letter-spacing:-.02em;color:var(--ink);text-transform:none;font-stretch:106%;margin-bottom:2px}
+
+/* ═══ THE PERFORMED HERO ═════════════════════════════════════════════════════
+   The page's one indulgence. Rather than a screenshot of a zoom, the hero does
+   the zoom: the cursor travels, clicks, the frame eases in, a caption lands.
+   It is the single most characteristic thing this product does, so it is the
+   one place boldness is spent — everything below stays quiet.                 */
+.demo{position:relative;border:1px solid var(--edge-soft);border-radius:12px;overflow:hidden;
+  background:var(--surface);box-shadow:var(--demo-shadow)}
+.demo-chrome{display:flex;align-items:center;gap:8px;padding:11px 14px;background:var(--raise);
+  border-bottom:1px solid var(--edge)}
+.demo-chrome i{width:9px;height:9px;border-radius:50%;background:var(--edge-soft);flex:none}
+.demo-chrome .url{margin-left:8px;font-family:var(--mono);font-size:.68rem;color:var(--faint);
+  letter-spacing:.02em;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.demo-chrome .live{margin-left:auto;display:flex;align-items:center;gap:6px;font-family:var(--mono);
+  font-size:.62rem;letter-spacing:.14em;color:var(--rec);flex:none}
+.demo-chrome .live i{width:6px;height:6px;background:var(--rec);animation:blink 1.9s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.28}}
+
+.stage{position:relative;aspect-ratio:16/10;background:
+  radial-gradient(120% 90% at 22% 8%,#242a3d 0%,#12151d 58%,#0b0d12 100%);
+  padding:5.5%;overflow:hidden}
+.frame{position:relative;width:100%;height:100%;border-radius:7px;overflow:hidden;
+  background:#0f1218;border:1px solid rgba(255,255,255,.07);
+  transform-origin:72% 46%;animation:push 11s cubic-bezier(.55,.02,.25,1) infinite}
+@keyframes push{
+  0%,20%   {transform:scale(1)}
+  32%,60%  {transform:scale(1.72)}
+  74%,100% {transform:scale(1)}
+}
+
+/* A plausible dashboard, drawn in CSS so there is no image to load and nothing
+   to go stale when the product's UI moves on. */
+.ui{position:absolute;inset:0;padding:5%}
+.ui-top{display:flex;align-items:center;gap:7px;margin-bottom:6%}
+.bar{height:7px;border-radius:3px;background:rgba(255,255,255,.16)}
+.ui-cols{display:grid;grid-template-columns:repeat(3,1fr);gap:4%;margin-bottom:6%}
+.tile{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.07);border-radius:5px;padding:7% 8%}
+.tile .n{font-family:var(--display);font-size:clamp(11px,2vw,19px);font-weight:650;color:#fff;
+  letter-spacing:-.02em;line-height:1;margin-bottom:14%}
+.tile.hot{border-color:rgba(255,194,71,.5);background:rgba(255,194,71,.09)}
+.tile.hot .n{color:var(--zoom)}
+.rows{display:flex;flex-direction:column;gap:5px}
+.row{display:flex;align-items:center;gap:7px;padding:5px 7px;border-radius:4px;background:rgba(255,255,255,.03)}
+
+.cursor{position:absolute;left:0;top:0;width:19px;height:19px;z-index:4;
+  filter:drop-shadow(0 2px 4px rgba(0,0,0,.75));animation:travel 11s cubic-bezier(.5,.05,.25,1) infinite}
+@keyframes travel{
+  0%      {transform:translate(28%,88%)}
+  16%,20% {transform:translate(70%,44%)}
+  60%     {transform:translate(70%,44%)}
+  76%,100%{transform:translate(52%,72%)}
+}
+.ping{position:absolute;left:70%;top:44%;width:15px;height:15px;margin:-7.5px 0 0 -7.5px;
+  border-radius:50%;border:2px solid var(--zoom);opacity:0;z-index:3;animation:ping 11s linear infinite}
+@keyframes ping{
+  0%,19%  {opacity:0;transform:scale(.3)}
+  21%     {opacity:.95;transform:scale(1)}
+  30%,100%{opacity:0;transform:scale(3.4)}
+}
+.subtitle{position:absolute;left:50%;bottom:9%;transform:translateX(-50%);z-index:5;
+  background:rgba(6,8,12,.9);border:1px solid rgba(255,255,255,.09);border-radius:6px;
+  padding:7px 15px;font-size:.82rem;font-weight:550;white-space:nowrap;opacity:0;
+  animation:cue 11s ease infinite}
+.subtitle b{color:var(--cue);font-weight:650}
+@keyframes cue{0%,34%{opacity:0;transform:translate(-50%,7px)}42%,62%{opacity:1;transform:translate(-50%,0)}70%,100%{opacity:0;transform:translate(-50%,7px)}}
+
+/* The strip beneath the stage is the editor's own timeline: a clip, the amber
+   zoom span the click produced, and the playhead sweeping across it. */
+.track{display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--raise);
+  border-top:1px solid var(--edge)}
+.track .clip{position:relative;flex:1;height:26px;border-radius:4px;background:var(--surface);
+  border:1px solid var(--edge-soft);overflow:hidden}
+.track .zoomspan{position:absolute;left:20%;top:3px;bottom:3px;width:40%;border-radius:3px;
+  background:rgba(255,194,71,.22);border:1px solid rgba(255,194,71,.55)}
+.track .head{position:absolute;top:-3px;bottom:-3px;width:1.5px;background:var(--rec);
+  animation:sweep 11s cubic-bezier(.55,.02,.25,1) infinite}
+@keyframes sweep{0%{left:0}100%{left:100%}}
+.track .t{font-family:var(--mono);font-size:.66rem;color:var(--faint);font-variant-numeric:tabular-nums;flex:none}
+
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .frame,.cursor,.ping,.subtitle,.track .head,.demo-chrome .live i{animation:none}
+  /* Hold the composed mid-zoom frame — the story still reads without movement. */
+  .frame{transform:scale(1.45)}
+  .subtitle{opacity:1;transform:translateX(-50%)}
+  .track .head{left:46%}
+  .reveal{opacity:1;transform:none}
+}
+
+/* ═══ ABSTRACT ═══════════════════════════════════════════════════════════════ */
+.abstract{font-size:clamp(1.12rem,1.9vw,1.42rem);line-height:1.5;max-width:64ch;
+  color:var(--mute);letter-spacing:-.016em;margin:0}
+.abstract strong{color:var(--ink);font-weight:600}
+
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+  gap:0 clamp(28px,4vw,64px);margin:44px 0 0;border-top:1px solid var(--edge)}
+.facts > div{display:grid;grid-template-columns:minmax(0,.32fr) minmax(0,.68fr);gap:18px;
+  padding:14px 0;border-bottom:1px solid var(--edge)}
+.facts dt{font-family:var(--mono);font-size:.7rem;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--faint);padding-top:3px}
+.facts dd{margin:0;font-size:.92rem;color:var(--mute)}
+@media(max-width:560px){.facts > div{grid-template-columns:1fr;gap:3px}}
+
+/* ═══ EDITORIAL BLOCKS ═══════════════════════════════════════════════════════ */
+.split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(34px,5.5vw,80px);align-items:center}
+.split.wide-left{grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr)}
+@media(max-width:900px){.split,.split.wide-left{grid-template-columns:1fr;gap:36px}}
+@media(max-width:900px){.split .visual{order:2}}
+
+.points{list-style:none;margin:26px 0 0;padding:0;border-top:1px solid var(--edge)}
+.points li{padding:16px 0;border-bottom:1px solid var(--edge);color:var(--mute);font-size:.96rem}
+.points b{color:var(--ink);font-weight:600}
+
+/* ═══ CAPABILITY LEDGER ══════════════════════════════════════════════════════
+   Not a card grid. A ledger: hairline-ruled rows with the label held left in
+   mono, which suits a tool whose whole job is precision.                      */
+.ledger{border-top:1px solid var(--edge)}
+.entry{display:grid;grid-template-columns:minmax(0,.36fr) minmax(0,.64fr);gap:clamp(20px,4vw,56px);
+  padding:26px 0;border-bottom:1px solid var(--edge);align-items:start}
+@media(max-width:760px){.entry{grid-template-columns:1fr;gap:8px;padding:20px 0}}
+.entry p{color:var(--mute);font-size:.95rem;margin:0}
+.entry .k{font-family:var(--mono);font-size:.7rem;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);margin-top:5px}
+@media(max-width:760px){.entry .k{margin-top:0}}
+
+/* ═══ CONSOLE PANEL ══════════════════════════════════════════════════════════ */
+.console{background:var(--sunk);border:1px solid var(--edge-soft);border-radius:10px;overflow:hidden;
+  font-family:var(--mono);font-size:.78rem}
+.console-top{display:flex;gap:16px;padding:10px 14px;border-bottom:1px solid var(--edge);color:var(--faint);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase}
+.console-top .on{color:var(--ink)}
+.log{display:grid;grid-template-columns:auto auto auto minmax(0,1fr);gap:12px;align-items:baseline;
+  padding:9px 14px;border-bottom:1px solid var(--edge)}
+.log:last-child{border-bottom:none}
+.log .ts{color:var(--faint);font-variant-numeric:tabular-nums}
+.log .vb{color:var(--link)}
+.log .ok{color:var(--cue)}
+.log .bad{color:var(--rec)}
+.log .u{color:var(--mute);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.log.flag{background:var(--wash-rec)}
+
+/* ═══ SPEC SHEET (comparison) ════════════════════════════════════════════════ */
+.sheet{overflow-x:auto;border:1px solid var(--edge);border-radius:10px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:660px;font-size:.9rem}
+caption{caption-side:bottom;text-align:left;padding:14px 18px;color:var(--faint);font-size:.78rem;line-height:1.5;border-top:1px solid var(--edge)}
+th,td{padding:14px 18px;text-align:left;border-bottom:1px solid var(--edge)}
+thead th{font-family:var(--mono);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--faint);font-weight:500;background:var(--raise)}
+thead th.us{color:var(--zoom)}
+tbody th{font-weight:500;color:var(--mute);font-size:.9rem}
+td{color:var(--faint);font-size:.87rem}
+td.us{color:var(--ink);font-weight:550;background:var(--wash-zoom);border-left:1px solid var(--line-zoom);border-right:1px solid var(--line-zoom)}
+tbody tr:last-child th,tbody tr:last-child td{border-bottom:none}
+
+/* ═══ FAQ ════════════════════════════════════════════════════════════════════ */
+.faq{max-width:78ch;border-top:1px solid var(--edge)}
+details{border-bottom:1px solid var(--edge)}
+summary{cursor:pointer;padding:20px 0;font-family:var(--display);font-size:1.04rem;font-weight:550;
+  font-stretch:104%;letter-spacing:-.014em;list-style:none;display:flex;justify-content:space-between;gap:22px;align-items:baseline}
+summary::-webkit-details-marker{display:none}
+summary::after{content:'+';font-family:var(--mono);color:var(--faint);font-size:1.05rem;flex:none;font-weight:400}
+details[open] summary::after{content:'–';color:var(--zoom)}
+details[open] summary{color:var(--ink)}
+summary:hover{color:var(--ink)}
+details > div{padding:0 0 22px;color:var(--mute);max-width:68ch;font-size:.96rem}
+
+/* ═══ CLOSE ══════════════════════════════════════════════════════════════════ */
+.close{text-align:left;border-bottom:none}
+.close h2{max-width:16ch}
+.close .actions{margin-top:30px}
+
+footer{padding:52px 0 46px;font-size:.86rem;color:var(--faint)}
+.fcols{display:grid;grid-template-columns:1.6fr repeat(3,1fr);gap:34px;margin-bottom:38px}
+@media(max-width:760px){.fcols{grid-template-columns:1fr 1fr}}
+footer h3{font-family:var(--mono);font-size:.66rem;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--faint);font-weight:500;margin-bottom:14px}
+footer ul{list-style:none;margin:0;padding:0}
+footer li{margin-bottom:10px}
+footer a{color:var(--mute)}
+footer a:hover{color:var(--ink)}
+.rule{border-top:1px solid var(--edge);padding-top:22px;display:flex;flex-wrap:wrap;gap:14px;justify-content:space-between}
+
+/* Scroll reveal — one gesture, applied once, never stacked with others. */
+.reveal{opacity:0;transform:translateY(14px);transition:opacity .62s cubic-bezier(.2,.6,.2,1),transform .62s cubic-bezier(.2,.6,.2,1)}
+.reveal.in{opacity:1;transform:none}
+
+.skip{position:absolute;left:-9999px;background:var(--ink);color:var(--void);padding:11px 18px;z-index:100}
+.skip:focus{left:0;top:0}
+
+/* ═══ MOTION LAYER ═══════════════════════════════════════════════════════════
+   Everything below is additive: no existing rule is altered, so the composition
+   is exactly as it was and only its behaviour changes.
+
+   One new idea, then silence. The rail is already a timeline, so the page gets a
+   playhead: a record-red dot that scrubs down the rule as you scroll, and section
+   markers that light up as it passes them — the same thing the editor does when a
+   zoom keyframe is hit. Every other addition here is ordinary hover feedback,
+   deliberately quiet, because scattered animation is what makes a page feel
+   automated rather than designed.                                              */
+
+.scrollhead{position:fixed;top:0;bottom:0;width:1px;z-index:40;pointer-events:none;
+  left:var(--ph-x,-100px);opacity:0;transition:opacity .5s ease}
+.scrollhead.ready{opacity:1}
+.scrollhead .dot{position:absolute;left:-4.5px;width:10px;height:10px;border-radius:50%;
+  background:var(--rec);box-shadow:var(--head-glow);
+  transform:translateY(-50%)}
+.scrollhead .trail{position:absolute;left:0;top:0;width:1px;background:linear-gradient(
+  to bottom,transparent,var(--glow-rec))}
+@media(max-width:820px){.scrollhead{display:none}}
+
+/* Section markers behave like keyframes: they register when the playhead reaches them. */
+.tc::before{transition:transform .45s cubic-bezier(.2,.7,.2,1),box-shadow .45s ease}
+.tc.live::before{transform:scale(1.3)}
+.tc.live::before{box-shadow:0 0 0 4px var(--glow-neutral)}
+.tc.live[data-mark="rec"]::before{box-shadow:0 0 0 4px var(--glow-rec)}
+.tc.live[data-mark="zoom"]::before{box-shadow:0 0 0 4px var(--glow-zoom)}
+.tc.live[data-mark="cue"]::before{box-shadow:0 0 0 4px var(--glow-cue)}
+.tc.live[data-mark="link"]::before{box-shadow:0 0 0 4px var(--glow-link)}
+
+/* Nav: a rule that draws in from the left rather than a colour flash. */
+.mast nav a:not(.btn){position:relative;transition:color .2s ease}
+.mast nav a:not(.btn)::after{content:'';position:absolute;left:0;right:100%;bottom:-5px;height:1px;
+  background:var(--ink);transition:right .3s cubic-bezier(.2,.7,.2,1)}
+.mast nav a:not(.btn):hover::after,.mast nav a:not(.btn):focus-visible::after{right:0}
+
+/* Hovering the demo pauses the loop, so a frame that caught your eye can be read. */
+.demo:hover .frame,.demo:hover .cursor,.demo:hover .ping,
+.demo:hover .subtitle,.demo:hover .track .head{animation-play-state:paused}
+.demo{transition:border-color .3s ease}
+.demo:hover{border-color:var(--edge-strong)}
+
+/* Ledger, facts, points, rows: the hairline brightens and the label takes the accent.
+   No movement except a small nudge on the list — enough to feel responsive, not
+   enough to be noticed as an effect. */
+.entry,.facts > div{transition:border-color .25s ease}
+.entry:hover,.facts > div:hover{border-bottom-color:var(--edge-soft)}
+.entry:hover h3{color:var(--ink)}
+.entry:hover .k,.facts > div:hover dt{color:var(--zoom)}
+.facts dt,.entry .k,.entry h3{transition:color .25s ease}
+
+.points li{transition:color .22s ease,border-color .22s ease,padding-left .28s cubic-bezier(.2,.7,.2,1)}
+.points li:hover{color:var(--ink);border-bottom-color:var(--edge-soft);padding-left:9px}
+.points li b{transition:color .22s ease}
+.points li:hover b{color:var(--ink)}
+
+tbody tr{transition:background .2s ease}
+tbody tr:hover{background:var(--hover)}
+tbody tr:hover th{color:var(--ink)}
+tbody th,thead th.us{transition:color .2s ease}
+
+.console{transition:border-color .28s ease}
+.console:hover{border-color:var(--edge-strong)}
+.log{transition:background .18s ease}
+.log:hover{background:var(--hover)}
+
+summary::after{transition:transform .25s cubic-bezier(.2,.7,.2,1),color .2s ease}
+summary:hover::after{color:var(--zoom);transform:scale(1.2)}
+summary{transition:color .2s ease}
+
+/* The record dot breathes when you are about to press the thing it belongs to. */
+.btn .dotrec{transition:box-shadow .3s ease}
+.btn-solid:hover .dotrec{box-shadow:0 0 0 4px var(--glow-rec)}
+.wordmark .dotrec{transition:box-shadow .3s ease}
+.wordmark:hover .dotrec{box-shadow:0 0 0 4px var(--glow-rec)}
+
+@media(prefers-reduced-motion:reduce){
+  .scrollhead{display:none}
+  .tc.live::before{transform:none}
+  .mast nav a:not(.btn)::after{transition:none}
+  .points li:hover{padding-left:0}
+}
+</style>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "SoftwareApplication",
+      "@id": "https://clickandrecord.com/#app",
+      "name": "Click & Record",
+      "applicationCategory": "MultimediaApplication",
+      "applicationSubCategory": "Screen Recorder",
+      "operatingSystem": "Chrome, Edge, Brave (Chromium 116+)",
+      "url": "https://clickandrecord.com/",
+      "description": "A Chrome screen recorder that turns every click into a smooth zoom, transcribes subtitles on-device, and captures network and console logs alongside the video for bug reports.",
+      "featureList": [
+        "Automatic zoom on every click",
+        "Record a tab, an application window, or the whole screen",
+        "Offline subtitle transcription with word-level timing",
+        "Network and console capture with HAR export",
+        "Webcam recorded as a separate, repositionable track",
+        "Backgrounds, insets, rounded corners and browser frames",
+        "Trim, split and per-clip speed up to 4x",
+        "MP4 and WebM export with selectable quality"
+      ],
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD", "availability": "https://schema.org/InStock" },
+      "isAccessibleForFree": true,
+      "browserRequirements": "Requires Chromium 116 or newer (Chrome, Edge, Brave)",
+      "softwareVersion": "1.0",
+      "permissions": "Screen capture, camera and microphone (optional), and network observation on the recorded tab (optional)",
+      "screenshot": "https://clickandrecord.com/og-image.png",
+      "publisher": { "@id": "https://clickandrecord.com/#org" }
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://clickandrecord.com/#faq",
+      "mainEntity": [
+        { "@type": "Question", "name": "Is my screen recording uploaded anywhere?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. Recording, editing, subtitle transcription and export all run inside your browser on your own machine. The speech model ships with the extension rather than being downloaded, so subtitles work with the network disconnected. Video only leaves your computer if you explicitly click Save to Google Drive." } },
+        { "@type": "Question", "name": "How does the automatic zoom know where to zoom?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Every click is logged with its position and timestamp while you record. Afterwards the editor turns each click into a zoom keyframe. Because zooms are applied after the fact rather than baked into the video, you can retime them, change their strength and hold, drag the target, or remove any of them." } },
+        { "@type": "Question", "name": "Can I record an application window or my whole screen, not just a browser tab?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes. Click and Record captures a Chrome tab, any application window including non-Chrome apps, or a full display. Click zoom-ins work on all three, though clicks are only detected inside web pages, so clicks in other applications will not produce a zoom." } },
+        { "@type": "Question", "name": "Does the 3-2-1 count-in appear in the recorded video?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. The count-in runs before the recorder starts, so the first frame of your file is the moment it reaches zero. There is nothing to trim off the front." } },
+        { "@type": "Question", "name": "Can I export MP4 as well as WebM?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes. Choose MP4 (H.264 and AAC) or WebM (VP9 and Opus) at export time, along with a quality preset. The dialog shows the exact resolution, bitrate and estimated file size before you commit." } },
+        { "@type": "Question", "name": "How is this different from Cursorful or other auto-zoom screen recorders?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Auto-zoom recorders make polished demo videos but capture nothing about what the page was doing. Bug reporting tools capture network and console logs but produce plain, unpolished video. Click and Record does both: the same recording gives you a demo with cinematic zooms and, optionally, a timestamped network and console log exportable as a HAR file. It also transcribes subtitles on-device, which neither category offers." } },
+        { "@type": "Question", "name": "Do subtitles require an internet connection or an API key?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Neither. A Whisper speech model is bundled with the extension and runs locally in your browser. There is no API key, no per-minute cost and no upload. You can pick a faster or a more accurate model, edit any cue by hand, add cues manually, and download SRT or VTT sidecar files." } },
+        { "@type": "Question", "name": "Is Click and Record free?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes. Recording, the full editor, automatic zooms, subtitles, network and console capture and both export formats are free to use, with no account and no sign-up." } }
+      ]
+    },
+    {
+      "@type": "Organization",
+      "@id": "https://clickandrecord.com/#org",
+      "name": "Click & Record",
+      "url": "https://clickandrecord.com/",
+      "logo": "https://clickandrecord.com/logo.png",
+      "description": "Maker of Click & Record, a Chrome screen recorder with automatic click zoom, on-device subtitles and network capture.",
+      "sameAs": [
+        "https://chromewebstore.google.com/detail/REPLACE-WITH-EXTENSION-ID"
+      ]
+    },
+    { "@type": "WebSite", "@id": "https://clickandrecord.com/#site", "url": "https://clickandrecord.com/", "name": "Click & Record", "publisher": { "@id": "https://clickandrecord.com/#org" } },
+    {
+      "@type": "WebPage",
+      "@id": "https://clickandrecord.com/#page",
+      "url": "https://clickandrecord.com/",
+      "name": "Screen Recorder with Auto Zoom & Subtitles",
+      "isPartOf": { "@id": "https://clickandrecord.com/#site" },
+      "about": { "@id": "https://clickandrecord.com/#app" },
+      "primaryImageOfPage": "https://clickandrecord.com/og-image.png",
+      "datePublished": "2026-07-28",
+      "dateModified": "2026-07-28",
+      "inLanguage": "en",
+      "speakable": {
+        "@type": "SpeakableSpecification",
+        "cssSelector": [".abstract"]
+      },
+      "mentions": [
+        { "@type": "Thing", "name": "Screen recording" },
+        { "@type": "Thing", "name": "Automatic zoom" },
+        { "@type": "Thing", "name": "Closed captioning" },
+        { "@type": "Thing", "name": "HAR (HTTP Archive) file" },
+        { "@type": "Thing", "name": "Bug reporting" }
+      ]
+    }
+  ]
+}
+</script>
+</head>
+
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<!-- The page's playhead. Decorative, so it is hidden from assistive tech. -->
+<div class="scrollhead" aria-hidden="true"><span class="trail"></span><span class="dot"></span></div>
+
+<header class="mast">
+  <div class="shell">
+    <a class="wordmark" href="/"><span class="dotrec" aria-hidden="true"></span> Click&nbsp;&amp;&nbsp;Record</a>
+    <nav aria-label="Primary">
+      <a href="#zoom">Zoom</a>
+      <a href="#subtitles">Subtitles</a>
+      <a href="#evidence">Evidence</a>
+      <a href="#compare">Compare</a>
+      <a href="#faq">FAQ</a>
+      <a href="/editor/editor.html">Editor</a>
+      <button class="themer" id="themer" type="button" aria-pressed="false"
+              aria-label="Switch to dark theme" title="Switch theme">
+        <svg class="ico-sun" viewBox="0 0 20 20" width="16" height="16" fill="none" aria-hidden="true">
+          <circle cx="10" cy="10" r="3.6" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M10 1.8v2.1M10 16.1v2.1M18.2 10h-2.1M3.9 10H1.8M15.8 4.2l-1.5 1.5M5.7 14.3l-1.5 1.5M15.8 15.8l-1.5-1.5M5.7 5.7L4.2 4.2"
+                stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <svg class="ico-moon" viewBox="0 0 20 20" width="16" height="16" fill="none" aria-hidden="true">
+          <path d="M16.5 12.4A7 7 0 017.6 3.5a7 7 0 108.9 8.9z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <a class="btn btn-solid" href="#get">Add to Chrome</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- ── HERO ─────────────────────────────────────────────────────────────── -->
+  <section class="hero">
+    <div class="shell hero-grid">
+      <div>
+        <p class="tc" data-mark="rec">00:00 · Free Chrome extension</p>
+        <h1>Every click becomes a <em>zoom</em>.</h1>
+        <p class="lede">
+          Record a tab, a window, or your whole screen. Click&nbsp;&amp; Record follows what you
+          clicked and pushes in on it — then writes your subtitles on your own machine, and can
+          keep the network log to prove what the app actually did.
+        </p>
+        <div class="actions">
+          <a class="btn btn-solid" href="#get"><span class="dotrec" aria-hidden="true"></span> Add to Chrome</a>
+          <a class="btn btn-line" href="#zoom">How it works</a>
+        </div>
+        <p class="note" style="margin-top:16px">Free. No account, no watermark, no upload.</p>
+
+        <ul class="specs">
+          <li><b>3</b>sources</li>
+          <li><b>0</b>uploads</li>
+          <li><b>MP4</b>&amp; WebM</li>
+        </ul>
+      </div>
+
+      <!-- The demo performs the product rather than picturing it. -->
+      <figure class="demo" role="img" aria-label="A recording in progress: the pointer clicks a metric on a dashboard, the frame pushes in on it, a subtitle appears, and the editor timeline below shows the zoom the click created.">
+        <div class="demo-chrome" aria-hidden="true">
+          <i></i><i></i><i></i>
+          <span class="url">app.example.com/dashboard</span>
+          <span class="live"><i></i> REC</span>
+        </div>
+        <div class="stage" aria-hidden="true">
+          <div class="frame">
+            <div class="ui">
+              <div class="ui-top">
+                <span class="bar" style="width:26%"></span>
+                <span class="bar" style="width:12%;opacity:.5"></span>
+                <span class="bar" style="width:9%;opacity:.5"></span>
+              </div>
+              <div class="ui-cols">
+                <div class="tile"><div class="n">1,284</div><span class="bar" style="width:70%;opacity:.5"></span></div>
+                <div class="tile hot"><div class="n">92.4%</div><span class="bar" style="width:56%;opacity:.5"></span></div>
+                <div class="tile"><div class="n">318</div><span class="bar" style="width:64%;opacity:.5"></span></div>
+              </div>
+              <div class="rows">
+                <div class="row"><span class="bar" style="width:34%"></span><span class="bar" style="width:18%;opacity:.45"></span></div>
+                <div class="row"><span class="bar" style="width:28%"></span><span class="bar" style="width:24%;opacity:.45"></span></div>
+                <div class="row"><span class="bar" style="width:41%"></span><span class="bar" style="width:14%;opacity:.45"></span></div>
+              </div>
+            </div>
+            <span class="ping"></span>
+            <svg class="cursor" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M5 2.5l13.4 8.1-6 .9-2.6 6.2L5 2.5z" fill="#fff" stroke="#0c0e13" stroke-width="1.1" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="subtitle">Conversion is up <b>4.2 points</b> this week</div>
+        </div>
+        <div class="track" aria-hidden="true">
+          <span class="t">00:00</span>
+          <span class="clip"><span class="zoomspan"></span><span class="head"></span></span>
+          <span class="t">00:12</span>
+        </div>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ── IN SHORT ─────────────────────────────────────────────────────────
+       An answer-first block. The hero sells; this states plainly what the thing
+       *is*, in the shape an answer engine can lift — "X is a Y that does Z" —
+       followed by hard facts as key/value pairs, which is the form both AI
+       systems and skim-readers extract most reliably. It earns its place for
+       humans too: anyone arriving cold from a search result gets the whole
+       product in four sentences without scrolling. -->
+  <section id="what">
+    <div class="shell reveal">
+      <p class="tc">00:02 · In short</p>
+      <p class="abstract">
+        <!-- Plain space, not &nbsp;: this is the sentence answer engines are most
+             likely to quote, and a non-breaking space survives naive extractors
+             less reliably than it saves an awkward line break. -->
+        <strong>Click &amp; Record is a free Chrome extension that records your screen
+        and turns every click into an automatic zoom.</strong> It captures a browser tab, an
+        application window or an entire display; transcribes subtitles on your own machine
+        using a bundled Whisper model; and can record the network and console alongside the
+        video for export as a HAR file. It requires no account, and nothing you record is
+        uploaded.
+      </p>
+      <dl class="facts">
+        <div><dt>Price</dt><dd>Free — no account, no watermark, no sign-up</dd></div>
+        <div><dt>Records</dt><dd>A browser tab, any application window, or a whole screen</dd></div>
+        <div><dt>Zoom</dt><dd>Applied automatically on every click, and editable afterwards</dd></div>
+        <div><dt>Subtitles</dt><dd>Transcribed on-device with word-level timing; SRT and VTT export</dd></div>
+        <div><dt>Debugging</dt><dd>Network and console capture, timestamped to the video, exported as HAR</dd></div>
+        <div><dt>Export</dt><dd>MP4 (H.264 + AAC) or WebM (VP9 + Opus), at a quality you choose</dd></div>
+        <div><dt>Aspect ratios</dt><dd>16:9, 9:16, 1:1, 4:5, or the source dimensions</dd></div>
+        <div><dt>Privacy</dt><dd>Recording, editing, transcription and export all run locally; works offline</dd></div>
+        <div><dt>Requires</dt><dd>Chrome, Edge or Brave (Chromium 116 or newer)</dd></div>
+        <div><dt>Without installing</dt><dd>The editor opens on its own — bring your own video and use every tool except automatic click zoom</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- ── ZOOM ─────────────────────────────────────────────────────────────── -->
+  <section id="zoom">
+    <div class="shell split wide-left reveal">
+      <div>
+        <p class="tc" data-mark="zoom">00:04 · Automatic zoom</p>
+        <h2>The zoom is a decision you can change later.</h2>
+        <p class="lede">
+          Most recorders bake the zoom into the pixels the moment you stop. This one logs where
+          you clicked and when, then builds the camera move afterwards — so every push-in stays
+          editable long after the take is over.
+        </p>
+        <ul class="points">
+          <li><b>Retime, restrength, or remove</b> any zoom, or drag its target to somewhere you didn't click.</li>
+          <li><b>Bursts don't stack.</b> Clicks landing inside a zoom already in flight are skipped, so a flurry reads as one move.</li>
+          <li><b>Close clicks link up</b> — the camera pans between them at full magnification instead of yo-yoing out and back.</li>
+          <li><b>Works on window and screen too</b>, not just a browser tab.</li>
+        </ul>
+      </div>
+      <div class="visual">
+        <div class="console">
+          <div class="console-top"><span class="on">Timeline</span><span>Source time</span></div>
+          <div class="log"><span class="ts">00:02.4</span><span class="vb">CLICK</span><span class="ok">zoom 1.6×</span><span class="u">Export button</span></div>
+          <div class="log"><span class="ts">00:05.1</span><span class="vb">CLICK</span><span class="ok">zoom 1.6×</span><span class="u">Row · Acme Corp</span></div>
+          <div class="log"><span class="ts">00:05.6</span><span class="ts">CLICK</span><span class="ts">skipped</span><span class="u">inside active zoom</span></div>
+          <div class="log"><span class="ts">00:09.8</span><span class="vb">MANUAL</span><span class="ok">zoom 2.1×</span><span class="u">added at playhead</span></div>
+        </div>
+        <p class="note" style="margin-top:14px">Every click is stored in recording time, so trimming and speed changes never move a zoom off its mark.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SUBTITLES ────────────────────────────────────────────────────────── -->
+  <section id="subtitles">
+    <div class="shell split reveal">
+      <div class="visual">
+        <div class="console" style="font-family:var(--body);font-size:.92rem">
+          <div class="console-top" style="font-family:var(--mono)"><span class="on">Cues</span><span>Whisper · on-device</span></div>
+          <div style="padding:16px 16px 18px;display:flex;flex-direction:column;gap:11px">
+            <div style="display:flex;gap:13px;align-items:baseline">
+              <span style="font-family:var(--mono);font-size:.72rem;color:var(--faint);font-variant-numeric:tabular-nums">00:00</span>
+              <span style="color:var(--mute)">Here is the <b style="color:var(--cue);font-weight:600">dashboard</b> we shipped</span>
+            </div>
+            <div style="display:flex;gap:13px;align-items:baseline">
+              <span style="font-family:var(--mono);font-size:.72rem;color:var(--faint);font-variant-numeric:tabular-nums">00:04</span>
+              <span style="color:var(--mute)">Clicking a row opens the detail panel</span>
+            </div>
+            <div style="display:flex;gap:13px;align-items:baseline">
+              <span style="font-family:var(--mono);font-size:.72rem;color:var(--faint);font-variant-numeric:tabular-nums">00:09</span>
+              <span style="color:var(--mute)">And that is the whole flow</span>
+            </div>
+          </div>
+        </div>
+        <p class="note" style="margin-top:14px">Word-level timings drive the karaoke highlight — and survive every trim.</p>
+      </div>
+      <div>
+        <p class="tc" data-mark="cue">00:08 · Subtitles</p>
+        <h2>Transcribed here. Not in someone else's cloud.</h2>
+        <p class="lede">
+          The speech model ships inside the extension. Nothing is uploaded, there is no API key
+          and no per-minute bill, and it still works with the network unplugged.
+        </p>
+        <ul class="points">
+          <li><b>Two models</b> — faster, or more accurate when the script is full of product names.</li>
+          <li><b>Edit anything</b>, or write cues by hand when there was never any narration to transcribe.</li>
+          <li><b>Burned in or sidecar</b> — captions render into the video, and SRT or VTT downloads for YouTube and Vimeo.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── EVIDENCE ─────────────────────────────────────────────────────────── -->
+  <section id="evidence">
+    <div class="shell split wide-left reveal">
+      <div>
+        <p class="tc" data-mark="rec">00:11 · Network &amp; console</p>
+        <h2>A demo and a bug report, from one take.</h2>
+        <p class="lede">
+          Turn on capture before you record. Every request and log line is stamped against the
+          video, so clicking a row jumps the playhead to the moment it happened — and the row
+          under the playhead lights up as it plays.
+        </p>
+        <ul class="points">
+          <li><b>Full request detail</b> — method, status, headers, payloads, timings, and response bodies for the calls your page made.</li>
+          <li><b>HAR export</b> that opens straight in Chrome DevTools or Charles.</li>
+          <li><b>Copy as cURL</b>, the same flavour DevTools produces.</li>
+          <li><b>No debugger banner</b> across the page, and DevTools stays yours on the tab being recorded.</li>
+        </ul>
+      </div>
+      <div class="visual">
+        <div class="console">
+          <div class="console-top"><span class="on">Network</span><span>Console</span><span style="margin-left:auto">HAR ↓</span></div>
+          <div class="log"><span class="ts">00:04</span><span class="vb">GET</span><span class="ok">200</span><span class="u">/v2/dashboard/summary</span></div>
+          <div class="log"><span class="ts">00:07</span><span class="vb">POST</span><span class="ok">201</span><span class="u">/v2/events</span></div>
+          <div class="log flag"><span class="ts">00:11</span><span class="vb">GET</span><span class="bad">500</span><span class="u">/v2/report/export</span></div>
+          <div class="log"><span class="ts">00:11</span><span class="ts">ERR</span><span class="bad">TypeError</span><span class="u">cannot read properties of undefined</span></div>
+        </div>
+        <p class="note" style="margin-top:14px">The 500 is at 00:11 in the log and at 00:11 in the video. Same clock.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── LEDGER ───────────────────────────────────────────────────────────── -->
+  <section id="editor">
+    <div class="shell reveal">
+      <p class="tc">00:20 · The editor</p>
+      <h2 style="max-width:19ch">What happens after you stop recording.</h2>
+      <div class="ledger" style="margin-top:38px">
+        <div class="entry"><div><h3>Sources</h3><p class="k">Tab · Window · Screen</p></div>
+          <p>Capture a single tab for the cleanest result, any desktop application including non-Chrome apps, or a whole display when the demo crosses between them.</p></div>
+        <div class="entry"><div><h3>Webcam</h3><p class="k">Separate track</p></div>
+          <p>Your camera is saved beside the video rather than stamped onto it, so afterwards you can resize the bubble, drag it anywhere on the frame, restyle it, or hide it for part of the take.</p></div>
+        <div class="entry"><div><h3>Stage</h3><p class="k">Background · Frame · Crop</p></div>
+          <p>Set the recording on a gradient or your own image, adjust inset, corner radius and shadow, and wrap it in mock macOS or Windows chrome with an editable URL bar.</p></div>
+        <div class="entry"><div><h3>Cut</h3><p class="k">Trim · Split · 0.5–4×</p></div>
+          <p>Take a mistake out of the middle, then run the dull stretch at 4× while narration stays intact. Speed is set per clip, not per video.</p></div>
+        <div class="entry"><div><h3>Deliver</h3><p class="k">16:9 · 9:16 · 1:1 · 4:5</p></div>
+          <p>Export the same recording for YouTube, for Shorts and Reels, or for a square feed. Pick MP4 or WebM and a quality — the dialog states the resolution, bitrate and file size before you commit.</p></div>
+      </div>
+      <div class="actions" style="margin-top:34px">
+        <a class="btn btn-line" href="/editor/editor.html" data-cta="open-editor-inline">Open the editor with your own video →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── COMPARE ──────────────────────────────────────────────────────────── -->
+  <section id="compare">
+    <div class="shell reveal">
+      <p class="tc" data-mark="link">00:34 · Where it sits</p>
+      <h2 style="max-width:22ch">Two categories. Nothing in the overlap.</h2>
+      <p class="lede" style="margin-bottom:34px">
+        Auto-zoom recorders make a handsome video and know nothing about what the page was doing.
+        Bug-report recorders keep the logs and hand you a plain one. This does both from a single take.
+      </p>
+      <div class="sheet">
+        <table>
+          <caption>Compiled from each product's own publicly listed features, July 2026. Vendors change; check theirs.</caption>
+          <thead>
+            <tr>
+              <th scope="col">Capability</th>
+              <th scope="col" class="us">Click &amp; Record</th>
+              <th scope="col">Auto-zoom recorders</th>
+              <th scope="col">Bug-report recorders</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row">Automatic zoom on clicks</th><td class="us">Yes</td><td>Yes</td><td>No</td></tr>
+            <tr><th scope="row">Backgrounds &amp; browser frames</th><td class="us">Yes</td><td>Yes</td><td>No</td></tr>
+            <tr><th scope="row">Network &amp; console capture</th><td class="us">Yes</td><td>No</td><td>Yes</td></tr>
+            <tr><th scope="row">HAR export for DevTools</th><td class="us">Yes</td><td>No</td><td>Usually</td></tr>
+            <tr><th scope="row">Subtitles transcribed on-device</th><td class="us">Yes</td><td>No</td><td>No</td></tr>
+            <tr><th scope="row">Webcam movable after recording</th><td class="us">Yes</td><td>Burned in</td><td>Varies</td></tr>
+            <tr><th scope="row">Count-in kept out of the file</th><td class="us">Yes</td><td>Varies</td><td>Varies</td></tr>
+            <tr><th scope="row">Runs fully offline</th><td class="us">Yes</td><td>Varies</td><td>Often cloud</td></tr>
+            <tr><th scope="row">Account required</th><td class="us">No</td><td>Varies</td><td>Usually</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FAQ ──────────────────────────────────────────────────────────────── -->
+  <section id="faq">
+    <div class="shell reveal">
+      <p class="tc">00:47 · Questions</p>
+      <h2 style="max-width:14ch">Before you install.</h2>
+      <div class="faq" style="margin-top:34px">
+        <details open>
+          <summary>Is my screen recording uploaded anywhere?</summary>
+          <div><p>No. Recording, editing, subtitle transcription and export all run inside your browser on your own machine. The speech model ships with the extension rather than being downloaded, so subtitles work with the network disconnected. Video only leaves your computer if you explicitly click <strong>Save to Google Drive</strong>.</p></div>
+        </details>
+        <details>
+          <summary>How does the automatic zoom know where to zoom?</summary>
+          <div><p>Every click is logged with its position and timestamp while you record. Afterwards the editor turns each click into a zoom keyframe. Because zooms are applied after the fact rather than baked into the video, you can retime them, change their strength and hold, drag the target, or remove any of them.</p></div>
+        </details>
+        <details>
+          <summary>Can I record an application window or my whole screen, not just a browser tab?</summary>
+          <div><p>Yes — a Chrome tab, any application window including non-Chrome apps, or a full display. Click zoom-ins work on all three. One honest limit: clicks are only detected inside web pages, so clicking in another application will not produce a zoom.</p></div>
+        </details>
+        <details>
+          <summary>Does the 3-2-1 count-in appear in the recorded video?</summary>
+          <div><p>No. The count-in runs before the recorder starts, so the first frame of your file is the moment it reaches zero. There is nothing to trim off the front.</p></div>
+        </details>
+        <details>
+          <summary>Can I export MP4 as well as WebM?</summary>
+          <div><p>Yes. Choose MP4 (H.264 + AAC) or WebM (VP9 + Opus) at export time, along with a quality preset. The dialog shows the exact resolution, bitrate and estimated file size before you commit.</p></div>
+        </details>
+        <details>
+          <summary>How is this different from Cursorful or other auto-zoom screen recorders?</summary>
+          <div>
+            <p>Auto-zoom recorders make polished demo videos but capture nothing about what the page was doing. Bug reporting tools capture network and console logs but produce plain, unpolished video.</p>
+            <p>Click &amp; Record does both from one recording, and adds on-device subtitles, which neither category offers.</p>
+          </div>
+        </details>
+        <details>
+          <summary>Do subtitles require an internet connection or an API key?</summary>
+          <div><p>Neither. A Whisper model is bundled with the extension and runs locally. No API key, no per-minute cost, no upload. Pick a faster or more accurate model, edit any cue, add cues by hand, and download SRT or VTT sidecars.</p></div>
+        </details>
+        <details>
+          <summary>Is Click &amp; Record free?</summary>
+          <div><p>Yes. Recording, the full editor, automatic zooms, subtitles, network and console capture and both export formats are free, with no account and no sign-up.</p></div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CLOSE ────────────────────────────────────────────────────────────── -->
+  <section id="get" class="close">
+    <div class="shell reveal">
+      <p class="tc" data-mark="rec">01:02 · Start</p>
+      <h2>Record something worth watching.</h2>
+      <p class="lede">Free, no account, and nothing leaves your machine.</p>
+      <div class="actions">
+        <a class="btn btn-solid" href="#" data-cta="chrome-store"><span class="dotrec" aria-hidden="true"></span> Add to Chrome</a>
+        <a class="btn btn-line" href="/editor/editor.html" data-cta="open-editor">Open the editor</a>
+      </div>
+      <p class="note" style="margin-top:18px;max-width:52ch">
+        The editor runs in your browser. Open a video you already have and try the
+        trimming, zooms and subtitles before installing anything — recording is the only
+        part that needs the extension.
+      </p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="shell">
+    <div class="fcols">
+      <div>
+        <a class="wordmark" href="/"><span class="dotrec" aria-hidden="true"></span> Click&nbsp;&amp;&nbsp;Record</a>
+        <p style="margin-top:14px;max-width:32ch;color:var(--faint)">
+          The screen recorder that pushes in on every click — and can prove what the app was doing.
+        </p>
+      </div>
+      <div><h3>Product</h3><ul>
+        <li><a href="#zoom">Automatic zoom</a></li>
+        <li><a href="#subtitles">Subtitles</a></li>
+        <li><a href="#evidence">Network &amp; console</a></li>
+        <li><a href="/editor/editor.html">Open the editor</a></li>
+      </ul></div>
+      <div><h3>Uses</h3><ul>
+        <li><a href="#zoom">Product demos</a></li>
+        <li><a href="#subtitles">Tutorials</a></li>
+        <li><a href="#evidence">Bug reports</a></li>
+        <li><a href="#editor">Support replies</a></li>
+      </ul></div>
+      <div><h3>More</h3><ul>
+        <li><a href="#compare">Comparison</a></li>
+        <li><a href="#faq">FAQ</a></li>
+        <li><a href="/privacy">Privacy</a></li>
+        <li><a href="/terms">Terms</a></li>
+      </ul></div>
+    </div>
+    <div class="rule">
+      <span>© 2026 Click &amp; Record</span>
+      <span>Built for people who make demos.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+// One gesture, applied once. Sections settle in as they arrive; anything already
+// on screen at load is revealed immediately so nothing waits on a scroll that
+// never comes.
+(function () {
+  var items = document.querySelectorAll('.reveal');
+  if (!('IntersectionObserver' in window) ||
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    items.forEach(function (el) { el.classList.add('in'); });
+    return;
+  }
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    });
+  }, { rootMargin: '0px 0px -12% 0px', threshold: 0.06 });
+  items.forEach(function (el) { io.observe(el); });
+})();
+
+// ── Theme ───────────────────────────────────────────────────────────────────
+// Light is the default. The choice persists, and the button always shows the
+// theme it would move you to.
+(function () {
+  var root = document.documentElement;
+  var btn = document.getElementById('themer');
+  if (!btn) return;
+
+  function sync() {
+    var dark = root.getAttribute('data-theme') === 'dark';
+    btn.setAttribute('aria-pressed', String(dark));
+    btn.setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme');
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', dark ? '#0c0e13' : '#ffffff');
+  }
+
+  btn.addEventListener('click', function () {
+    var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('cr-theme', next); } catch (e) {}
+    sync();
+  });
+
+  sync();
+})();
+
+// ── The page's playhead ──────────────────────────────────────────────────────
+// Scrubs down the rail as you scroll, and lights each section marker as it
+// passes — the rail is a timeline, so this is the one thing it was missing.
+// Reads are batched into a rAF so scrolling never triggers layout per event.
+(function () {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  var head = document.querySelector('.scrollhead');
+  var dot = head.querySelector('.dot');
+  var trail = head.querySelector('.trail');
+  var marks = [].slice.call(document.querySelectorAll('.tc'));
+  var queued = false;
+
+  // The rule lives at the shell's left edge, so the playhead borrows that x.
+  function place() {
+    var shell = document.querySelector('.shell');
+    if (!shell) return;
+    document.documentElement.style.setProperty(
+      '--ph-x', Math.round(shell.getBoundingClientRect().left) + 'px');
+  }
+
+  function frame() {
+    queued = false;
+    var max = document.documentElement.scrollHeight - window.innerHeight;
+    var progress = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+    var y = progress * window.innerHeight;
+    dot.style.top = y + 'px';
+    trail.style.height = y + 'px';
+
+    // A marker is live while the playhead sits inside *its section* — not merely
+    // while the marker itself is on screen, which went dark as soon as you read
+    // past the heading and left most of the page unmarked.
+    marks.forEach(function (m) {
+      var s = m.closest('section') || m.parentElement;
+      var r = s.getBoundingClientRect();
+      m.classList.toggle('live', r.top <= y && r.bottom >= y);
+    });
+  }
+
+  function onScroll() {
+    if (queued) return;
+    queued = true;
+    requestAnimationFrame(frame);
+  }
+
+  place();
+  frame();
+  head.classList.add('ready');
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', function () { place(); onScroll(); });
+
+  // requestAnimationFrame does not run in a background tab. If the tab is hidden
+  // mid-scroll the queued flag would otherwise stay set, and every later scroll
+  // would be swallowed. Clearing it on return re-syncs the playhead in one step.
+  document.addEventListener('visibilitychange', function () {
+    if (!document.hidden) { queued = false; place(); frame(); }
+  });
+})();
+</script>
+</body>
+</html>

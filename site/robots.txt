@@ -1,0 +1,61 @@
+# https://clickandrecord.com/robots.txt
+# Everything is public — there is nothing here worth hiding from a crawler, and a
+# needlessly restrictive robots.txt is a common own-goal.
+
+# ── Search engines ───────────────────────────────────────────────────────────
+User-agent: *
+Allow: /
+
+# The editor is an application shell with no crawlable copy, and a ?session= URL is a
+# dead link for everyone except the person who recorded it — so it stays out of the
+# index. Note this does mean the "free browser video editor" angle cannot rank on its
+# own; if that becomes worth pursuing, the answer is a real marketing page that links
+# *into* the tool, not un-blocking this.
+Disallow: /editor/
+Disallow: /vendor/
+
+# ── Answer engines and AI assistants ─────────────────────────────────────────
+# Named explicitly and allowed on purpose. These crawlers decide whether Click &
+# Record can be mentioned at all when someone asks ChatGPT, Perplexity, Claude or
+# Google's AI Overviews for "a screen recorder that zooms on clicks". Being absent
+# from them is invisibility in a fast-growing share of product discovery, and the
+# `User-agent: *` block above would already have permitted them — this section
+# exists so the decision is deliberate and survives the next edit.
+#
+# Two of these are a real judgement call rather than an obvious yes: GPTBot and
+# CCBot feed model *training*, not live citation. They are allowed here on the
+# view that a tool people can only find by searching benefits from being known.
+# Disallow those two if you would rather the copy stayed out of training corpora;
+# it costs little retrieval reach, because the retrieval bots are separate.
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-User
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+Sitemap: https://clickandrecord.com/sitemap.xml

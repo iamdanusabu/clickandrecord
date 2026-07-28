@@ -1,0 +1,374 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Click &amp; Record — Editor</title>
+  <link rel="stylesheet" href="editor.css" />
+</head>
+<body>
+<div class="app">
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo-dot" title="Click &amp; Record"></div>
+      <!-- An input rather than a heading: the recording's name is the one piece of text
+           on this page the user owns, and it names the exported file. -->
+      <input
+        id="recording-name"
+        class="recording-name"
+        type="text"
+        spellcheck="false"
+        maxlength="120"
+        placeholder="Untitled recording"
+        aria-label="Recording name"
+        title="Click to rename — this names the exported file"
+      />
+    </div>
+    <div class="topbar-right">
+      <span id="status-text" class="status-text"></span>
+      <button id="btn-drive" class="secondary">
+        <svg viewBox="0 0 87.3 78" width="15" height="15" aria-hidden="true">
+          <path d="M6.6 66.85l3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3l13.75-23.8H0c0 1.55.4 3.1 1.2 4.5z" fill="#0066da"/>
+          <path d="M43.65 25L29.9 1.2c-1.35.8-2.5 1.9-3.3 3.3l-25.4 44A9.06 9.06 0 000 53h27.5z" fill="#00ac47"/>
+          <path d="M73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75 7.65-13.25c.8-1.4 1.2-2.95 1.2-4.5H59.798l5.852 11.5z" fill="#ea4335"/>
+          <path d="M43.65 25L57.4 1.2C56.05.4 54.5 0 52.9 0H34.4c-1.6 0-3.15.45-4.5 1.2z" fill="#00832d"/>
+          <path d="M59.8 53H27.5L13.75 76.8c1.35.8 2.9 1.2 4.5 1.2h50.8c1.6 0 3.15-.45 4.5-1.2z" fill="#2684fc"/>
+          <path d="M73.4 26.5l-12.7-22c-.8-1.4-1.95-2.5-3.3-3.3L43.65 25l16.15 28h27.45c0-1.55-.4-3.1-1.2-4.5z" fill="#ffba00"/>
+        </svg>
+        Save to Drive
+      </button>
+      <button id="btn-export" class="primary">
+        <svg viewBox="0 0 20 20" width="15" height="15" fill="none" aria-hidden="true"><path d="M10 3v10m0 0l-4-4m4 4l4-4M4 16h12" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Export
+      </button>
+    </div>
+  </header>
+
+  <div class="workspace">
+
+    <!-- ============ centre column: preview, transport, timeline ============ -->
+    <main class="stage-col">
+
+      <!-- Shown when the editor is opened on its own rather than from a recording.
+           Everything downstream is identical: the file you pick takes the place a
+           capture would have, so zooms, trimming, subtitles and export all behave
+           the same way. -->
+      <div class="dropzone" id="dropzone">
+        <div class="dz-card">
+          <svg viewBox="0 0 48 48" width="40" height="40" fill="none" aria-hidden="true">
+            <rect x="4" y="10" width="30" height="28" rx="4" stroke="currentColor" stroke-width="2.2"/>
+            <path d="M44 16.5v15l-10-5.5v-4l10-5.5z" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/>
+            <path d="M19 20v9M14.5 24.5h9" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+          </svg>
+          <h2>Open a video to edit</h2>
+          <p>Trim and split it, run the slow parts faster, add zooms, generate subtitles
+             on your machine, then export MP4 or WebM.</p>
+          <button id="btn-open-video" class="primary">Choose a video…</button>
+          <p class="dz-hint">or drop one anywhere on this page</p>
+        </div>
+      </div>
+
+      <div class="preview-wrap">
+        <!-- The overlays live inside this wrapper and are positioned relative to it,
+             so they stay pinned to the video when the page scrolls. -->
+        <div class="preview-stage" id="preview-stage">
+          <canvas id="preview-canvas" width="1280" height="720"></canvas>
+          <!-- The crop overlay dims everything outside itself with a huge box-shadow,
+               so it needs its own clipper. The stage itself must NOT clip, or the
+               zoom crosshair gets cut in half whenever a zoom targets an edge. -->
+          <div class="crop-clip">
+            <div class="crop-overlay" id="crop-overlay">
+              <div class="crop-handle top" data-edge="top"></div>
+              <div class="crop-handle bottom" data-edge="bottom"></div>
+              <div class="crop-handle left" data-edge="left"></div>
+              <div class="crop-handle right" data-edge="right"></div>
+            </div>
+          </div>
+          <div class="zoom-target" id="zoom-target" title="Drag to aim this zoom"></div>
+        </div>
+      </div>
+
+      <div class="transport">
+        <button id="btn-play" class="round-btn" title="Play / pause (Space)">
+          <svg id="icon-play" viewBox="0 0 20 20" width="15" height="15" fill="currentColor"><path d="M6.5 4.4v11.2l9.2-5.6-9.2-5.6z"/></svg>
+          <svg id="icon-pause" viewBox="0 0 20 20" width="15" height="15" fill="currentColor" class="hidden"><path d="M6 4h3.1v12H6zM10.9 4H14v12h-3.1z"/></svg>
+        </button>
+        <span id="time-label">00:00.0 / 00:00.0</span>
+      </div>
+
+      <div class="timeline-panel">
+        <div class="timeline-toolbar">
+          <button id="btn-split" class="ghost" title="Split the clip at the playhead (S)">
+            <svg viewBox="0 0 20 20" width="14" height="14" fill="none" aria-hidden="true"><path d="M10 2.5v15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="2.6 2.6"/><path d="M5 5.5l3 4.5-3 4.5M15 5.5l-3 4.5 3 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Split
+          </button>
+          <button id="btn-add-zoom" class="ghost" title="Add a zoom at the playhead">
+            <svg viewBox="0 0 20 20" width="14" height="14" fill="none" aria-hidden="true"><circle cx="9" cy="9" r="5.4" stroke="currentColor" stroke-width="1.5"/><path d="M9 6.9v4.2M6.9 9h4.2M13 13l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            Add zoom
+          </button>
+          <button id="btn-add-video" class="ghost" title="Append another video clip">
+            <svg viewBox="0 0 20 20" width="14" height="14" fill="none" aria-hidden="true"><rect x="2.6" y="4.6" width="10" height="10.8" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M17.4 7.2v5.6l-4-2.2v-1.2l4-2.2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+            Add clip
+          </button>
+
+          <span class="toolbar-spacer"></span>
+
+          <span class="toolbar-label">Click zooms</span>
+          <button id="btn-zoom-all" class="ghost">Zoom every click</button>
+          <button id="btn-zoom-none" class="ghost">Clear all</button>
+        </div>
+
+        <div class="timeline-scroll">
+          <div class="timeline-body" id="timeline-body">
+            <div class="ruler" id="ruler"></div>
+            <div class="timeline-track" id="timeline-track">
+              <!-- clips injected here: each has a video lane and an audio lane -->
+            </div>
+            <div class="zoom-lane" id="zoom-lane" title="Zoom-ins and detected clicks"></div>
+            <div class="caption-lane hidden" id="caption-lane" title="Subtitle cues"></div>
+            <div class="playhead" id="playhead">
+              <div class="playhead-grab" id="playhead-grab" title="Drag to scrub"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- #zoom-settings is injected by editor.js immediately after .timeline-panel,
+           so it lands here, directly under the lane it belongs to. -->
+
+      <div class="clip-panel hidden" id="clip-panel"></div>
+
+      <p class="tip">Yellow dots are clicks — each one gets a zoom automatically. Click a dot to toggle it, drag a clip's ends to trim, hover the timeline to scrub.</p>
+
+      <input type="file" id="file-input" accept="video/*" class="hidden" />
+    </main>
+
+    <!-- ============ right rail: everything that styles the output ============ -->
+    <aside class="rail">
+      <nav class="rail-tabs" id="rail-tabs">
+        <button class="rail-tab active" data-page="style" title="Background">
+          <svg viewBox="0 0 20 20" width="18" height="18" fill="none" aria-hidden="true"><path d="M10 2.6c-4.1 0-7.4 3.1-7.4 7 0 3.9 3.3 6.7 7.4 6.7.9 0 1.6-.7 1.6-1.5 0-.4-.2-.8-.4-1.1-.3-.3-.4-.6-.4-1 0-.8.7-1.5 1.6-1.5h1.1c2 0 3.5-1.5 3.5-3.5 0-3.2-3.3-5.1-6.9-5.1z" stroke="currentColor" stroke-width="1.4"/><circle cx="6.4" cy="9.2" r="1" fill="currentColor"/><circle cx="9.4" cy="6.3" r="1" fill="currentColor"/><circle cx="13" cy="7.6" r="1" fill="currentColor"/></svg>
+          <span>Style</span>
+        </button>
+        <button class="rail-tab" data-page="frame" title="Window frame">
+          <svg viewBox="0 0 20 20" width="18" height="18" fill="none" aria-hidden="true"><rect x="2.6" y="3.6" width="14.8" height="12.8" rx="2.2" stroke="currentColor" stroke-width="1.4"/><path d="M2.6 7.6h14.8" stroke="currentColor" stroke-width="1.4"/><circle cx="5.3" cy="5.6" r=".8" fill="currentColor"/><circle cx="7.7" cy="5.6" r=".8" fill="currentColor"/></svg>
+          <span>Frame</span>
+        </button>
+        <button class="rail-tab" data-page="camera" title="Webcam bubble">
+          <svg viewBox="0 0 20 20" width="18" height="18" fill="none" aria-hidden="true"><circle cx="10" cy="8" r="3.1" stroke="currentColor" stroke-width="1.4"/><path d="M3.6 16.8c.9-2.9 3.4-4.4 6.4-4.4s5.5 1.5 6.4 4.4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          <span>Camera</span>
+        </button>
+        <button class="rail-tab" data-page="output" title="Aspect ratio and crop">
+          <svg viewBox="0 0 20 20" width="18" height="18" fill="none" aria-hidden="true"><path d="M6.2 2.4v11.4h11.4M2.4 6.2h11.4v11.4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span>Output</span>
+        </button>
+        <button class="rail-tab" data-page="subtitles" title="Subtitles">
+          <svg viewBox="0 0 20 20" width="18" height="18" fill="none" aria-hidden="true"><rect x="2.4" y="4.2" width="15.2" height="11.6" rx="2.2" stroke="currentColor" stroke-width="1.4"/><path d="M8.3 9.2a2 2 0 100 2.4M14.2 9.2a2 2 0 100 2.4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          <span>Subtitles</span>
+        </button>
+        <button class="rail-tab" data-page="inspect" title="Network &amp; console capture">
+          <svg viewBox="0 0 20 20" width="18" height="18" fill="none" aria-hidden="true"><path d="M2.4 10.6h3.2l2-5.2 3 10.2 2.2-6.4 1.3 1.4h3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span>Inspect</span>
+        </button>
+      </nav>
+
+      <div class="rail-body">
+
+        <!-- ---- Style: background + stage look ---- -->
+        <section class="rail-page active" data-page="style">
+          <div class="field-group">
+            <h3 class="field-title">Background</h3>
+            <div class="swatches" id="bg-swatches"></div>
+            <div class="field-actions">
+              <button id="btn-bg-image" class="ghost">Upload image…</button>
+              <button id="btn-bg-clear" class="ghost hidden">Remove image</button>
+              <input type="file" id="bg-file-input" accept="image/*" class="hidden" />
+            </div>
+          </div>
+
+          <div class="field-group">
+            <h3 class="field-title">Stage</h3>
+            <label class="field"><span class="field-label">Inset</span><input type="range" id="stage-padding" min="0" max="0.14" step="0.005" /><span class="kf-val" id="stage-padding-val"></span></label>
+            <label class="field"><span class="field-label">Corners</span><input type="range" id="stage-radius" min="0" max="0.05" step="0.002" /><span class="kf-val" id="stage-radius-val"></span></label>
+            <label class="check"><input type="checkbox" id="stage-shadow" checked /> Drop shadow</label>
+            <label class="check" id="trim-bars-wrap" hidden><input type="checkbox" id="stage-trim-bars" checked /> Trim black bars</label>
+          </div>
+        </section>
+
+        <!-- ---- Frame: mock window chrome ---- -->
+        <section class="rail-page" data-page="frame">
+          <div class="field-group">
+            <h3 class="field-title">Window frame</h3>
+            <div class="frame-options" id="frame-options"></div>
+            <label class="check"><input type="checkbox" id="frame-light" /> Light chrome</label>
+          </div>
+          <div class="field-group">
+            <h3 class="field-title">URL bar</h3>
+            <label class="url-label"><input type="text" id="frame-label" class="frame-url-input" placeholder="example.com/page" /></label>
+            <p class="field-hint">Shown in the mock browser's address bar — edit it if the real URL isn't for public eyes.</p>
+          </div>
+        </section>
+
+        <!-- ---- Camera: webcam bubble ---- -->
+        <section class="rail-page" data-page="camera">
+          <div class="field-group" id="webcam-row" hidden>
+            <h3 class="field-title">Webcam bubble</h3>
+            <label class="check"><input type="checkbox" id="cam-enabled" checked /> Show bubble</label>
+            <div class="field-sub">Position</div>
+            <div class="frame-options" id="cam-corners"></div>
+            <label class="field"><span class="field-label">Size</span><input type="range" id="cam-size" min="0.1" max="0.45" step="0.01" /><span class="kf-val" id="cam-size-val"></span></label>
+            <div class="field-sub">Shape</div>
+            <div class="frame-options" id="cam-shapes"></div>
+            <div class="check-row">
+              <label class="check"><input type="checkbox" id="cam-border" checked /> Border</label>
+              <label class="check"><input type="checkbox" id="cam-shadow" checked /> Shadow</label>
+              <label class="check"><input type="checkbox" id="cam-mirror" checked /> Mirror</label>
+            </div>
+            <p class="field-hint">Drag the bubble anywhere on the preview. Use a clip's <strong>Webcam</strong> checkbox to hide it for part of the video.</p>
+          </div>
+          <p class="rail-empty" id="webcam-empty">This recording has no separate webcam track.</p>
+        </section>
+
+        <!-- ---- Output: aspect + crop ---- -->
+        <section class="rail-page" data-page="output">
+          <div class="field-group">
+            <h3 class="field-title">Aspect ratio</h3>
+            <div class="frame-options" id="aspect-options"></div>
+          </div>
+          <div class="field-group">
+            <h3 class="field-title">Crop</h3>
+            <div class="field-actions">
+              <button id="btn-crop" class="ghost">Crop</button>
+              <button id="btn-crop-reset" class="ghost">Reset crop</button>
+            </div>
+            <p class="field-hint">Turn Crop on, then drag the edges of the preview. Reset returns to the automatic letterbox trim.</p>
+          </div>
+        </section>
+
+        <!-- ---- Subtitles ---- -->
+        <section class="rail-page" data-page="subtitles">
+          <div class="subs-panel" id="subs-panel">
+            <div class="subs-head">
+              <button id="btn-transcribe" class="ghost wide">
+                <svg viewBox="0 0 20 20" width="14" height="14" fill="none" aria-hidden="true"><path d="M10 2.8a2.3 2.3 0 012.3 2.3v4.3a2.3 2.3 0 11-4.6 0V5.1A2.3 2.3 0 0110 2.8z" stroke="currentColor" stroke-width="1.4"/><path d="M5 9.2a5 5 0 0010 0M10 14.4v2.8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+                Generate subtitles
+              </button>
+              <div class="field-sub">Model</div>
+              <div class="frame-options" id="sub-models"></div>
+              <label class="check"><input type="checkbox" id="sub-enabled" checked /> Show captions</label>
+              <div class="field-sub">Style</div>
+              <div class="frame-options" id="sub-styles"></div>
+              <label class="field"><span class="field-label">Size</span><input type="range" id="sub-size" min="0.025" max="0.08" step="0.002" /><span class="kf-val" id="sub-size-val"></span></label>
+              <div class="field-sub">Position</div>
+              <div class="frame-options" id="sub-positions"></div>
+              <label class="check"><input type="checkbox" id="sub-highlight" /> Word highlight</label>
+              <div class="check-row">
+                <label class="colour">Text <input type="color" id="sub-color" /></label>
+                <label class="colour">Accent <input type="color" id="sub-highlight-color" /></label>
+              </div>
+              <div class="field-actions">
+                <button id="btn-srt" class="ghost">Download .srt</button>
+                <button id="btn-vtt" class="ghost">Download .vtt</button>
+              </div>
+            </div>
+            <p class="subs-hint" id="subs-hint">Transcribed on this machine — nothing is uploaded. The first run loads the model, so it takes a moment. You can also write cues by hand with <strong>+ Add cue</strong>.</p>
+            <div class="subs-progress hidden" id="subs-progress">
+              <div class="subs-progress-top">
+                <span class="subs-spinner"></span>
+                <span id="sub-progress-label">Working…</span>
+                <span class="subs-detail" id="sub-progress-detail"></span>
+                <span class="subs-elapsed" id="sub-progress-elapsed">0:00</span>
+              </div>
+              <div class="subs-bar"><div class="subs-bar-fill" id="sub-progress"></div></div>
+              <p class="subs-note">Running on your machine — the first run also loads the speech model. Roughly half a minute for a short recording. You can keep editing while it works.</p>
+            </div>
+            <div class="subs-list-head">
+              <span class="toolbar-label" id="subs-count">No cues yet</span>
+              <button id="btn-add-cue" class="ghost" title="Write a cue by hand at the playhead">
+                <svg viewBox="0 0 20 20" width="13" height="13" fill="none" aria-hidden="true"><path d="M10 4.4v11.2M4.4 10h11.2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+                Add cue
+              </button>
+            </div>
+            <div class="subs-list" id="subs-list"></div>
+          </div>
+        </section>
+
+        <!-- ---- Inspect: QA capture ---- -->
+        <section class="rail-page" data-page="inspect">
+          <div class="debug-panel hidden" id="debug-panel">
+            <div class="debug-head">
+              <div class="debug-tabs">
+                <button class="debug-tab active" id="tab-network" data-tab="network">Network <span class="count" id="count-network">0</span></button>
+                <button class="debug-tab" id="tab-console" data-tab="console">Console <span class="count" id="count-console">0</span></button>
+              </div>
+              <input type="search" id="debug-filter" class="debug-filter" placeholder="Filter…" />
+              <label class="check follow-check"><input type="checkbox" id="debug-follow" checked /> Follow playhead</label>
+              <div class="field-actions">
+                <button id="btn-download-har" class="ghost">Download HAR</button>
+                <button id="btn-download-console" class="ghost">Download console log</button>
+              </div>
+            </div>
+            <p class="debug-note hidden" id="debug-note"></p>
+            <div class="debug-list" id="debug-list"></div>
+          </div>
+          <p class="rail-empty" id="debug-empty-state">Nothing was captured for this recording. Turn on <strong>Network &amp; console</strong> in the popup before recording to collect it.</p>
+        </section>
+
+      </div>
+    </aside>
+  </div>
+</div>
+
+<div class="hover-preview" id="hover-preview">
+  <canvas id="hover-preview-canvas" width="160" height="90"></canvas>
+  <span id="hover-preview-time">00:00</span>
+</div>
+
+<div id="export-dialog" class="modal hidden">
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="export-dialog-title">
+    <h2 class="modal-title" id="export-dialog-title">Export video</h2>
+
+    <div class="field-group">
+      <h3 class="field-title">Format</h3>
+      <div class="frame-options" id="export-formats"></div>
+      <p class="field-hint" id="export-format-note"></p>
+    </div>
+
+    <div class="field-group">
+      <h3 class="field-title">Quality</h3>
+      <div class="frame-options" id="export-qualities"></div>
+      <p class="field-hint" id="export-estimate"></p>
+    </div>
+
+    <div class="modal-actions">
+      <button id="export-cancel" class="ghost">Cancel</button>
+      <button id="export-go" class="primary">
+        <svg viewBox="0 0 20 20" width="15" height="15" fill="none" aria-hidden="true"><path d="M10 3v10m0 0l-4-4m4 4l4-4M4 16h12" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Export
+      </button>
+    </div>
+  </div>
+</div>
+
+<div id="export-overlay" class="export-overlay hidden">
+  <div class="export-box">
+    <div class="spinner"></div>
+    <p>Exporting your video… <span id="export-progress">0%</span></p>
+    <p class="hint">This renders in real time, so it takes about as long as the final video's length.</p>
+    <!-- Not a nicety: the render loop is driven by requestAnimationFrame, which Chrome
+         stops entirely in a hidden tab. Switch away and the export stalls where it is. -->
+    <p class="hint warn"><strong>Keep this tab visible</strong> — switching to another tab
+      pauses the render until you come back.</p>
+    <button id="btn-export-cancel" class="ghost">Cancel export</button>
+  </div>
+</div>
+
+<!-- db.js is loaded on demand, and only when running inside the extension —
+     the hosted copy of this page gets its recording through bridge.html
+     instead, so it needs nothing but editor.js/.css to be served. -->
+<script src="editor.js"></script>
+<!-- Purely presentational: drives the right-rail tabs. Loaded after editor.js so a
+     failure here can never stop the editor itself from wiring up. -->
+<script src="ui.js"></script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+/* The visible window whose only job is to trigger Chrome's camera/mic prompt.
+   Shares the popup's palette, which is the editor's palette — one light identity
+   across every surface the extension shows. */
+
+/* Inter, vendored under /fonts — see fonts/README.md. */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('fonts/inter-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('fonts/inter-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face{font-family:'Archivo';font-style:normal;font-weight:400 700;font-stretch:75% 125%;
+  font-display:swap;src:url('fonts/archivo-latin.woff2') format('woff2')}
+
+* { box-sizing: border-box; }
+html, body {
+  margin: 0;
+  height: 100%;
+  background: #ffffff;
+  color: #14161c;
+  font-family: 'Inter', 'Segoe UI Variable Text', 'Segoe UI', -apple-system, Roboto, sans-serif;
+  font-size: 13px;
+  letter-spacing: -0.006em;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+.box {
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.logo-dot {
+  width: 11px; height: 11px;
+  border-radius: 50%;
+  background: #e5484d;
+  box-shadow: 0 0 0 3px rgba(229, 72, 77, 0.14);
+}
+h1 { font-family: 'Archivo', Impact, sans-serif; font-size: 16px; margin: 0;
+     font-weight: 650; font-stretch: 108%; letter-spacing: -0.022em; }
+.hint { font-size: 12px; color: #5c6371; margin: 0; line-height: 1.55; }
+.error { font-size: 12px; color: #c2373b; margin: 0; line-height: 1.55; }
+.hidden { display: none !important; }
+/* Indigo, not red: red is reserved for the record control across the product, and
+   this button only says "Try again". */
+.primary {
+  align-self: flex-start;
+  background: #5b5bd6;
+  color: #fff;
+  border: none;
+  border-radius: 9px;
+  padding: 9px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+.primary:hover { background: #4f4fc4; }
