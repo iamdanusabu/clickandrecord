@@ -1293,15 +1293,26 @@ body.scrubbing, body.scrubbing * { cursor: ew-resize !important; user-select: no
 }
 .export-box p { margin: 0 0 6px; font-size: 13px; font-weight: 600; }
 .export-box .hint { margin: 0; font-size: 12px; font-weight: 400; color: var(--text-dim); line-height: 1.5; }
-.export-box .hint.warn {
-  margin-top: 10px;
+/* #export-headline-active and #export-headline-paused share one line; exactly one
+   is shown at a time via .paused on the wrapper. Toggling display rather than
+   overwriting textContent means #export-progress (nested in the active line)
+   never gets destroyed by a state change. */
+#export-headline-paused { display: none; }
+#export-headline.paused #export-headline-active { display: none; }
+#export-headline.paused #export-headline-paused { display: inline; }
+/* An informational hold, not a warning about data loss — amber-quiet rather than
+   alarmed, applied by JS in renderComposition's visibilitychange handler. */
+#export-headline.paused {
+  margin: 0 0 6px;
   padding: 8px 10px;
   background: #fff8e8;
   border: 1px solid #f2e0b8;
   border-radius: var(--radius-xs);
   color: #8a5a00;
 }
-.export-box .hint.warn strong { color: #6f4800; font-weight: 650; }
+/* Nothing is being drawn while paused; a spinning spinner over a frozen percentage
+   would read as stuck rather than deliberately waiting. */
+#export-spinner.paused { animation-play-state: paused; opacity: 0.4; }
 #btn-export-cancel { margin-top: 14px; padding: 8px 16px; font-size: 12.5px; }
 .spinner {
   width: 30px; height: 30px; margin: 0 auto 16px;

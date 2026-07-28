@@ -4169,6 +4169,10 @@ async function renderComposition(plan = exportPlan()) {
   const overlay = document.getElementById('export-overlay');
   overlay.classList.remove('hidden');
   document.getElementById('export-progress').textContent = '0%';
+  // Defensive reset: normally cleared by resumeFromHidden() before an export can
+  // finish, but a stray leftover from an aborted prior run must not leak in.
+  document.getElementById('export-headline').classList.remove('paused');
+  document.getElementById('export-spinner').classList.remove('paused');
 
   exportAbort.requested = false;
   const cancelBtn = document.getElementById('btn-export-cancel');
@@ -4215,47 +4219,129 @@ async function renderComposition(plan = exportPlan()) {
   await first.src.videoEl.play();
   syncWebcamPlayback(first);
 
-  await new Promise((resolve) => {
-    function loop() {
-      // Checked first so a cancel takes effect on the very next frame rather than after
-      // whatever seek or segment change was about to happen.
-      if (exportAbort.requested) { resolve(); return; }
-      const cur = getCurrentSegment();
-      if (!cur) { resolve(); return; }
-      renderInto(octx, w, h);
-      const elapsed = currentOutputElapsedMs();
-      document.getElementById('export-progress').textContent = `${Math.min(100, Math.round((elapsed / totalMs) * 100))}%`;
+  // ---- tab-visibility guard --------------------------------------------------
+  //
+  // Export is real-time: renderInto() has to be called roughly once per output
+  // frame, in step with how far the source video has actually played. That
+  // pairing only holds while the tab is visible. Chrome throttles or fully stops
+  // requestAnimationFrame in a hidden tab, but does NOT stop <video> playback —
+  // so currentTime keeps advancing while renderInto() stops being called. The
+  // segment-transition bookkeeping still ends up visiting every segment (a
+  // Node harness confirmed that), but visually the frames that should have
+  // shown the skipped stretch were simply never drawn — canvas.captureStream()
+  // just keeps re-emitting whatever was on the canvas before the gap, which
+  // reads as "part of the video is missing" once played back. This is also
+  // consistent with something measured directly in this codebase: a canvas
+  // capture stream in a hidden tab has produced literally 0 recorded bytes.
+  //
+  // The fix is to make hiding harmless rather than merely discouraged: pause the
+  // recorder AND the currently-playing source in lockstep the instant the tab
+  // goes hidden, and resume both together when it's visible again. Paused video
+  // does not advance currentTime, so nothing drifts and nothing gets skipped —
+  // the recording picks back up exactly where it left off. `pendingFrame` is
+  // tracked and explicitly cancelled on hide so a stray already-queued rAF can
+  // never sneak a tick in after the recorder has been told to pause, and the
+  // loop's own first check re-confirms visibility before doing any work.
+  let pendingFrame = null;
+  let pausedForVisibility = false;
 
-      // Speed needs no special handling here: playbackRate makes the source run
-      // faster in real time, and MediaRecorder simply captures fewer seconds.
-      playhead.localMs = cur.src.videoEl.currentTime * 1000;
-      syncWebcamPlayback(cur);
-      if (playhead.localMs >= cur.seg.out - 15) {
-        const nextIndex = playhead.segIndex + 1;
-        if (nextIndex >= segmentCount()) { resolve(); return; }
-        const next = getSegmentByIndex(nextIndex);
-        playhead.segIndex = nextIndex;
-        const contiguous = next.src === cur.src
-          && Math.abs(next.seg.in - cur.seg.out) < 40
-          && speedOf(next.seg) === speedOf(cur.seg);
-        if (contiguous) {
-          requestAnimationFrame(loop);
-          return;
-        }
-        cur.src.videoEl.pause();
-        applySpeed(next);
-        syncWebcamSeek(next.seg.in);
-        seekTo(next.src.videoEl, next.seg.in / 1000).then(() => {
-          next.src.videoEl.play();
-          requestAnimationFrame(loop);
-        });
+  const exportHeadline = document.getElementById('export-headline');
+  const exportSpinner = document.getElementById('export-spinner');
+
+  function pauseForHidden() {
+    if (pausedForVisibility) return;
+    pausedForVisibility = true;
+    if (pendingFrame !== null) { cancelAnimationFrame(pendingFrame); pendingFrame = null; }
+    if (recorder.state === 'recording') recorder.pause();
+    const cur = getCurrentSegment();
+    if (cur && !cur.src.videoEl.paused) cur.src.videoEl.pause();
+    if (project.webcam && !project.webcam.videoEl.paused) project.webcam.videoEl.pause();
+    exportHeadline.classList.add('paused');
+    exportSpinner.classList.add('paused');
+  }
+
+  function resumeFromHidden() {
+    if (!pausedForVisibility) return;
+    pausedForVisibility = false;
+    if (recorder.state === 'paused') recorder.resume();
+    const cur = getCurrentSegment();
+    if (cur) cur.src.videoEl.play().catch(() => {});
+    exportHeadline.classList.remove('paused');
+    exportSpinner.classList.remove('paused');
+    pendingFrame = requestAnimationFrame(loop);
+  }
+
+  function onVisibilityChange() {
+    if (document.hidden) pauseForHidden();
+    else resumeFromHidden();
+  }
+  document.addEventListener('visibilitychange', onVisibilityChange);
+  // The tab could already be hidden when Export was clicked (e.g. triggered
+  // programmatically, or focus moved during the confirmation dialog) — catch that
+  // starting condition too, rather than only reacting to a later transition.
+  if (document.hidden) pauseForHidden();
+
+  function loop() {
+    pendingFrame = null;
+    // Belt and braces alongside the cancel-on-hide above: if some scheduling
+    // order let a tick through right at the hidden/visible boundary, bail
+    // rather than render or advance state on stale timing.
+    if (pausedForVisibility || document.hidden) return;
+    // Checked first so a cancel takes effect on the very next frame rather than after
+    // whatever seek or segment change was about to happen.
+    if (exportAbort.requested) { finish(); return; }
+    const cur = getCurrentSegment();
+    if (!cur) { finish(); return; }
+    renderInto(octx, w, h);
+    const elapsed = currentOutputElapsedMs();
+    document.getElementById('export-progress').textContent = `${Math.min(100, Math.round((elapsed / totalMs) * 100))}%`;
+
+    // Speed needs no special handling here: playbackRate makes the source run
+    // faster in real time, and MediaRecorder simply captures fewer seconds.
+    playhead.localMs = cur.src.videoEl.currentTime * 1000;
+    syncWebcamPlayback(cur);
+    if (playhead.localMs >= cur.seg.out - 15) {
+      const nextIndex = playhead.segIndex + 1;
+      if (nextIndex >= segmentCount()) { finish(); return; }
+      const next = getSegmentByIndex(nextIndex);
+      playhead.segIndex = nextIndex;
+      const contiguous = next.src === cur.src
+        && Math.abs(next.seg.in - cur.seg.out) < 40
+        && speedOf(next.seg) === speedOf(cur.seg);
+      if (contiguous) {
+        pendingFrame = requestAnimationFrame(loop);
         return;
       }
-      requestAnimationFrame(loop);
+      cur.src.videoEl.pause();
+      applySpeed(next);
+      syncWebcamSeek(next.seg.in);
+      seekTo(next.src.videoEl, next.seg.in / 1000).then(() => {
+        // The tab may have gone hidden while this seek was in flight; don't
+        // resume playback (or schedule the next frame) into a paused export.
+        if (pausedForVisibility) return;
+        next.src.videoEl.play();
+        pendingFrame = requestAnimationFrame(loop);
+      });
+      return;
     }
-    requestAnimationFrame(loop);
+    pendingFrame = requestAnimationFrame(loop);
+  }
+
+  let finish;
+  await new Promise((resolve) => {
+    finish = resolve;
+    if (!document.hidden) pendingFrame = requestAnimationFrame(loop);
+    // else: pauseForHidden() already ran above; resumeFromHidden() starts the
+    // loop once the tab is actually shown.
   });
 
+  document.removeEventListener('visibilitychange', onVisibilityChange);
+  // recorder.state is never 'paused' here: finish() is only reachable from inside
+  // loop(), and loop() returns immediately without doing anything while
+  // pausedForVisibility is true — so reaching this line already implies we are not
+  // paused. stop() is spec-valid directly from 'paused' too if that ever changes,
+  // so no need to resume() first — doing so would risk capturing one extra,
+  // unwanted frame of stale canvas content between the resume and the stop.
   recorder.stop();
   await stopped;
   const cancelled = exportAbort.requested;

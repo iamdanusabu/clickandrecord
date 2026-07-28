@@ -301,11 +301,33 @@ things most likely to be "fixed" back into bugs.
 - **Export is real-time** (it replays the composition), so a 5-minute video takes
   5 minutes. A WebCodecs path would fix that and is the biggest performance win
   available — and would also remove the must-stay-visible constraint below.
-- **The editor tab must stay visible during an export.** The render loop uses
-  `requestAnimationFrame`, which Chrome stops in a hidden tab. Demonstrated while testing:
-  in a hidden tab a `setInterval(33ms)` draw loop fired twice in 1.5 s and
-  `canvas.captureStream` produced a **0-byte** recording. The export overlay now warns
-  about it, but nothing enforces it — a `visibilitychange` handler that pauses and resumes
-  the render, or warns on return, would be the honest fix.
+- ~~The editor tab must stay visible during an export~~ **Fixed 2026-07-28.** This was
+  the leading suspect for "the exported video isn't full" reports, and the mechanism
+  checks out: `requestAnimationFrame` throttles or stops entirely in a hidden tab, but
+  `<video>` playback does not — so `currentTime` kept advancing while `renderInto()`
+  stopped being called. The segment-transition *bookkeeping* still visited every
+  segment correctly (confirmed with a Node harness), but the *frames* for whatever
+  stretch played while hidden were never drawn — canvas.captureStream() just kept
+  re-emitting the last frame it had, which plays back as missing/frozen content. This
+  matches something already measured directly in this codebase: a hidden-tab canvas
+  stream once produced a **0-byte** recording.
+
+  `renderComposition()` now pauses the `MediaRecorder` and the active source `<video>`
+  together the instant `document.visibilitychange` reports hidden, and resumes both
+  together when visible again — paused video doesn't advance `currentTime`, so nothing
+  drifts and nothing is skipped; the recording picks up exactly where it left off. A
+  second Node harness (13/13) specifically exercises the dangerous race — the tab
+  hiding while a cross-source `seekTo().then()` is still in flight — and confirms the
+  stale seek can't double-schedule the loop once `resumeFromHidden()` has already
+  restarted it (`pausedForVisibility` gates the seek's own callback). The overlay now
+  says switching tabs is safe and shows a distinct "Paused — waiting…" state instead of
+  a data-loss warning.
+
+  **Not yet run in a real browser** — browser automation was unavailable this session,
+  so this is code + harness verified only. Test it for real before fully trusting it:
+  export something with multiple clips including at least one non-contiguous cut, switch
+  tabs for 10+ seconds partway through (both mid-segment and, harder, right as a cut
+  happens), come back, and confirm the finished file plays the full timeline with no
+  skipped or frozen stretch where you were away.
 - Whisper `base.en` only — no other languages vendored.
 - Not tested outside Chrome on Windows 11.

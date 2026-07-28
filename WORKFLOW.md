@@ -128,8 +128,16 @@ throttled to roughly 1/second and doesn't composite, so:
 
 Measured: a `setInterval(33ms)` draw loop fired **twice in 1.5 s** in a hidden tab. So
 export cannot be verified from a background tab or from automation that backgrounds the
-page. Export has to be tested by hand, in a focused window, watching it. This is also why
-the export overlay tells the user to keep the tab visible.
+page. Export has to be tested by hand, in a focused window, watching it.
+
+As of 2026-07-28 the export loop pauses the recorder and the source video together on
+`document.visibilitychange` and resumes both together, specifically so a real user
+backgrounding the tab mid-export can no longer produce a truncated file (see HANDOFF.md
+— this was the leading suspect for "exported video isn't full" reports). That fix is
+**verified by two Node harnesses, not by a live browser** — this same limitation is why.
+When automation is available, the priority test is: export something with a
+non-contiguous cut, switch tabs mid-export (including right as a cut happens), come
+back, and confirm the file is complete with no skipped or frozen stretch.
 
 ---
 

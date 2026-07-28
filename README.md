@@ -175,8 +175,11 @@ Recording quality was raised too, on the same reasoning: capture is no longer ca
 8 Mbps.
 
 The render is **real time** — a 5-minute video takes 5 minutes — and it's driven by
-`requestAnimationFrame`, which Chrome stops entirely in a hidden tab. So the editor tab
-must stay visible while it works; the overlay says so.
+`requestAnimationFrame`, which Chrome stops entirely in a hidden tab. **It's safe to
+switch tabs anyway**: export pauses the recorder and the source video together the
+moment the tab is hidden, and resumes both together when it's visible again, so nothing
+is skipped or lost — it just takes longer. The overlay shows a distinct paused state so
+it's obvious nothing is stuck.
 
 ## Subtitles
 
@@ -513,9 +516,9 @@ Consequences worth knowing:
   window or desktop recording with one tab's network log is actively misleading in a bug
   hunt. Disabled for Window and Screen in the popup *and* in `background.js`, so a stale
   options object can't re-enable it.
-- Export is **real time**: a 5-minute video takes 5 minutes, and the render is driven by
-  `requestAnimationFrame`, which Chrome stops in a hidden tab — so the editor tab has to
-  stay visible for the duration. The export overlay says so.
+- Export is **real time**: a 5-minute video takes 5 minutes. Switching tabs no longer
+  risks the output — export pauses cleanly while hidden and resumes where it left off —
+  but it does mean a backgrounded export takes however much longer you were away.
 - The editor is single-track: one screen recording plus any number of
   appended clips, played back-to-back — no overlays/picture-in-picture
   beyond the baked-in webcam bubble, no titles/annotations yet.

@@ -352,13 +352,20 @@
 
 <div id="export-overlay" class="export-overlay hidden">
   <div class="export-box">
-    <div class="spinner"></div>
-    <p>Exporting your video… <span id="export-progress">0%</span></p>
-    <p class="hint">This renders in real time, so it takes about as long as the final video's length.</p>
-    <!-- Not a nicety: the render loop is driven by requestAnimationFrame, which Chrome
-         stops entirely in a hidden tab. Switch away and the export stalls where it is. -->
-    <p class="hint warn"><strong>Keep this tab visible</strong> — switching to another tab
-      pauses the render until you come back.</p>
+    <div class="spinner" id="export-spinner"></div>
+    <!-- Two lines, one shown at a time via .paused on the wrapper — rather than
+         overwriting textContent, which would destroy #export-progress along with
+         whatever text surrounded it every time the paused state is entered or left. -->
+    <p id="export-headline">
+      <span id="export-headline-active">Exporting your video… <span id="export-progress">0%</span></span>
+      <span id="export-headline-paused">Paused — waiting for this tab to be visible again…</span>
+    </p>
+    <!-- The render loop needs requestAnimationFrame, which Chrome throttles or stops
+         in a hidden tab — but switching away no longer risks a broken export: the
+         recorder and the source video are paused together the instant the tab hides,
+         and resumed together when it's shown again, so nothing is skipped or lost.
+         The only cost is time, which #export-headline says plainly when it happens. -->
+    <p class="hint" id="export-hint">This renders in real time, so it takes about as long as the final video's length. It's safe to switch tabs — export pauses and picks back up exactly where it left off.</p>
     <button id="btn-export-cancel" class="ghost">Cancel export</button>
   </div>
 </div>
