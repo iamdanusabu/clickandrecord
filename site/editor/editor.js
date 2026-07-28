@@ -7,6 +7,10 @@
 const qs = new URLSearchParams(location.search);
 const sessionId = qs.get('session');
 
+// Flip to true once Drive is ready for outside users — the OAuth consent screen
+// is still unverified during beta, so the button stays visible but inert.
+const DRIVE_ENABLED = false;
+
 const canvas = document.getElementById('preview-canvas');
 const ctx = canvas.getContext('2d', { alpha: false });
 
@@ -140,6 +144,12 @@ window.addEventListener('unhandledrejection', (e) => {
 // Function declarations hoist; const declarations don't.
 
 async function init() {
+  if (!DRIVE_ENABLED) {
+    const driveBtn = document.getElementById('btn-drive');
+    driveBtn.disabled = true;
+    driveBtn.title = 'Save to Drive is disabled during beta.';
+  }
+
   // No session means the editor was opened on its own rather than from a capture.
   // That is a supported way in, not an error.
   if (!sessionId) return initStandalone();

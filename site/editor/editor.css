@@ -207,6 +207,8 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
   border: 1px solid var(--border-soft);
 }
 .secondary:hover { background: var(--panel-2); border-color: #c7ccd8; }
+.secondary:disabled { opacity: 0.5; }
+.secondary:disabled:hover { background: var(--panel); border-color: var(--border-soft); }
 
 .ghost {
   display: inline-flex; align-items: center; gap: 6px;
