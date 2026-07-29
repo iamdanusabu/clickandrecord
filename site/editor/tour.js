@@ -25,6 +25,12 @@
 
   const STEPS = [
     {
+      targetSel: '.recording-name',
+      side: 'bottom',
+      title: 'Name it',
+      body: 'This names the exported file — click it any time to rename. It stays “Untitled recording” until you do.',
+    },
+    {
       targetSel: '.timeline-panel',
       side: 'top',
       title: 'Timeline',
