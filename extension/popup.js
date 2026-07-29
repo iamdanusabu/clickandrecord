@@ -222,6 +222,21 @@ async function maybeAutoRequestPermission() {
 // on and the controls window can open the device cleanly.
 window.addEventListener('unload', stopPreview);
 
+// Duplicated from background.js — no module system between a service worker and
+// a popup page to share it, so keep the two in sync if this changes. Describes
+// what's actually open (gotWebcam/gotMic), not just what was asked for: a webcam
+// that failed to grant still leaves options.webcam true, and telling someone
+// their camera is recording when it silently isn't would just be a different
+// version of the same confusion this exists to fix.
+function captureSummary(options, gotWebcam, gotMic) {
+  const items = ['screen'];
+  if (options.webcam && gotWebcam) items.push('camera');
+  if (options.mic && gotMic) items.push('microphone');
+  if (items.length === 1) return 'your screen keeps recording';
+  if (items.length === 2) return `your ${items[0]} and ${items[1]} keep recording`;
+  return `your ${items[0]}, ${items[1]} and ${items[2]} all keep recording`;
+}
+
 async function refreshState() {
   const state = await chrome.runtime.sendMessage({ type: 'GET_STATE' });
   if (!state) return;
@@ -236,6 +251,8 @@ async function refreshState() {
 
   if (state.phase === 'recording') {
     document.getElementById('click-count').textContent = `${state.clickCount || 0} clicks detected`;
+    document.getElementById('keep-going-what').textContent =
+      captureSummary(state.options || {}, state.gotWebcam, state.gotMic);
     // Reopened during the countdown — startTime is still in the future, so pick the
     // countdown back up rather than showing a timer stuck at 00:00.
     if (state.startTime > Date.now()) {
@@ -288,6 +305,17 @@ document.getElementById('btn-start').addEventListener('click', async () => {
     document.getElementById('click-count').textContent =
       `Recording without ${resp.missing.join(' and ')}`;
   }
+
+  // runCountdown() below flips to the recording view itself once the countdown
+  // ends, without going through refreshState() — so without this, the very first
+  // recording of a session would show the note's default HTML text regardless of
+  // what was actually granted, and only get corrected if the popup happened to be
+  // reopened later.
+  document.getElementById('keep-going-what').textContent = captureSummary(
+    opts,
+    opts.webcam && !(resp.missing || []).includes('webcam'),
+    opts.mic && !(resp.missing || []).includes('microphone'),
+  );
 
   runCountdown(resp.startTime);
 });

@@ -501,6 +501,13 @@ async function setUpRecording(options) {
     paused: false,
     options,
     clicks: [],
+    // What actually opened, not just what was asked for — a webcam/mic that failed
+    // to grant still leaves options.webcam/mic true, and telling the popup "your
+    // camera is recording" when it silently isn't would be its own kind of
+    // confusion. Kept in state (not just the one-time startRecording response) so
+    // reopening the popup later still describes the recording accurately.
+    gotWebcam: !!prepResp.gotWebcam,
+    gotMic: !!prepResp.gotMic,
     // Only meaningful for a tab recording — it prefills the editor's mock URL bar, and
     // labelling a window or desktop capture with whatever tab happened to be in front
     // would put a URL on footage that isn't of that page.
@@ -511,10 +518,14 @@ async function setUpRecording(options) {
   chrome.action.setBadgeText({ text: 'REC' });
   chrome.action.setBadgeBackgroundColor({ color: '#e53c48' });
   // The badge alone reads as "something is on", not "this is still recording even
-  // though you closed the popup" — the confusion this exists to head off. The
-  // tooltip says that outright, and it's there on hover whether or not the popup
-  // is open.
-  chrome.action.setTitle({ title: 'Click & Record — recording (closing this popup won’t stop it). Click the icon, or press Alt+Shift+S, to stop.' });
+  // though you closed the popup" — the confusion this exists to head off. Naming
+  // what's actually being captured matters too: without it, "recording" reads as
+  // screen-only, and someone who can't see their camera preview anywhere once the
+  // popup is closed has no way to tell it's still being captured in the background.
+  chrome.action.setTitle({
+    title: `Click & Record — recording ${captureSummary(options, state.gotWebcam, state.gotMic)}. `
+      + 'This keeps going even if you close this popup — click the icon, or press Alt+Shift+S, to stop.',
+  });
 
   // Armed now rather than at startTime, so requests already in flight when the
   // recording begins are still seen. capture.js floors its offsets at zero, so
@@ -640,6 +651,18 @@ async function stopRecording() {
 // once granted, the offscreen recorder can open the same devices silently.
 
 let permissionWaiter = null;
+
+// Shared with popup.js's own copy (there's no module system between a service
+// worker and a popup page to import this from, so it's duplicated — keep them in
+// sync if this changes).
+function captureSummary(options, gotWebcam, gotMic) {
+  const items = ['screen'];
+  if (options.webcam && gotWebcam) items.push('camera');
+  if (options.mic && gotMic) items.push('microphone');
+  if (items.length === 1) return 'your screen';
+  if (items.length === 2) return `your ${items[0]} and ${items[1]}`;
+  return `your ${items[0]}, ${items[1]} and ${items[2]}`;
+}
 
 async function requestMediaPermission({ video, audio }) {
   if (!video && !audio) return { ok: true };
