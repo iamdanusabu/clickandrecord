@@ -650,7 +650,7 @@ async function requestMediaPermission({ video, audio }) {
   // prompt" reports this exists to fix. Centre it over whichever window the user is
   // actually looking at instead of trusting Chrome's default placement.
   const width = 480;
-  const height = 300;
+  const height = 340; // room for the longer macOS-specific denial copy without scrolling
   let left; let top;
   try {
     const anchor = await chrome.windows.getLastFocused({ windowTypes: ['normal'] });

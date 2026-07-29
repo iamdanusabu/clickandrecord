@@ -26,6 +26,16 @@ const label = wantVideo && wantAudio ? 'camera & microphone'
   : wantVideo ? 'camera' : 'microphone';
 titleEl.textContent = `Allow ${label}`;
 
+// macOS gates camera/mic behind its own system-level permission for the whole
+// browser, on top of Chrome's per-site one — and the two look identical from
+// here (getUserMedia rejects with the same NotAllowedError either way). Most
+// "the prompt wasn't visible" reports turn out to be that OS dialog: it can
+// appear once, on first use ever, easy to click through without reading, and a
+// no at the OS level makes Chrome fail silently forever after with no
+// indication that this page's own permission was never actually the problem.
+const macPlatform = (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || '';
+const isMac = /mac/i.test(macPlatform);
+
 let reported = false;
 
 function report(payload) {
@@ -50,7 +60,9 @@ async function alreadyGranted() {
 async function request() {
   errorEl.classList.add('hidden');
   retryBtn.classList.add('hidden');
-  hintEl.textContent = `Chrome will ask for access. Choose Allow so your ${label} can be recorded.`;
+  hintEl.textContent = isMac
+    ? `Chrome will ask for access — macOS may also show its own system dialog the first time. Choose Allow on both so your ${label} can be recorded.`
+    : `Chrome will ask for access. Choose Allow so your ${label} can be recorded.`;
 
   try {
     const stream = await navigator.mediaDevices.getUserMedia({
@@ -70,7 +82,11 @@ async function request() {
     const missing = err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError';
     hintEl.textContent = '';
     errorEl.textContent = denied
-      ? `Access was blocked. Click the camera icon in Chrome's address bar (or Settings → Privacy and security → Site settings → Camera/Microphone) and allow it for this extension, then press Try again.`
+      ? (isMac
+        // Lead with the OS-level gate: it's the more likely cause on a Mac, and
+        // Chrome's own address-bar fix does nothing if this is what's blocking it.
+        ? `Access was blocked. On a Mac this is usually macOS itself: open System Settings → Privacy & Security → Camera (and Microphone), turn on Google Chrome, then fully quit and reopen Chrome — the toggle doesn't take effect without a restart — and press Try again. If Chrome is already allowed there, click the camera icon in Chrome's address bar instead and allow it for this extension.`
+        : `Access was blocked. Click the camera icon in Chrome's address bar (or Settings → Privacy and security → Site settings → Camera/Microphone) and allow it for this extension, then press Try again.`)
       : missing
         ? `No ${label} was found. Plug one in, or turn that option off in the popup and record the screen only.`
         : `Could not open the ${label}: ${err.name} — ${err.message}`;

@@ -27,6 +27,7 @@
 html, body {
   margin: 0;
   height: 100%;
+  overflow-y: auto; /* the macOS-specific error copy is long enough to need it */
   background: #ffffff;
   color: #14161c;
   font-family: 'Inter', 'Segoe UI Variable Text', 'Segoe UI', -apple-system, Roboto, sans-serif;
