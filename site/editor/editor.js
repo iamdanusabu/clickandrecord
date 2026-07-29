@@ -42,7 +42,11 @@ const captionStyle = {
   style: 'box',         // 'box' | 'outline' | 'shadow'
   boxColor: '#000000',
   boxOpacity: 0.72,
-  position: 'bottom',   // 'bottom' | 'top'
+  // Centre of the caption block, freely draggable — like webcamStyle.x/y below.
+  // Defaults approximate the old fixed 'bottom' position (a margin-from-edge
+  // anchor) for a typical one-line cue.
+  x: 0.5,
+  y: 0.91,
   maxWidthFrac: 0.8,
   wordHighlight: false,
   highlightColor: '#ffd23f',
@@ -60,6 +64,16 @@ const webcamStyle = {
   shadow: true,
   mirror: true,
 };
+
+// Solid bands over the top and/or bottom of the video content — for redacting a
+// taskbar, notification area, or anything else that shouldn't be in frame.
+// Fractions of the content rect's height, like crop; 0 means off.
+const maskStyle = {
+  top: 0,
+  bottom: 0,
+  color: '#000000',
+};
+
 const playhead = { segIndex: 0, localMs: 0 };
 let playing = false;
 let rafId = null;
@@ -76,6 +90,7 @@ const MIN_SEGMENT_MS = 200;
 // output aspect.
 let baseOutputSize = { w: 1280, h: 720 };
 let cropping = false;
+let maskAdjusting = false;
 
 const editorAudioCtx = new AudioContext();
 const audioGainByVideo = new WeakMap();
@@ -1033,6 +1048,11 @@ function renderInto(targetCtx, w, h) {
   // the background, or straddling the edge between them.
   drawWebcamBubble(targetCtx, w, h, cur);
 
+  // After the webcam bubble, so a mask band also covers it if the bubble strays
+  // into a redacted area, and before captions, which must stay legible on top of
+  // whatever's masked underneath them.
+  drawMasks(targetCtx, rect);
+
   // Captions last, on top of everything — they're the one thing that must never be
   // obscured. Being part of renderInto means they burn into the export for free.
   drawCaptions(targetCtx, w, h, cur);
@@ -1076,7 +1096,15 @@ function wrapWords(targetCtx, words, maxWidth) {
   return lines;
 }
 
+// The caption block's bounding box in canvas space, from the most recent draw —
+// null whenever nothing was actually drawn (no active cue, captions off, etc).
+// Used by the drag hit-test, so what you grab is exactly what's on screen; there's
+// no equivalent geometry function computable ahead of time the way webcamRect() is,
+// since the block's size depends on the current cue's wrapped text.
+let captionHitRect = null;
+
 function drawCaptions(targetCtx, w, h, cur) {
+  captionHitRect = null;
   if (!captionsVisibleFor(cur)) return;
   const sourceMs = cur.src.videoEl.currentTime * 1000;
   const cue = activeCue(sourceMs);
@@ -1100,15 +1128,25 @@ function drawCaptions(targetCtx, w, h, cur) {
   const padX = fontPx * 0.5;
   const padY = fontPx * 0.32;
   const blockH = lines.length * lineHeight;
-  const margin = h * 0.06;
-  const top = captionStyle.position === 'top' ? margin : h - margin - blockH;
+
+  const lineTexts = lines.map((lineWords) => lineWords.map((word) => word.text).join(' '));
+  const lineWidths = lineTexts.map((text) => targetCtx.measureText(text).width);
+  const blockW = Math.max(0, ...lineWidths);
+
+  // Free-dragged, like the webcam bubble: x/y are the block's centre. Clamped so
+  // an extreme drag, or an unusually tall multi-line cue, can never push the text
+  // fully off-canvas — captions are the one thing that must stay legible.
+  const anchorX = captionStyle.x * w;
+  const top = Math.min(Math.max(captionStyle.y * h - blockH / 2, 0), Math.max(0, h - blockH));
+
+  captionHitRect = { x: anchorX - blockW / 2, y: top, w: blockW, h: blockH };
 
   const spaceW = targetCtx.measureText(' ').width;
 
   lines.forEach((lineWords, i) => {
-    const lineText = lineWords.map((word) => word.text).join(' ');
-    const lineW = targetCtx.measureText(lineText).width;
-    const x0 = (w - lineW) / 2;
+    const lineText = lineTexts[i];
+    const lineW = lineWidths[i];
+    const x0 = anchorX - lineW / 2;
     const cy = top + i * lineHeight + lineHeight / 2;
 
     if (captionStyle.style === 'box') {
@@ -1153,6 +1191,25 @@ function drawCaptions(targetCtx, w, h, cur) {
     });
   });
 
+  targetCtx.restore();
+}
+
+// Solid bands over the top and/or bottom of the video content — redacting a
+// taskbar, a notification, or anything else that shouldn't be in frame. `rect` is
+// the current segment's content rect (post-crop, post-aspect), the same one the
+// video itself was just drawn into, so the mask always lines up with what's
+// actually on screen regardless of aspect ratio or per-clip crop.
+function drawMasks(targetCtx, rect) {
+  if (maskStyle.top <= 0 && maskStyle.bottom <= 0) return;
+  targetCtx.save();
+  targetCtx.fillStyle = maskStyle.color;
+  if (maskStyle.top > 0) {
+    targetCtx.fillRect(rect.x, rect.y, rect.w, rect.h * maskStyle.top);
+  }
+  if (maskStyle.bottom > 0) {
+    const bandH = rect.h * maskStyle.bottom;
+    targetCtx.fillRect(rect.x, rect.y + rect.h - bandH, rect.w, bandH);
+  }
   targetCtx.restore();
 }
 
@@ -1235,6 +1292,7 @@ function renderFrame() {
   highlightActiveCue();
   updateZoomTarget();
   updateCropOverlay();
+  updateMaskOverlay();
 }
 
 // ---------- transport ----------
@@ -2105,6 +2163,47 @@ function bindWebcamControls() {
     });
 }
 
+// Drag the caption block straight on the preview, the same way the webcam bubble
+// works. Registered before initWebcamDrag() and stops the event outright on a hit,
+// so the two never both start a drag from one click where a dragged caption
+// happens to overlap the bubble — captions are drawn on top, so they get first
+// refusal, matching what's actually visible.
+function initCaptionDrag() {
+  canvas.addEventListener('mousedown', (e) => {
+    if (cropping || !captionHitRect) return;
+
+    const map = clientToCanvasNorm(e.clientX, e.clientY);
+    if (!map) return;
+
+    const box = captionHitRect;
+    const px = (e.clientX - map.clientRect.left) / map.scale;
+    const py = (e.clientY - map.clientRect.top) / map.scale;
+    if (px < box.x || px > box.x + box.w || py < box.y || py > box.y + box.h) return;
+
+    e.preventDefault();
+    e.stopImmediatePropagation(); // claim this click before initWebcamDrag sees it
+    canvas.classList.add('grabbing');
+    // Grab offset, so the block doesn't snap its centre to the cursor.
+    const grabDx = captionStyle.x - map.x;
+    const grabDy = captionStyle.y - map.y;
+    const onMove = (ev) => {
+      const m = clientToCanvasNorm(ev.clientX, ev.clientY);
+      if (!m) return;
+      captionStyle.x = Math.min(1, Math.max(0, m.x + grabDx));
+      captionStyle.y = Math.min(1, Math.max(0, m.y + grabDy));
+      renderFrame();
+    };
+    const onUp = () => {
+      canvas.classList.remove('grabbing');
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', onUp);
+      renderSubtitleControls(); // a preset may no longer be the active one
+    };
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+  });
+}
+
 // Drag the bubble straight on the preview. Hit-tested against the same rect the
 // renderer draws, so what you grab is what you see.
 function initWebcamDrag() {
@@ -2242,6 +2341,114 @@ function initCropDrag() {
       window.addEventListener('mousemove', onMove);
       window.addEventListener('mouseup', onUp);
     });
+  });
+}
+
+// ---------- mask ----------
+//
+// Unlike crop, which is expressed against the *uncropped* source (see
+// fullFrameRect()), a mask paints over the already-composited output — so its
+// handles are positioned against previewMapping()'s *current* (post-crop,
+// post-aspect) content rect instead. That's also the same rect drawMasks() uses
+// at render time, so the handle always lines up with the band actually drawn.
+
+const MIN_MASK_GAP = 0.08; // fraction of content height that must stay unmasked
+
+function updateMaskOverlay() {
+  const topHandle = document.getElementById('mask-handle-top');
+  const bottomHandle = document.getElementById('mask-handle-bottom');
+  if (!topHandle || !bottomHandle) return;
+  if (!maskAdjusting) {
+    topHandle.classList.remove('visible');
+    bottomHandle.classList.remove('visible');
+    return;
+  }
+  const map = previewMapping();
+  if (!map) return;
+
+  const left = map.content.x * map.scale;
+  const width = map.content.w * map.scale;
+  topHandle.style.left = `${left}px`;
+  topHandle.style.width = `${width}px`;
+  topHandle.style.top = `${(map.content.y + maskStyle.top * map.content.h) * map.scale}px`;
+  topHandle.classList.toggle('visible', maskStyle.top > 0);
+
+  bottomHandle.style.left = `${left}px`;
+  bottomHandle.style.width = `${width}px`;
+  bottomHandle.style.top = `${(map.content.y + (1 - maskStyle.bottom) * map.content.h) * map.scale}px`;
+  bottomHandle.classList.toggle('visible', maskStyle.bottom > 0);
+}
+
+function initMaskDrag() {
+  ['top', 'bottom'].forEach((edge) => {
+    const handle = document.getElementById(`mask-handle-${edge}`);
+    handle.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const onMove = (ev) => {
+        const map = previewMapping();
+        if (!map) return;
+        const fy = clientToContent(map, ev.clientX, ev.clientY).y;
+
+        if (edge === 'top') {
+          maskStyle.top = Math.max(0, Math.min(fy, 1 - maskStyle.bottom - MIN_MASK_GAP));
+        } else {
+          maskStyle.bottom = Math.max(0, Math.min(1 - fy, 1 - maskStyle.top - MIN_MASK_GAP));
+        }
+        renderFrame();
+        renderMaskControls(); // checkbox state can flip if a drag zeroes a band out
+      };
+      const onUp = () => {
+        window.removeEventListener('mousemove', onMove);
+        window.removeEventListener('mouseup', onUp);
+      };
+      window.addEventListener('mousemove', onMove);
+      window.addEventListener('mouseup', onUp);
+    });
+  });
+}
+
+const DEFAULT_MASK_FRACTION = 0.12;
+
+function renderMaskControls() {
+  document.getElementById('mask-top').checked = maskStyle.top > 0;
+  document.getElementById('mask-bottom').checked = maskStyle.bottom > 0;
+  document.getElementById('mask-color').value = maskStyle.color;
+}
+
+function bindMaskControls() {
+  document.getElementById('mask-top').addEventListener('change', (e) => {
+    maskStyle.top = e.target.checked
+      ? Math.min(DEFAULT_MASK_FRACTION, 1 - maskStyle.bottom - MIN_MASK_GAP)
+      : 0;
+    renderFrame();
+    updateMaskOverlay();
+  });
+  document.getElementById('mask-bottom').addEventListener('change', (e) => {
+    maskStyle.bottom = e.target.checked
+      ? Math.min(DEFAULT_MASK_FRACTION, 1 - maskStyle.top - MIN_MASK_GAP)
+      : 0;
+    renderFrame();
+    updateMaskOverlay();
+  });
+  document.getElementById('mask-color').addEventListener('input', (e) => {
+    maskStyle.color = e.target.value;
+    renderFrame();
+  });
+
+  document.getElementById('btn-mask-adjust').addEventListener('click', () => {
+    maskAdjusting = !maskAdjusting;
+    // Mutually exclusive with crop: both dim/overlay the same preview area, and
+    // showing both sets of handles at once would be unreadable.
+    if (maskAdjusting && cropping) {
+      cropping = false;
+      document.getElementById('btn-crop').classList.remove('active');
+      setStatus('');
+    }
+    document.getElementById('btn-mask-adjust').classList.toggle('active', maskAdjusting);
+    setStatus(maskAdjusting ? 'Drag the handles to resize the masked bands' : '');
+    renderFrame();
   });
 }
 
@@ -2681,6 +2888,11 @@ document.getElementById('stage-trim-bars').addEventListener('change', (e) => {
 
 document.getElementById('btn-crop').addEventListener('click', () => {
   cropping = !cropping;
+  // Mutually exclusive with mask-adjust — see the note above bindMaskControls().
+  if (cropping && maskAdjusting) {
+    maskAdjusting = false;
+    document.getElementById('btn-mask-adjust').classList.remove('active');
+  }
   document.getElementById('btn-crop').classList.toggle('active', cropping);
   setStatus(cropping ? 'Drag the edges of the preview to crop' : '');
   renderFrame();
@@ -3261,8 +3473,8 @@ try {
 }
 
 const SUB_POSITIONS = [
-  { id: 'bottom', name: 'Bottom' },
-  { id: 'top', name: 'Top' },
+  { id: 'bottom', name: 'Bottom', x: 0.5, y: 0.91 },
+  { id: 'top', name: 'Top', x: 0.5, y: 0.09 },
 ];
 
 function renderSubtitleControls() {
@@ -3310,9 +3522,13 @@ function renderSubtitleControls() {
     btn.type = 'button';
     btn.className = 'frame-option ghost';
     btn.textContent = p.name;
-    btn.classList.toggle('active', captionStyle.position === p.id);
+    // Free dragging means captions often sit at no preset; highlight only on an
+    // actual match, same as the webcam corner buttons.
+    btn.classList.toggle('active',
+      Math.abs(captionStyle.x - p.x) < 0.01 && Math.abs(captionStyle.y - p.y) < 0.01);
     btn.addEventListener('click', () => {
-      captionStyle.position = p.id;
+      captionStyle.x = p.x;
+      captionStyle.y = p.y;
       renderSubtitleControls();
       renderFrame();
     });
@@ -4387,12 +4603,16 @@ renderSwatches();
 renderFrameOptions();
 renderAspectOptions();
 renderSubtitleControls();
+renderMaskControls();
 initZoomTargetDrag();
 initCropDrag();
+initMaskDrag();
 initScrubbing();
 bindWebcamControls();
+initCaptionDrag();
 initWebcamDrag();
 bindSubtitleControls();
+bindMaskControls();
 initDropTarget();
 detectAvailableModels().catch(() => {}); // async; re-renders the model picker if one is absent
 

@@ -315,6 +315,29 @@ body.dragging .dz-card svg { color: var(--accent); }
   pointer-events: none; /* handles opt back in */
 }
 
+/* Handles only, shown while adjusting a mask band — the mask fill itself is part
+   of the canvas render, so it's visible in the preview at all times regardless. */
+.mask-clip {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.mask-handle {
+  position: absolute;
+  z-index: 41;
+  height: 7px;
+  margin-top: -3.5px;
+  border-radius: 3px;
+  background: repeating-linear-gradient(
+    90deg, #fff 0, #fff 10px, rgba(255, 255, 255, 0.4) 10px, rgba(255, 255, 255, 0.4) 20px
+  );
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35);
+  cursor: ns-resize;
+  pointer-events: auto; /* .mask-clip disables pointer events for its subtree */
+  visibility: hidden;
+}
+.mask-handle.visible { visibility: visible; }
+
 .transport {
   flex: 0 0 auto;
   display: flex;
