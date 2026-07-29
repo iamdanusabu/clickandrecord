@@ -1056,7 +1056,7 @@ function renderInto(targetCtx, w, h) {
   // After the webcam bubble, so a mask band also covers it if the bubble strays
   // into a redacted area, and before captions, which must stay legible on top of
   // whatever's masked underneath them.
-  drawMasks(targetCtx, rect);
+  drawMasks(targetCtx, w, h);
 
   // Captions last, on top of everything — they're the one thing that must never be
   // obscured. Being part of renderInto means they burn into the export for free.
@@ -1223,48 +1223,49 @@ function addSmoothstepStops(grad, r, g, b, alphaFrom, alphaTo) {
   }
 }
 
-// Solid bands over the top and/or bottom of the video content — redacting a
-// taskbar, a notification, or anything else that shouldn't be in frame. `rect` is
-// the current segment's content rect (post-crop, post-aspect), the same one the
-// video itself was just drawn into, so the mask always lines up with what's
-// actually on screen regardless of aspect ratio or per-clip crop.
+// Solid bands over the top and/or bottom of the *whole exported frame* — not just
+// the inset video rect. A taskbar or notification to redact can sit anywhere in
+// that band, including over the background/stage padding or a webcam bubble
+// docked there, so the mask spans full canvas width and is sized against full
+// canvas height, the same coordinate space webcamStyle/captionStyle already use
+// (see clientToCanvasNorm) — not the content rect crop/aspect changes.
 //
-// Only the inner edge (the one facing the visible video) feathers into a
+// Only the inner edge (the one facing the centre of the frame) feathers into a
 // gradient; the outer edge stays a hard line flush with the frame's own edge,
 // where there's nothing to dissolve into.
-function drawMasks(targetCtx, rect) {
+function drawMasks(targetCtx, w, h) {
   if (maskStyle.top <= 0 && maskStyle.bottom <= 0) return;
   const { r, g, b } = hexToRgb(maskStyle.color);
   targetCtx.save();
 
   if (maskStyle.top > 0) {
-    const bandH = rect.h * maskStyle.top;
+    const bandH = h * maskStyle.top;
     const featherH = bandH * maskStyle.feather;
     const solidH = bandH - featherH;
     targetCtx.fillStyle = maskStyle.color;
-    if (solidH > 0) targetCtx.fillRect(rect.x, rect.y, rect.w, solidH);
+    if (solidH > 0) targetCtx.fillRect(0, 0, w, solidH);
     if (featherH > 0) {
-      const grad = targetCtx.createLinearGradient(0, rect.y + solidH, 0, rect.y + bandH);
+      const grad = targetCtx.createLinearGradient(0, solidH, 0, bandH);
       addSmoothstepStops(grad, r, g, b, 1, 0); // opaque where it meets the solid fill, fading to nothing
       targetCtx.fillStyle = grad;
-      targetCtx.fillRect(rect.x, rect.y + solidH, rect.w, featherH);
+      targetCtx.fillRect(0, solidH, w, featherH);
     }
   }
 
   if (maskStyle.bottom > 0) {
-    const bandH = rect.h * maskStyle.bottom;
+    const bandH = h * maskStyle.bottom;
     const featherH = bandH * maskStyle.feather;
     const solidH = bandH - featherH;
-    const bandTop = rect.y + rect.h - bandH;
+    const bandTop = h - bandH;
     if (featherH > 0) {
       const grad = targetCtx.createLinearGradient(0, bandTop, 0, bandTop + featherH);
-      addSmoothstepStops(grad, r, g, b, 0, 1); // nothing at the video-facing edge, opaque where the solid fill picks up
+      addSmoothstepStops(grad, r, g, b, 0, 1); // nothing at the frame-centre-facing edge, opaque where the solid fill picks up
       targetCtx.fillStyle = grad;
-      targetCtx.fillRect(rect.x, bandTop, rect.w, featherH);
+      targetCtx.fillRect(0, bandTop, w, featherH);
     }
     if (solidH > 0) {
       targetCtx.fillStyle = maskStyle.color;
-      targetCtx.fillRect(rect.x, bandTop + featherH, rect.w, solidH);
+      targetCtx.fillRect(0, bandTop + featherH, w, solidH);
     }
   }
 
@@ -2405,12 +2406,13 @@ function initCropDrag() {
 // ---------- mask ----------
 //
 // Unlike crop, which is expressed against the *uncropped* source (see
-// fullFrameRect()), a mask paints over the already-composited output — so its
-// handles are positioned against previewMapping()'s *current* (post-crop,
-// post-aspect) content rect instead. That's also the same rect drawMasks() uses
-// at render time, so the handle always lines up with the band actually drawn.
+// fullFrameRect()), a mask paints over the whole composited output, full canvas
+// width — the same coordinate space webcamStyle/clientToCanvasNorm already use —
+// rather than the inset content rect, so it stays put across crop/aspect changes
+// and still covers a webcam bubble docked in that band. Handles are positioned
+// against the same full-canvas fractions drawMasks() itself draws from.
 
-const MIN_MASK_GAP = 0.08; // fraction of content height that must stay unmasked
+const MIN_MASK_GAP = 0.08; // fraction of canvas height that must stay unmasked
 
 function updateMaskOverlay() {
   const topHandle = document.getElementById('mask-handle-top');
@@ -2421,19 +2423,19 @@ function updateMaskOverlay() {
     bottomHandle.classList.remove('visible');
     return;
   }
-  const map = previewMapping();
-  if (!map) return;
+  const clientRect = canvas.getBoundingClientRect();
+  if (!clientRect.width) return;
+  const scale = clientRect.width / canvas.width;
+  const width = canvas.width * scale;
 
-  const left = map.content.x * map.scale;
-  const width = map.content.w * map.scale;
-  topHandle.style.left = `${left}px`;
+  topHandle.style.left = '0px';
   topHandle.style.width = `${width}px`;
-  topHandle.style.top = `${(map.content.y + maskStyle.top * map.content.h) * map.scale}px`;
+  topHandle.style.top = `${maskStyle.top * canvas.height * scale}px`;
   topHandle.classList.toggle('visible', maskStyle.top > 0);
 
-  bottomHandle.style.left = `${left}px`;
+  bottomHandle.style.left = '0px';
   bottomHandle.style.width = `${width}px`;
-  bottomHandle.style.top = `${(map.content.y + (1 - maskStyle.bottom) * map.content.h) * map.scale}px`;
+  bottomHandle.style.top = `${(1 - maskStyle.bottom) * canvas.height * scale}px`;
   bottomHandle.classList.toggle('visible', maskStyle.bottom > 0);
 }
 
@@ -2445,9 +2447,9 @@ function initMaskDrag() {
       e.stopPropagation();
 
       const onMove = (ev) => {
-        const map = previewMapping();
+        const map = clientToCanvasNorm(ev.clientX, ev.clientY);
         if (!map) return;
-        const fy = clientToContent(map, ev.clientX, ev.clientY).y;
+        const fy = map.y;
 
         if (edge === 'top') {
           maskStyle.top = Math.max(0, Math.min(fy, 1 - maskStyle.bottom - MIN_MASK_GAP));
