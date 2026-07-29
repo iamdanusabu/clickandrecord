@@ -67,10 +67,15 @@ const webcamStyle = {
 
 // Solid bands over the top and/or bottom of the video content — for redacting a
 // taskbar, notification area, or anything else that shouldn't be in frame.
-// Fractions of the content rect's height, like crop; 0 means off.
+// top/bottom/feather are fractions of the content rect's height, like crop;
+// 0 means off. feather softens the inner edge (the one facing the visible
+// video) into a gradient instead of a hard line, so the band reads as a dissolve
+// rather than a cut — a small default so a freshly-enabled mask already looks
+// intentional rather than like a clipping bug.
 const maskStyle = {
   top: 0,
   bottom: 0,
+  feather: 0.035,
   color: '#000000',
 };
 
@@ -1194,22 +1199,59 @@ function drawCaptions(targetCtx, w, h, cur) {
   targetCtx.restore();
 }
 
+function hexToRgb(hex) {
+  const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return m ? { r: parseInt(m[1], 16), g: parseInt(m[2], 16), b: parseInt(m[3], 16) } : { r: 0, g: 0, b: 0 };
+}
+
 // Solid bands over the top and/or bottom of the video content — redacting a
 // taskbar, a notification, or anything else that shouldn't be in frame. `rect` is
 // the current segment's content rect (post-crop, post-aspect), the same one the
 // video itself was just drawn into, so the mask always lines up with what's
 // actually on screen regardless of aspect ratio or per-clip crop.
+//
+// Only the inner edge (the one facing the visible video) feathers into a
+// gradient; the outer edge stays a hard line flush with the frame's own edge,
+// where there's nothing to dissolve into.
 function drawMasks(targetCtx, rect) {
   if (maskStyle.top <= 0 && maskStyle.bottom <= 0) return;
+  const { r, g, b } = hexToRgb(maskStyle.color);
+  const transparent = `rgba(${r},${g},${b},0)`;
   targetCtx.save();
-  targetCtx.fillStyle = maskStyle.color;
+
   if (maskStyle.top > 0) {
-    targetCtx.fillRect(rect.x, rect.y, rect.w, rect.h * maskStyle.top);
+    const bandH = rect.h * maskStyle.top;
+    const featherH = Math.min(rect.h * maskStyle.feather, bandH);
+    const solidH = bandH - featherH;
+    targetCtx.fillStyle = maskStyle.color;
+    if (solidH > 0) targetCtx.fillRect(rect.x, rect.y, rect.w, solidH);
+    if (featherH > 0) {
+      const grad = targetCtx.createLinearGradient(0, rect.y + solidH, 0, rect.y + bandH);
+      grad.addColorStop(0, maskStyle.color);
+      grad.addColorStop(1, transparent);
+      targetCtx.fillStyle = grad;
+      targetCtx.fillRect(rect.x, rect.y + solidH, rect.w, featherH);
+    }
   }
+
   if (maskStyle.bottom > 0) {
     const bandH = rect.h * maskStyle.bottom;
-    targetCtx.fillRect(rect.x, rect.y + rect.h - bandH, rect.w, bandH);
+    const featherH = Math.min(rect.h * maskStyle.feather, bandH);
+    const solidH = bandH - featherH;
+    const bandTop = rect.y + rect.h - bandH;
+    if (featherH > 0) {
+      const grad = targetCtx.createLinearGradient(0, bandTop, 0, bandTop + featherH);
+      grad.addColorStop(0, transparent);
+      grad.addColorStop(1, maskStyle.color);
+      targetCtx.fillStyle = grad;
+      targetCtx.fillRect(rect.x, bandTop, rect.w, featherH);
+    }
+    if (solidH > 0) {
+      targetCtx.fillStyle = maskStyle.color;
+      targetCtx.fillRect(rect.x, bandTop + featherH, rect.w, solidH);
+    }
   }
+
   targetCtx.restore();
 }
 
@@ -2415,6 +2457,8 @@ function renderMaskControls() {
   document.getElementById('mask-top').checked = maskStyle.top > 0;
   document.getElementById('mask-bottom').checked = maskStyle.bottom > 0;
   document.getElementById('mask-color').value = maskStyle.color;
+  document.getElementById('mask-feather').value = maskStyle.feather;
+  document.getElementById('mask-feather-val').textContent = `${Math.round(maskStyle.feather * 100)}%`;
 }
 
 function bindMaskControls() {
@@ -2434,6 +2478,11 @@ function bindMaskControls() {
   });
   document.getElementById('mask-color').addEventListener('input', (e) => {
     maskStyle.color = e.target.value;
+    renderFrame();
+  });
+  document.getElementById('mask-feather').addEventListener('input', (e) => {
+    maskStyle.feather = parseFloat(e.target.value);
+    document.getElementById('mask-feather-val').textContent = `${Math.round(maskStyle.feather * 100)}%`;
     renderFrame();
   });
 

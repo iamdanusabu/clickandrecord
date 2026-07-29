@@ -55,12 +55,12 @@
     {
       tab: 'output',
       title: 'Output',
-      body: 'Choose the export aspect ratio — 16:9, 9:16, 1:1, 4:5 — then turn on Crop and drag the preview’s edges to frame exactly what matters.',
+      body: 'Choose the export aspect ratio — 16:9, 9:16, 1:1, 4:5 — then turn on Crop and drag the preview’s edges to frame exactly what matters. <strong>Mask</strong> covers a band at the top or bottom instead — handy for hiding a taskbar or a notification, with a soft feathered edge so it reads as a dissolve rather than a hard cut.',
     },
     {
       tab: 'subtitles',
       title: 'Subtitles',
-      body: 'Generate captions on your own machine, nothing uploaded, then style their size, position and colour — or write cues by hand with <strong>+ Add cue</strong>.',
+      body: 'Generate captions on your own machine, nothing uploaded, then style their size, position and colour. Drag the subtitle anywhere on the preview to place it, or write cues by hand with <strong>+ Add cue</strong>.',
     },
     {
       tab: 'inspect',

@@ -262,7 +262,8 @@
               <button id="btn-mask-adjust" class="ghost">Drag to resize</button>
               <label class="colour">Colour <input type="color" id="mask-color" value="#000000" /></label>
             </div>
-            <p class="field-hint">Covers a band of the recording — handy for hiding a taskbar or a notification. Turn on Top and/or Bottom, then use Drag to resize to set how much is covered.</p>
+            <label class="field"><span class="field-label">Feather</span><input type="range" id="mask-feather" min="0" max="0.12" step="0.005" /><span class="kf-val" id="mask-feather-val"></span></label>
+            <p class="field-hint">Covers a band of the recording — handy for hiding a taskbar or a notification. Turn on Top and/or Bottom, then use Drag to resize to set how much is covered. Feather softens the inner edge into a dissolve instead of a hard line.</p>
           </div>
         </section>
 
