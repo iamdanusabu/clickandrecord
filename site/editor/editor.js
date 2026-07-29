@@ -67,15 +67,15 @@ const webcamStyle = {
 
 // Solid bands over the top and/or bottom of the video content — for redacting a
 // taskbar, notification area, or anything else that shouldn't be in frame.
-// top/bottom/feather are fractions of the content rect's height, like crop;
-// 0 means off. feather softens the inner edge (the one facing the visible
-// video) into a gradient instead of a hard line, so the band reads as a dissolve
-// rather than a cut — a small default so a freshly-enabled mask already looks
-// intentional rather than like a clipping bug.
+// top/bottom are fractions of the content rect's height, like crop; 0 means off.
+// feather is a fraction *of the band itself* (0-1), not of the content rect — at 0
+// the band is a hard-edged block; at 1 the whole band is a gradient with no solid
+// core at all. Default is well past halfway so a freshly-enabled mask already
+// reads as a soft dissolve rather than a harder-edged block.
 const maskStyle = {
   top: 0,
   bottom: 0,
-  feather: 0.035,
+  feather: 0.5,
   color: '#000000',
 };
 
@@ -1204,6 +1204,25 @@ function hexToRgb(hex) {
   return m ? { r: parseInt(m[1], 16), g: parseInt(m[2], 16), b: parseInt(m[3], 16) } : { r: 0, g: 0, b: 0 };
 }
 
+// A linear (evenly-spaced) alpha ramp butting straight up against a flat, fully
+// opaque fill has a kink in it — the *rate* of change jumps from zero (across the
+// solid fill) to whatever the ramp's slope is, right at the seam. Vision is very
+// sensitive to exactly that kind of discontinuity (the same mechanism behind Mach
+// bands), so even a fairly long, gentle ramp reads as a distinct edge/line right
+// at the point where the solid fill ends — a "soft-edged line" instead of an
+// actual dissolve. Smoothstep has zero slope at both ends, so it meets the solid
+// fill, and fades out to nothing, with no kink either way — several stops
+// approximate the curve, since canvas gradients only interpolate linearly
+// *between* stops.
+function addSmoothstepStops(grad, r, g, b, alphaFrom, alphaTo) {
+  const STEPS = 8;
+  for (let i = 0; i <= STEPS; i++) {
+    const t = i / STEPS;
+    const eased = t * t * (3 - 2 * t);
+    grad.addColorStop(t, `rgba(${r},${g},${b},${alphaFrom + (alphaTo - alphaFrom) * eased})`);
+  }
+}
+
 // Solid bands over the top and/or bottom of the video content — redacting a
 // taskbar, a notification, or anything else that shouldn't be in frame. `rect` is
 // the current segment's content rect (post-crop, post-aspect), the same one the
@@ -1216,19 +1235,17 @@ function hexToRgb(hex) {
 function drawMasks(targetCtx, rect) {
   if (maskStyle.top <= 0 && maskStyle.bottom <= 0) return;
   const { r, g, b } = hexToRgb(maskStyle.color);
-  const transparent = `rgba(${r},${g},${b},0)`;
   targetCtx.save();
 
   if (maskStyle.top > 0) {
     const bandH = rect.h * maskStyle.top;
-    const featherH = Math.min(rect.h * maskStyle.feather, bandH);
+    const featherH = bandH * maskStyle.feather;
     const solidH = bandH - featherH;
     targetCtx.fillStyle = maskStyle.color;
     if (solidH > 0) targetCtx.fillRect(rect.x, rect.y, rect.w, solidH);
     if (featherH > 0) {
       const grad = targetCtx.createLinearGradient(0, rect.y + solidH, 0, rect.y + bandH);
-      grad.addColorStop(0, maskStyle.color);
-      grad.addColorStop(1, transparent);
+      addSmoothstepStops(grad, r, g, b, 1, 0); // opaque where it meets the solid fill, fading to nothing
       targetCtx.fillStyle = grad;
       targetCtx.fillRect(rect.x, rect.y + solidH, rect.w, featherH);
     }
@@ -1236,13 +1253,12 @@ function drawMasks(targetCtx, rect) {
 
   if (maskStyle.bottom > 0) {
     const bandH = rect.h * maskStyle.bottom;
-    const featherH = Math.min(rect.h * maskStyle.feather, bandH);
+    const featherH = bandH * maskStyle.feather;
     const solidH = bandH - featherH;
     const bandTop = rect.y + rect.h - bandH;
     if (featherH > 0) {
       const grad = targetCtx.createLinearGradient(0, bandTop, 0, bandTop + featherH);
-      grad.addColorStop(0, transparent);
-      grad.addColorStop(1, maskStyle.color);
+      addSmoothstepStops(grad, r, g, b, 0, 1); // nothing at the video-facing edge, opaque where the solid fill picks up
       targetCtx.fillStyle = grad;
       targetCtx.fillRect(rect.x, bandTop, rect.w, featherH);
     }
