@@ -1,0 +1,103 @@
+/* Click & Record — "How it works" tour.
+   Isolated on purpose: delete this file and its <link>/<script> tags in
+   editor.html and the tour is gone with no trace in editor.css or editor.js. */
+
+.tour-help-btn {
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-soft);
+  border-radius: 50%;
+  background: var(--panel);
+  color: var(--text-dim);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+}
+.tour-help-btn:hover { background: var(--panel-2); color: var(--text); border-color: #c7ccd8; }
+
+.tour-overlay { position: fixed; inset: 0; z-index: 130; }
+
+.tour-mask {
+  position: fixed;
+  background: rgba(20, 22, 28, 0.55);
+  transition: top 0.25s ease, left 0.25s ease, width 0.25s ease, height 0.25s ease;
+  cursor: pointer;
+}
+
+.tour-ring {
+  position: fixed;
+  border-radius: 10px;
+  box-shadow: 0 0 0 3px var(--accent-soft), 0 0 0 1px var(--accent-line);
+  pointer-events: none;
+  transition: top 0.25s ease, left 0.25s ease, width 0.25s ease, height 0.25s ease;
+  animation: tour-pulse 2s ease-in-out infinite;
+}
+@keyframes tour-pulse {
+  0%, 100% { box-shadow: 0 0 0 3px var(--accent-soft), 0 0 0 1px var(--accent-line); }
+  50% { box-shadow: 0 0 0 6px var(--accent-soft), 0 0 0 1px var(--accent-line); }
+}
+
+.tour-card {
+  position: fixed;
+  z-index: 132;
+  width: 300px;
+  max-width: calc(100vw - 24px);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: left 0.25s ease, top 0.25s ease;
+}
+.tour-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.tour-count {
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.tour-skip {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 12px;
+  color: var(--text-dim);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.tour-skip:hover { color: var(--text); }
+.tour-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 650;
+  letter-spacing: -0.015em;
+}
+.tour-body {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text-dim);
+}
+.tour-body strong { color: var(--text); font-weight: 650; }
+.tour-card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 2px;
+}
+.tour-card-actions .ghost,
+.tour-card-actions .primary { padding: 7px 13px; font-size: 13px; }

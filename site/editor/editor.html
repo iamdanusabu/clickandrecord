@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <title>Click &amp; Record — Editor</title>
   <link rel="stylesheet" href="editor.css" />
+  <link rel="stylesheet" href="tour.css" />
 </head>
 <body>
 <div class="app">
@@ -377,5 +378,8 @@
 <!-- Purely presentational: drives the right-rail tabs. Loaded after editor.js so a
      failure here can never stop the editor itself from wiring up. -->
 <script src="ui.js"></script>
+<!-- Purely presentational: the "how it works" tour. Loaded last so a failure here
+     can never stop the editor or the rail tabs from wiring up. -->
+<script src="tour.js"></script>
 </body>
 </html>
