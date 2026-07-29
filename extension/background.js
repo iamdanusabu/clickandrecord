@@ -510,6 +510,11 @@ async function setUpRecording(options) {
 
   chrome.action.setBadgeText({ text: 'REC' });
   chrome.action.setBadgeBackgroundColor({ color: '#e53c48' });
+  // The badge alone reads as "something is on", not "this is still recording even
+  // though you closed the popup" — the confusion this exists to head off. The
+  // tooltip says that outright, and it's there on hover whether or not the popup
+  // is open.
+  chrome.action.setTitle({ title: 'Click & Record — recording (closing this popup won’t stop it). Click the icon, or press Alt+Shift+S, to stop.' });
 
   // Armed now rather than at startTime, so requests already in flight when the
   // recording begins are still seen. capture.js floors its offsets at zero, so
@@ -615,6 +620,7 @@ async function stopRecording() {
 
   chrome.tabs.sendMessage(state.tabId, { type: 'RECORDING_STOPPED' }).catch(() => {});
   chrome.action.setBadgeText({ text: '' });
+  chrome.action.setTitle({ title: '' }); // back to the manifest default
 
   // OFFSCREEN_STOP saves both the screen recording and the webcam track.
   const stopResp = await chrome.runtime.sendMessage({ type: 'OFFSCREEN_STOP' });
@@ -639,13 +645,40 @@ async function requestMediaPermission({ video, audio }) {
   if (!video && !audio) return { ok: true };
   if (permissionWaiter) return { ok: false, error: 'A permission prompt is already open.' };
 
+  // A default-positioned popup window can land in a corner, off to the side, or
+  // behind the main window on some window managers — exactly the "nobody saw the
+  // prompt" reports this exists to fix. Centre it over whichever window the user is
+  // actually looking at instead of trusting Chrome's default placement.
+  const width = 480;
+  const height = 300;
+  let left; let top;
+  try {
+    const anchor = await chrome.windows.getLastFocused({ windowTypes: ['normal'] });
+    left = Math.round(anchor.left + (anchor.width - width) / 2);
+    top = Math.round(anchor.top + (anchor.height - height) / 2);
+  } catch (_) {
+    // No normal window to anchor to (e.g. only popups open) — Chrome's default
+    // placement is the fallback, not a hard failure.
+  }
+
   const win = await chrome.windows.create({
     url: `permission.html?video=${video ? 1 : 0}&audio=${audio ? 1 : 0}`,
     type: 'popup',
-    width: 460,
-    height: 260,
+    width,
+    height,
+    left,
+    top,
     focused: true, // must be focused or the prompt can't be answered
   });
+
+  // getLastFocused above and the create() call aren't atomic, so re-assert focus and
+  // ask Chrome to flash the taskbar/dock entry — belt-and-suspenders against the
+  // window opening without actually grabbing attention.
+  try {
+    await chrome.windows.update(win.id, { focused: true, drawAttention: true });
+  } catch (_) {
+    // window may already be gone (closed instantly) — nothing to focus
+  }
 
   const result = await new Promise((resolve) => {
     permissionWaiter = resolve;

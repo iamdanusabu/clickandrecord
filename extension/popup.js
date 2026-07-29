@@ -159,15 +159,12 @@ async function refreshPermissionNotice() {
   else stopPreview();
 }
 
-['opt-webcam', 'opt-mic'].forEach((id) => {
-  document.getElementById(id).addEventListener('change', refreshPermissionNotice);
-});
-
-// Release the camera when the popup goes away, so the indicator light doesn't stay
-// on and the controls window can open the device cleanly.
-window.addEventListener('unload', stopPreview);
-
-document.getElementById('btn-grant').addEventListener('click', async () => {
+// Shared by the explicit "Allow camera & mic" button and the automatic trigger
+// below. `silent` skips the full-screen error view for the automatic path — a
+// toggle flip shouldn't blow away everything else the user was setting up over a
+// prompt they may not have even wanted answered yet; the inline notice already
+// says enough, and the button stays there to retry.
+async function requestPermissionNow({ silent } = {}) {
   const btn = document.getElementById('btn-grant');
   btn.disabled = true;
   btn.textContent = 'Waiting for Chrome…';
@@ -178,12 +175,52 @@ document.getElementById('btn-grant').addEventListener('click', async () => {
   });
   btn.disabled = false;
   btn.textContent = 'Allow camera & mic';
-  if (resp && resp.ok) {
-    await refreshPermissionNotice();
-  } else {
-    showError((resp && resp.error) || 'Access was not granted.');
+  await refreshPermissionNotice();
+  if (!resp || !resp.ok) {
+    if (!silent) showError((resp && resp.error) || 'Access was not granted.');
   }
+}
+
+document.getElementById('btn-grant').addEventListener('click', () => requestPermissionNow());
+
+// The production complaint this exists to fix: people toggle webcam/mic on (or
+// just open the popup with the defaults already on), click Start, and never
+// noticed the "Allow camera & mic" button or the Chrome prompt it opens — so they
+// get a screen-only recording and think the app is broken. Firing the same
+// request automatically, the moment access is wanted, means the visible Chrome
+// window shows up without needing a second click on something easy to miss.
+let autoPermissionInFlight = false;
+async function maybeAutoRequestPermission() {
+  if (autoPermissionInFlight) return;
+  const wantCam = document.getElementById('opt-webcam').checked;
+  const wantMic = document.getElementById('opt-mic').checked;
+  if (!wantCam && !wantMic) return;
+
+  const access = await deviceAccess();
+  const ok = (!wantCam || access.camera.granted) && (!wantMic || access.mic.granted);
+  if (ok) return;
+
+  // Once explicitly blocked, Chrome won't show the prompt again regardless — pop
+  // an empty window on every toggle would just be noise. The notice + button
+  // below still lets them retry after fixing it in Chrome's site settings.
+  const permState = await chrome.runtime.sendMessage({ type: 'GET_MEDIA_PERMISSION' }).catch(() => null);
+  if (permState && permState.state === 'denied') return;
+
+  autoPermissionInFlight = true;
+  await requestPermissionNow({ silent: true });
+  autoPermissionInFlight = false;
+}
+
+['opt-webcam', 'opt-mic'].forEach((id) => {
+  document.getElementById(id).addEventListener('change', async () => {
+    await refreshPermissionNotice();
+    if (document.getElementById(id).checked) await maybeAutoRequestPermission();
+  });
 });
+
+// Release the camera when the popup goes away, so the indicator light doesn't stay
+// on and the controls window can open the device cleanly.
+window.addEventListener('unload', stopPreview);
 
 async function refreshState() {
   const state = await chrome.runtime.sendMessage({ type: 'GET_STATE' });
@@ -308,5 +345,11 @@ chrome.runtime.onMessage.addListener((msg) => {
 });
 
 applySourceUI();
-refreshState();
-refreshPermissionNotice();
+(async () => {
+  await refreshState();
+  await refreshPermissionNotice();
+  // Webcam and mic default to on, so most people never touch those toggles at
+  // all — gating on the idle view (not recording/processing/error) rather than
+  // firing unconditionally on every open.
+  if (!views.idle.classList.contains('hidden')) await maybeAutoRequestPermission();
+})();
