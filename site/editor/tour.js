@@ -13,6 +13,16 @@
 (() => {
   const SEEN_KEY = 'dr_tour_seen_v1';
 
+  // Only shown when the editor has no video loaded yet — everything else in the
+  // tour describes controls that either don't do anything or aren't even on
+  // screen until then, so it goes first and the rest follow once real.
+  const INTRO_STEP = {
+    targetSel: '.dz-card',
+    side: 'bottom',
+    title: 'Start here',
+    body: 'Choose a video to edit, or drop one anywhere on the page. Once it loads, the timeline, zooms, styling and export below all come alive.',
+  };
+
   const STEPS = [
     {
       targetSel: '.timeline-panel',
@@ -101,6 +111,7 @@
   const nextBtn = card.querySelector('#tour-next');
   const skipBtn = card.querySelector('#tour-skip');
 
+  let activeSteps = STEPS;
   let idx = 0;
   let currentEl = null;
   let currentSide = 'bottom';
@@ -169,8 +180,8 @@
   }
 
   function render(i) {
-    idx = Math.max(0, Math.min(i, STEPS.length - 1));
-    const resolved = resolveStep(STEPS[idx]);
+    idx = Math.max(0, Math.min(i, activeSteps.length - 1));
+    const resolved = resolveStep(activeSteps[idx]);
     if (!resolved || !resolved.el) return; // nothing sensible to point at; hold position
 
     // Some targets (the timeline, before any video is loaded) are legitimately
@@ -182,16 +193,16 @@
     currentSide = resolved.side || 'bottom';
     currentEl.scrollIntoView({ block: 'nearest', inline: 'nearest' });
 
-    countEl.textContent = `${idx + 1} / ${STEPS.length}`;
-    titleEl.textContent = STEPS[idx].title;
+    countEl.textContent = `${idx + 1} / ${activeSteps.length}`;
+    titleEl.textContent = activeSteps[idx].title;
     bodyEl.innerHTML = resolved.body;
     backBtn.style.visibility = idx === 0 ? 'hidden' : 'visible';
-    nextBtn.textContent = idx === STEPS.length - 1 ? 'Finish' : 'Next';
+    nextBtn.textContent = idx === activeSteps.length - 1 ? 'Finish' : 'Next';
 
     requestAnimationFrame(layout);
   }
 
-  function next() { if (idx >= STEPS.length - 1) return stop(true); render(idx + 1); }
+  function next() { if (idx >= activeSteps.length - 1) return stop(true); render(idx + 1); }
   function prev() { render(idx - 1); }
 
   function onKeydown(e) {
@@ -202,6 +213,9 @@
 
   function start() {
     running = true;
+    // Decided fresh each run: if a video's already loaded (or gets loaded between
+    // runs), the "add a video" step has nothing left to teach and is left out.
+    activeSteps = document.body.classList.contains('no-video') ? [INTRO_STEP, ...STEPS] : STEPS;
     overlay.classList.remove('hidden');
     document.addEventListener('keydown', onKeydown);
     window.addEventListener('resize', layout);
