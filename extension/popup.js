@@ -237,6 +237,16 @@ function captureSummary(options, gotWebcam, gotMic) {
   return `your ${items[0]}, ${items[1]} and ${items[2]} all keep recording`;
 }
 
+// The same reassurance appears in both the countdown and recording views — someone
+// might close the popup during either — so both spans get the same text together
+// rather than one view silently falling behind the other.
+function setKeepGoingText(text) {
+  ['keep-going-what', 'keep-going-what-countdown'].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = text;
+  });
+}
+
 async function refreshState() {
   const state = await chrome.runtime.sendMessage({ type: 'GET_STATE' });
   if (!state) return;
@@ -251,8 +261,7 @@ async function refreshState() {
 
   if (state.phase === 'recording') {
     document.getElementById('click-count').textContent = `${state.clickCount || 0} clicks detected`;
-    document.getElementById('keep-going-what').textContent =
-      captureSummary(state.options || {}, state.gotWebcam, state.gotMic);
+    setKeepGoingText(captureSummary(state.options || {}, state.gotWebcam, state.gotMic));
     // Reopened during the countdown — startTime is still in the future, so pick the
     // countdown back up rather than showing a timer stuck at 00:00.
     if (state.startTime > Date.now()) {
@@ -311,11 +320,11 @@ document.getElementById('btn-start').addEventListener('click', async () => {
   // recording of a session would show the note's default HTML text regardless of
   // what was actually granted, and only get corrected if the popup happened to be
   // reopened later.
-  document.getElementById('keep-going-what').textContent = captureSummary(
+  setKeepGoingText(captureSummary(
     opts,
     opts.webcam && !(resp.missing || []).includes('webcam'),
     opts.mic && !(resp.missing || []).includes('microphone'),
-  );
+  ));
 
   runCountdown(resp.startTime);
 });
