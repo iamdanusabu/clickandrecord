@@ -60,7 +60,7 @@ Everything below is implemented and loads without errors.
 | Save to Google Drive | Implemented, blocked on OAuth config last time it was tried |
 | **Export** | Implemented, **never verified end-to-end** |
 | Editor UI (light theme, right rail, timeline under the preview) | Rebuilt 2026-07-28; verified in the browser against synthetic state |
-| Hand-written subtitle cues (**+ Add cue**) | Working; logic verified in the browser (clamping, overlap refusal, live preview, sidecar exclusion of empty cues) |
+| Hand-written subtitle text (**+ Add text**) | Working; logic verified in the browser (clamping, overlap refusal, live preview, sidecar exclusion of empty lines) |
 | Window / screen recording | **Three** failed designs before this one — see the picker trap below. Fourth design (`getDisplayMedia()` in the offscreen document) is the current code and is **unrun**. |
 | Click zoom on window / screen | Implemented; mapping unit-tested (11 cases incl. multi-monitor and a window moved mid-take), **never run against a real desktop capture** |
 | Recording name / rename | Working, verified in the browser |

@@ -184,23 +184,23 @@ it's obvious nothing is stuck.
 ## Subtitles
 
 In the editor, **Generate subtitles** transcribes the recording's audio and turns it
-into editable cues. Style them as **Boxed**, **Outline** or **Shadow**, set size,
-text and accent colours, put them at the top or bottom, and optionally turn on
+into editable text. Style it as **Boxed**, **Outline** or **Shadow**, set size,
+text and accent colours, put it at the top or bottom, and optionally turn on
 **word highlight** — karaoke-style emphasis that follows the spoken word. Captions
 burn into the exported video, and **Download .srt / .vtt** produces a sidecar file
 for YouTube, Vimeo or any player.
 
-You don't have to transcribe to get subtitles. **+ Add cue** writes one by hand at the
-playhead — useful when there's no narration to transcribe at all, or when a mumbled
-word is quicker to type than to re-record. It's stored in recording-source time like
-any other cue, so trimming and speed changes carry it correctly; it clamps itself
-against the next cue rather than overlapping; and a hand-written cue **survives a
-re-run** of transcription, which replaces everything Whisper produced. An untyped cue
-draws nothing and is left out of the `.srt`/`.vtt`.
+You don't have to transcribe to get subtitles. **+ Add text** writes a line by hand at
+the playhead — useful when there's no narration to transcribe at all, or when a
+mumbled word is quicker to type than to re-record. It's stored in recording-source
+time like any other line, so trimming and speed changes carry it correctly; it clamps
+itself against the next line rather than overlapping; and a hand-written line
+**survives a re-run** of transcription, which replaces everything Whisper produced. An
+untyped line draws nothing and is left out of the `.srt`/`.vtt`.
 
-Cues are listed below the panel and are **editable** — click a timestamp to jump
-there, fix the text inline, or delete a cue. Transcription is never perfect with
-product names and jargon, so expect a pass. Corrections persist: cues are saved to
+Lines are listed below the panel and are **editable** — click a timestamp to jump
+there, fix the text inline, or delete a line. Transcription is never perfect with
+product names and jargon, so expect a pass. Corrections persist: text is saved to
 IndexedDB, so reopening the editor doesn't lose your edits or force a re-run.
 
 **Transcription runs entirely on this machine** — Whisper via transformers.js, with the
@@ -226,9 +226,9 @@ distil-whisper models can't be used here despite being the obvious size/speed wi
 
 Two things worth knowing:
 
-- Cue times are stored in **recording-source** time, like clicks and zooms, so
+- Line times are stored in **recording-source** time, like clicks and zooms, so
   trimming, splitting, deleting and speed changes never move a caption. The
-  `.srt`/`.vtt` export converts to **output** time — cues inside footage you cut are
+  `.srt`/`.vtt` export converts to **output** time — lines inside footage you cut are
   dropped and the rest renumbered — otherwise the sidecar would drift against the
   video.
 - Whisper invents text over silence, so empty and known-hallucination segments
