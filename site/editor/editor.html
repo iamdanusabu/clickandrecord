@@ -134,7 +134,7 @@
               <!-- clips injected here: each has a video lane and an audio lane -->
             </div>
             <div class="zoom-lane" id="zoom-lane" title="Zoom-ins and detected clicks"></div>
-            <div class="caption-lane hidden" id="caption-lane" title="Subtitle cues"></div>
+            <div class="caption-lane hidden" id="caption-lane" title="Subtitle text"></div>
             <div class="playhead" id="playhead">
               <div class="playhead-grab" id="playhead-grab" title="Drag to scrub"></div>
             </div>
@@ -294,7 +294,7 @@
                 <button id="btn-vtt" class="ghost">Download .vtt</button>
               </div>
             </div>
-            <p class="subs-hint" id="subs-hint">Transcribed on this machine — nothing is uploaded. The first run loads the model, so it takes a moment. You can also write cues by hand with <strong>+ Add cue</strong>.</p>
+            <p class="subs-hint" id="subs-hint">Transcribed on this machine — nothing is uploaded. The first run loads the model, so it takes a moment. You can also write text by hand with <strong>+ Add text</strong>.</p>
             <div class="subs-progress hidden" id="subs-progress">
               <div class="subs-progress-top">
                 <span class="subs-spinner"></span>
@@ -306,10 +306,10 @@
               <p class="subs-note">Running on your machine — the first run also loads the speech model. Roughly half a minute for a short recording. You can keep editing while it works.</p>
             </div>
             <div class="subs-list-head">
-              <span class="toolbar-label" id="subs-count">No cues yet</span>
-              <button id="btn-add-cue" class="ghost" title="Write a cue by hand at the playhead">
+              <span class="toolbar-label" id="subs-count">No text yet</span>
+              <button id="btn-add-cue" class="ghost" title="Write text by hand at the playhead">
                 <svg viewBox="0 0 20 20" width="13" height="13" fill="none" aria-hidden="true"><path d="M10 4.4v11.2M4.4 10h11.2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
-                Add cue
+                Add text
               </button>
             </div>
             <div class="subs-list" id="subs-list"></div>

@@ -3405,7 +3405,7 @@ async function generateSubtitles() {
       );
     });
 
-    setSubtitleProgress('Building cues', 0.98);
+    setSubtitleProgress('Building text', 0.98);
     // Hand-written cues aren't Whisper's to overwrite — a re-run replaces what it
     // transcribed, and merges the typed ones back in by time.
     const handWritten = project.captions.filter((c) => c.manual);
@@ -3426,7 +3426,7 @@ async function generateSubtitles() {
     renderFrame();
     setSubtitleProgress(null);
     setStatus(project.captions.length
-      ? `${project.captions.length} subtitle cues generated${wordLevel ? '' : ' (no word timings available)'}`
+      ? `${project.captions.length} subtitle lines generated${wordLevel ? '' : ' (no word timings available)'}`
       : 'No speech was detected in the recording');
   } catch (err) {
     setSubtitleProgress(null);
@@ -3662,7 +3662,7 @@ async function addManualCue() {
 
   const t = Math.max(0, Math.round(playhead.localMs));
   if (project.captions.some((c) => t >= c.t && t <= c.endT)) {
-    setStatus('A cue already covers that moment — edit it, or move the playhead.');
+    setStatus("There's already text at that moment — edit it, or move the playhead.");
     return;
   }
 
@@ -3673,7 +3673,7 @@ async function addManualCue() {
     .reduce((soonest, c) => (soonest == null || c.t < soonest.t ? c : soonest), null);
   const room = next ? next.t - t : Infinity;
   if (room < MANUAL_CUE_MIN_MS) {
-    setStatus('Not enough space before the next cue — move the playhead.');
+    setStatus('Not enough space before the next line of text — move the playhead.');
     return;
   }
 
@@ -3696,7 +3696,7 @@ async function addManualCue() {
   renderCaptionList();
   renderCaptionLane();
   renderFrame();
-  setStatus(`Cue added at ${fmtShort(t)} — type the text`);
+  setStatus(`Text added at ${fmtShort(t)} — type it in`);
 }
 
 // Set by addManualCue so the new row's input takes focus once it exists; a cue you
@@ -3712,8 +3712,8 @@ function renderCaptionList() {
   document.getElementById('subs-hint').classList.toggle('hidden', project.captions.length > 0);
   const count = project.captions.length;
   document.getElementById('subs-count').textContent = count
-    ? `${count} cue${count === 1 ? '' : 's'}`
-    : 'No cues yet';
+    ? `${count} line${count === 1 ? '' : 's'} of text`
+    : 'No text yet';
 
   project.captions.forEach((cue) => {
     const row = document.createElement('div');
@@ -3728,7 +3728,7 @@ function renderCaptionList() {
     time.addEventListener('click', () => {
       const globalMs = recordingTimeToGlobal(cue.t);
       if (globalMs != null) seekToGlobalElapsed(globalMs);
-      else setStatus('That cue sits in footage you trimmed away.');
+      else setStatus('That text sits in footage you trimmed away.');
     });
 
     const text = document.createElement('input');
@@ -3758,7 +3758,7 @@ function renderCaptionList() {
     del.type = 'button';
     del.className = 'sub-del';
     del.textContent = '✕';
-    del.title = 'Delete cue';
+    del.title = 'Delete text';
     del.addEventListener('click', () => {
       project.captions = project.captions.filter((c) => c.id !== cue.id);
       saveCaptions();

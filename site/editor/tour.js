@@ -60,7 +60,7 @@
     {
       tab: 'subtitles',
       title: 'Subtitles',
-      body: 'Generate captions on your own machine, nothing uploaded, then style their size, position and colour. Drag the subtitle anywhere on the preview to place it, or write cues by hand with <strong>+ Add cue</strong>.',
+      body: 'Generate captions on your own machine, nothing uploaded, then style their size, position and colour. Drag the subtitle anywhere on the preview to place it, or write text by hand with <strong>+ Add text</strong>.',
     },
     {
       tab: 'inspect',
