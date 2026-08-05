@@ -6,6 +6,44 @@ const views = {
   error: document.getElementById('view-error'),
 };
 
+// navigator.brave is Brave's own self-identification API (a Promise-returning
+// isBrave(), present only in Brave). Computed once and reused everywhere below —
+// it can't change over the popup's lifetime.
+const isBravePromise = (async () => {
+  try {
+    return !!(navigator.brave && await navigator.brave.isBrave());
+  } catch (_) {
+    return false;
+  }
+})();
+
+const BRAVE_NOTICE_DISMISSED_KEY = 'braveNoticeDismissed';
+
+// The idle-view onboarding banner: shown once per person, not once per open.
+async function refreshBraveNotice() {
+  const notice = document.getElementById('brave-notice');
+  if (!(await isBravePromise)) {
+    notice.classList.add('hidden');
+    return;
+  }
+  const stored = await chrome.storage.local.get(BRAVE_NOTICE_DISMISSED_KEY).catch(() => ({}));
+  notice.classList.toggle('hidden', !!stored[BRAVE_NOTICE_DISMISSED_KEY]);
+}
+
+document.getElementById('btn-dismiss-brave-notice').addEventListener('click', () => {
+  document.getElementById('brave-notice').classList.add('hidden');
+  chrome.storage.local.set({ [BRAVE_NOTICE_DISMISSED_KEY]: true }).catch(() => {});
+});
+
+// The in-recording reminder: not dismissible and not gated on the onboarding banner
+// having been seen, because this is the moment the Brave cutoff actually bites —
+// worth repeating even if the earlier notice was dismissed a dozen recordings ago.
+async function updateBraveRecordingNote(options) {
+  const note = document.getElementById('brave-recording-note');
+  const show = (await isBravePromise) && !!(options && options.webcam);
+  note.classList.toggle('hidden', !show);
+}
+
 function showView(name) {
   Object.values(views).forEach((v) => v.classList.add('hidden'));
   views[name].classList.remove('hidden');
@@ -262,6 +300,7 @@ async function refreshState() {
   if (state.phase === 'recording') {
     document.getElementById('click-count').textContent = `${state.clickCount || 0} clicks detected`;
     setKeepGoingText(captureSummary(state.options || {}, state.gotWebcam, state.gotMic));
+    updateBraveRecordingNote(state.options);
     // Reopened during the countdown — startTime is still in the future, so pick the
     // countdown back up rather than showing a timer stuck at 00:00.
     if (state.startTime > Date.now()) {
@@ -325,6 +364,7 @@ document.getElementById('btn-start').addEventListener('click', async () => {
     opts.webcam && !(resp.missing || []).includes('webcam'),
     opts.mic && !(resp.missing || []).includes('microphone'),
   ));
+  updateBraveRecordingNote(opts);
 
   runCountdown(resp.startTime);
 });
@@ -384,9 +424,17 @@ chrome.runtime.onMessage.addListener((msg) => {
 applySourceUI();
 (async () => {
   await refreshState();
-  await refreshPermissionNotice();
-  // Webcam and mic default to on, so most people never touch those toggles at
-  // all — gating on the idle view (not recording/processing/error) rather than
-  // firing unconditionally on every open.
-  if (!views.idle.classList.contains('hidden')) await maybeAutoRequestPermission();
+  // Both of these are idle-view-only concerns (perm-notice and the camera preview
+  // live inside view-idle, hidden and non-interactive otherwise) — but more importantly,
+  // refreshPermissionNotice() can call startPreview(), which opens its own getUserMedia
+  // stream to the camera. Reopening the popup mid-recording (which the UI explicitly
+  // invites: "you can close this popup ... come back here ... to stop") used to run this
+  // unconditionally, so it would open a second, independent stream to the same camera
+  // while offscreen.js was still actively recording it — starving that stream of frames
+  // and freezing the webcam video partway through an otherwise-successful recording.
+  if (!views.idle.classList.contains('hidden')) {
+    await refreshPermissionNotice();
+    await maybeAutoRequestPermission();
+    await refreshBraveNotice();
+  }
 })();

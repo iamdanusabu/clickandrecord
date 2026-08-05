@@ -57,6 +57,7 @@ function idleState() {
     paused: false,
     options: null,
     clicks: [],
+    typing: [],
     pageUrl: '',
     pageTitle: '',
   };
@@ -141,6 +142,31 @@ async function closeOffscreenDocument() {
   }
 }
 
+// Safety net against a hang anywhere in the offscreen document's message handler.
+// prepareCaptureInner()/stopCapture() do real, unbounded async work in there (camera
+// permission, video playback, IndexedDB writes) — a single stalled await, now or in
+// the future, means this call never resolves, which means startRecording()/
+// stopRecording() never resolve, which means state.phase never leaves 'starting' /
+// 'processing'. Every later attempt then fails with "A recording is already in
+// progress." even though nothing is actually happening — which is exactly what an
+// unawaited-timeout play() call did here before it was fixed. 20s is generous for
+// anything that isn't actually stuck (camera/mic permission happens earlier, as its
+// own step) and short enough that a genuinely stuck take fails fast and resets
+// cleanly instead of silently locking recording out until the extension is reloaded.
+const OFFSCREEN_MESSAGE_TIMEOUT_MS = 20000;
+
+function sendToOffscreen(message, timeoutMs = OFFSCREEN_MESSAGE_TIMEOUT_MS) {
+  const send = chrome.runtime.sendMessage(message)
+    .catch((err) => ({ ok: false, error: err.message || String(err) }));
+  const timeout = new Promise((resolve) => {
+    setTimeout(() => resolve({
+      ok: false,
+      error: `${message.type} timed out after ${timeoutMs}ms — the offscreen document may be stuck.`,
+    }), timeoutMs);
+  });
+  return Promise.race([send, timeout]);
+}
+
 function resetState() {
   state = idleState();
   chrome.action.setBadgeText({ text: '' });
@@ -148,6 +174,15 @@ function resetState() {
 }
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+  // chrome.runtime.sendMessage delivers to every extension context with a listener,
+  // including this one — so a message this file sent *to* offscreen.js (OFFSCREEN_*)
+  // arrives back here too. Without this guard, handleMessage's default case answered
+  // it with "Unknown message type" before offscreen.js's real, slower response (open
+  // the camera, wait on video metadata, flush the recording to IndexedDB) came back —
+  // and whichever answered first won the race. That's what made prepare/begin/stop
+  // fail intermittently: this fast, wrong answer usually beat the real one.
+  if (msg && typeof msg.type === 'string' && msg.type.startsWith('OFFSCREEN_')) return false;
+
   handleMessage(msg, sender).then(sendResponse).catch((err) => {
     console.error('[demo-recorder/background]', err);
     sendResponse({ ok: false, error: err.message || String(err) });
@@ -244,6 +279,19 @@ async function handleMessage(msg, sender) {
         // arrive at human pace, so the write volume is trivial.
         await persistState();
         chrome.runtime.sendMessage({ type: 'CLICK_COUNT_UPDATE', count: state.clicks.length }).catch(() => {});
+      }
+      return { ok: true };
+
+    case 'TYPING_INTERVAL':
+      // One message per burst (content.js debounces locally), not per keystroke, so
+      // this is as cheap to persist as a click. Clamped to >=0 for the same reason
+      // clicks are dropped below zero — a burst starting during the countdown has no
+      // frame before it to hold a zoom into.
+      if (state.phase === 'recording' && !state.paused) {
+        const start = Math.max(0, msg.interval.start);
+        const end = Math.max(start, msg.interval.end);
+        state.typing.push({ start, end });
+        await persistState();
       }
       return { ok: true };
 
@@ -454,7 +502,7 @@ async function setUpRecording(options) {
   // isn't the subject and shouldn't be touched.
   const viewport = source === 'tab' ? await getTabViewport(tab.id) : null;
 
-  const prepResp = await chrome.runtime.sendMessage({
+  const prepResp = await sendToOffscreen({
     type: 'OFFSCREEN_PREPARE',
     streamId,
     sessionId,
@@ -482,10 +530,10 @@ async function setUpRecording(options) {
   // notice of an instant that's already ticking. Awaited despite that: it's a couple
   // of milliseconds, and the alternative is a recording that shows REC, runs a timer,
   // and yields an empty file because nothing ever rolled.
-  const beginResp = await chrome.runtime.sendMessage({
+  const beginResp = await sendToOffscreen({
     type: 'OFFSCREEN_BEGIN',
     startAt: startTime,
-  }).catch((err) => ({ ok: false, error: err.message || String(err) }));
+  });
 
   if (!beginResp || !beginResp.ok) {
     // The devices are open at this point; hand them back before giving up.
@@ -634,7 +682,7 @@ async function stopRecording() {
   chrome.action.setTitle({ title: '' }); // back to the manifest default
 
   // OFFSCREEN_STOP saves both the screen recording and the webcam track.
-  const stopResp = await chrome.runtime.sendMessage({ type: 'OFFSCREEN_STOP' });
+  const stopResp = await sendToOffscreen({ type: 'OFFSCREEN_STOP' });
   if (!stopResp || !stopResp.ok) {
     drCapStop();
     resetState();
@@ -759,6 +807,7 @@ async function onRecordingSaved(sessionId, meta) {
     sessionId,
     meta,
     clicks: state.clicks,
+    typing: state.typing,
     startTime: state.startTime,
     // Used to prefill the mock browser frame's URL bar in the editor.
     pageUrl: state.pageUrl || '',

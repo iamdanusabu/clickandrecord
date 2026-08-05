@@ -13,6 +13,7 @@ let rec = {
   sessionId: null,
   tabStream: null,
   webcamStream: null,
+  webcamVideoEl: null,
   webcamRecorder: null,
   webcamChunks: [],
   webcamStartedAt: 0,
@@ -206,6 +207,40 @@ async function getTabStream(streamId, viewport) {
   return navigator.mediaDevices.getUserMedia({ audio, video: { mandatory: baseVideo } });
 }
 
+// Diagnostic only, for now: a track can go silently "muted" — the driver stops
+// delivering frames without ever firing 'ended' or any MediaRecorder error — which
+// would explain a webcam recording that looks fine, then freezes mid-take with no
+// visible failure anywhere in the pipeline. There's no confirmed fix yet because
+// there's no confirmed cause; this logs what actually happens to the track so the
+// next repro shows it instead of us guessing again. Check it via chrome://extensions
+// → Click & Record → "Inspect views: offscreen.html" → Console.
+function logTrackHealth(track, label) {
+  if (!track) return;
+  const since = () => (rec.startedAt ? `${Date.now() - rec.startedAt}ms into the take` : 'before roll');
+  console.info(`[demo-recorder] ${label} track ready, muted=${track.muted}`);
+  track.addEventListener('mute', () => console.warn(`[demo-recorder] ${label} track MUTED ${since()} — driver stopped delivering frames`));
+  track.addEventListener('unmute', () => console.info(`[demo-recorder] ${label} track unmuted ${since()}`));
+  track.addEventListener('ended', () => console.warn(`[demo-recorder] ${label} track ENDED ${since()}`));
+}
+
+// requestVideoFrameCallback, not requestAnimationFrame: rAF is tied to compositing and
+// is throttled/never fires in a hidden offscreen document (see drawLoop() below), but
+// rVFC is driven by the media pipeline itself and fires regardless of visibility — which
+// is exactly why it's the right tool to keep something continuously pulling frames here.
+// Self-reschedules until videoEl.srcObject is cleared (teardownStreams does that), so it
+// naturally stops once the take ends without needing its own cancellation handle.
+function pumpVideoFrames(videoEl, label) {
+  if (!videoEl.requestVideoFrameCallback) {
+    console.warn(`[demo-recorder] requestVideoFrameCallback unavailable, ${label} pipeline may go idle unattended`);
+    return;
+  }
+  const tick = () => {
+    if (!videoEl.srcObject) return;
+    videoEl.requestVideoFrameCallback(tick);
+  };
+  videoEl.requestVideoFrameCallback(tick);
+}
+
 async function prepareCapture(streamId, options) {
   try {
     return await prepareCaptureInner(streamId, options);
@@ -230,6 +265,7 @@ async function prepareCaptureInner(streamId, options) {
   // rather than finished.
   const [videoTrack] = rec.tabStream.getVideoTracks();
   if (videoTrack) {
+    logTrackHealth(videoTrack, 'tab/display');
     videoTrack.addEventListener('ended', () => {
       chrome.runtime.sendMessage({ type: 'SOURCE_ENDED' }).catch(() => {});
     });
@@ -249,6 +285,31 @@ async function prepareCaptureInner(streamId, options) {
         video: { width: 640, height: 480, facingMode: 'user' },
         audio: false, // mic is captured below and mixed into the screen recording
       });
+      logTrackHealth(rec.webcamStream.getVideoTracks()[0], 'webcam');
+
+      // MediaRecorder below records this stream directly — nothing else ever plays or
+      // reads its frames, unlike the tab video (drawn to canvas every tick) or a normal
+      // camera use case like a video call (which keeps a live self-view painting the
+      // whole time). A track with no active consumer, in a hidden offscreen document, is
+      // suspected of letting Chrome's camera pipeline go idle mid-take even though that
+      // never shows up as a 'mute' or 'ended' event on the track itself. Keep something
+      // actively pulling frames off it purely for the pipeline's own sake.
+      rec.webcamVideoEl = document.createElement('video');
+      rec.webcamVideoEl.srcObject = rec.webcamStream;
+      rec.webcamVideoEl.muted = true;
+      // Not awaited: play() settling is not required before pumpVideoFrames() below —
+      // its rVFC loop just starts whenever the first frame actually arrives, whenever
+      // that is. Awaiting here previously meant a slow-to-settle (or, worse, a never-
+      // settling) play() in this hidden document stalled prepareCaptureInner entirely,
+      // which stalled OFFSCREEN_PREPARE's response, which left background.js's
+      // startRecording() hung and state.phase stuck non-idle forever — so every later
+      // "Start Recording" failed with "A recording is already in progress." even though
+      // nothing was actually recording. The webcam pump is a best-effort nicety; it must
+      // never be able to block the recording it's trying to help.
+      rec.webcamVideoEl.play().catch((err) => {
+        console.warn('[demo-recorder] webcam warm-up play() failed, continuing anyway', err);
+      });
+      pumpVideoFrames(rec.webcamVideoEl, 'webcam');
     } catch (err) {
       console.warn('[demo-recorder] webcam unavailable, continuing without it', err);
       rec.webcamStream = null;
@@ -318,6 +379,9 @@ async function prepareCaptureInner(streamId, options) {
   rec.mediaRecorder.ondataavailable = (e) => {
     if (e.data && e.data.size) rec.chunks.push(e.data);
   };
+  rec.mediaRecorder.onerror = (e) => {
+    console.error('[demo-recorder] screen MediaRecorder error', e.error || e);
+  };
 
   // Second, independent recorder for the webcam — same session, separate file.
   if (rec.webcamStream) {
@@ -328,6 +392,9 @@ async function prepareCaptureInner(streamId, options) {
     rec.webcamChunks = [];
     rec.webcamRecorder.ondataavailable = (e) => {
       if (e.data && e.data.size) rec.webcamChunks.push(e.data);
+    };
+    rec.webcamRecorder.onerror = (e) => {
+      console.error('[demo-recorder] webcam MediaRecorder error', e.error || e);
     };
   }
 
@@ -397,6 +464,14 @@ function drawLoop(tabVideoEl) {
   rec.rafId = setInterval(frame, 1000 / CAPTURE_FPS);
 }
 
+function waitForRecorderStop(recorder) {
+  if (!recorder || recorder.state === 'inactive') return Promise.resolve();
+  return new Promise((resolve) => {
+    recorder.addEventListener('stop', resolve, { once: true });
+    recorder.stop();
+  });
+}
+
 async function stopCapture() {
   if (!rec.mediaRecorder) return { ok: false, error: 'Nothing is recording.' };
 
@@ -415,18 +490,16 @@ async function stopCapture() {
   const height = rec.canvas.height;
   const mimeType = rec.mediaRecorder.mimeType;
 
-  const stopped = new Promise((resolve) => {
-    rec.mediaRecorder.addEventListener('stop', resolve, { once: true });
-  });
-  if (rec.mediaRecorder.state !== 'inactive') rec.mediaRecorder.stop();
+  // A recorder can already be 'inactive' here without anyone having called stop() —
+  // its input track can die mid-take (camera taken by another app, OS revokes access,
+  // tab capture drops) and Chrome auto-stops the recorder, firing 'stop' once right
+  // then. Attaching the listener unconditionally and waiting for that event would hang
+  // forever in that case, since it already fired and won't again — so an
+  // already-inactive recorder resolves immediately instead of waiting on it.
+  const stopped = waitForRecorderStop(rec.mediaRecorder);
 
   // Stop the webcam recorder in parallel and save it under the same session id.
-  const webcamStopped = rec.webcamRecorder
-    ? new Promise((resolve) => {
-      rec.webcamRecorder.addEventListener('stop', resolve, { once: true });
-      if (rec.webcamRecorder.state !== 'inactive') rec.webcamRecorder.stop();
-    })
-    : Promise.resolve();
+  const webcamStopped = waitForRecorderStop(rec.webcamRecorder);
 
   await Promise.all([stopped, webcamStopped]);
 
@@ -463,6 +536,9 @@ async function stopCapture() {
 // released and the draw loop cleared, so no device is left held open.
 function teardownStreams() {
   if (rec.rafId) clearInterval(rec.rafId);
+  // Clears srcObject first so pumpVideoFrames's rVFC loop sees it and stops
+  // rescheduling itself, rather than firing once more against a dead element.
+  if (rec.webcamVideoEl) rec.webcamVideoEl.srcObject = null;
   [rec.tabStream, rec.webcamStream, rec.micStream].forEach((s) => {
     if (s) s.getTracks().forEach((t) => t.stop());
   });

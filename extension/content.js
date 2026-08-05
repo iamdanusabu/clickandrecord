@@ -66,6 +66,12 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     return;
   }
   if (msg.type === 'RECORDING_STARTED') {
+    // A burst carried over from a previous take (if its RECORDING_STOPPED was
+    // somehow missed) would carry timestamps relative to the old startTime, which
+    // is meaningless against this one — drop it rather than let it desync.
+    clearTimeout(typingIdleTimer);
+    typingIdleTimer = null;
+    typingBurst = null;
     drState = {
       active: true,
       paused: false,
@@ -74,11 +80,73 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       source: msg.options.source || 'tab',
     };
   } else if (msg.type === 'RECORDING_STOPPED') {
+    // A burst still open when Stop is hit would otherwise be lost — flush it with
+    // whatever was typed up to this instant rather than dropping it.
+    flushTypingBurst(Date.now() - drState.startTime);
     drState.active = false;
   } else if (msg.type === 'SET_PAUSED') {
     drState.paused = msg.paused;
   }
 });
+
+// ---------- typing ----------
+//
+// Lets the editor hold a zoom through an entire typing burst instead of cutting
+// away on a fixed timer while someone's still mid-sentence. Only *timing* is ever
+// sent — never the field, its value, or what was typed — for the same reason click
+// logging only ever sends coordinates: this can fire in a password field, and
+// knowing *when* someone typed is enough to inform how long a zoom holds; knowing
+// *what* is a completely different, unwanted kind of data to be collecting.
+
+const TYPING_IDLE_MS = 900; // no further input for this long ends the burst
+
+let typingBurst = null; // { start } in recording-relative ms, while a burst is open
+let typingIdleTimer = null;
+
+function isTextEntryTarget(el) {
+  if (!el) return false;
+  if (el.isContentEditable) return true;
+  const tag = el.tagName;
+  if (tag === 'TEXTAREA') return true;
+  if (tag !== 'INPUT') return false;
+  // These types are picked with a click or a drag, not typed into — that's already
+  // a click event, not a typing burst.
+  const nonText = ['checkbox', 'radio', 'range', 'color', 'file', 'button', 'submit', 'reset', 'image'];
+  return !nonText.includes((el.type || 'text').toLowerCase());
+}
+
+function flushTypingBurst(endT) {
+  if (!typingBurst) return;
+  clearTimeout(typingIdleTimer);
+  typingIdleTimer = null;
+  const interval = { start: typingBurst.start, end: Math.max(typingBurst.start, endT) };
+  typingBurst = null;
+  chrome.runtime.sendMessage({ type: 'TYPING_INTERVAL', interval }).catch(() => {});
+}
+
+document.addEventListener(
+  'input',
+  (e) => {
+    if (!drState.active || drState.paused || !drState.clicksEnabled) return;
+    if (!isTextEntryTarget(e.target)) return;
+    const now = Date.now() - drState.startTime;
+    if (!typingBurst) typingBurst = { start: now };
+    clearTimeout(typingIdleTimer);
+    typingIdleTimer = setTimeout(() => flushTypingBurst(Date.now() - drState.startTime), TYPING_IDLE_MS);
+  },
+  { capture: true }
+);
+
+// Losing focus mid-burst — tabbing to the next field, clicking Submit — ends it
+// right away rather than waiting out the idle timer for nothing.
+document.addEventListener(
+  'blur',
+  (e) => {
+    if (!typingBurst || !isTextEntryTarget(e.target)) return;
+    flushTypingBurst(Date.now() - drState.startTime);
+  },
+  { capture: true }
+);
 
 // probe.js runs in the page's MAIN world, which has no chrome.* APIs, so it
 // posts its entries to the window and we relay them. Only same-window messages

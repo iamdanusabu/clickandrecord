@@ -44,6 +44,7 @@ window.addEventListener('message', async (event) => {
         blob: rec.blob,
         meta: rec.meta,
         clicks: info.clicks || [],
+        typing: info.typing || [],
         pageUrl: info.pageUrl || '',
         pageTitle: info.pageTitle || '',
         source: info.source || 'tab',

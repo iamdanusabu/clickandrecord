@@ -13,6 +13,16 @@
     </header>
 
     <div id="view-idle" class="view">
+      <!-- Brave's privacy protections silently cut off the webcam mid-recording (see
+           logTrackHealth() in offscreen.js — confirmed via a Brave-vs-Chrome A/B test
+           that this is Brave-specific, not a bug here). Shown once, dismissible: it's
+           an onboarding notice, not a nag. -->
+      <div id="brave-notice" class="warn-note hidden">
+        <p><strong>You're using Brave.</strong> Its privacy protections can silently cut off webcam recording partway through — usually within the first 20–30 seconds — even though everything here is working correctly. Screen and audio recording are unaffected.</p>
+        <p>To fix it: click the Brave Shields icon in the address bar of the page you're recording, turn Shields off for that site (or set Fingerprinting protection to "Allow all fingerprinting" in <code>brave://settings/shields</code>), then reload the page before recording.</p>
+        <button id="btn-dismiss-brave-notice" class="secondary">Got it</button>
+      </div>
+
       <div class="cam-wrap hidden" id="cam-wrap">
         <video id="cam-preview" autoplay muted playsinline></video>
         <span class="cam-caption">This is how you'll look</span>
@@ -109,6 +119,7 @@
         <span id="rec-timer">00:00</span>
       </div>
       <p class="hint center" id="click-count">0 clicks detected</p>
+      <p class="hint center hidden" id="brave-recording-note">On Brave, your webcam can stop silently partway through — Shields is why.</p>
       <div class="btn-row">
         <button id="btn-pause" class="secondary">Pause</button>
         <button id="btn-stop" class="danger">
