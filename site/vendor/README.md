@@ -21,6 +21,15 @@ disconnecting the network and generating subtitles: it still works.
 | `transformers/ort-wasm-simd-threaded.jsep.{mjs,wasm}` | same package — the onnxruntime-web build it ships with | 3.8.1 | MIT (ONNX Runtime) | 22 MB |
 | `models/whisper-base.en-timestamped/` | [`onnx-community/whisper-base.en_timestamped`](https://huggingface.co/onnx-community/whisper-base.en_timestamped) | `main` @ 2026-07 | Apache-2.0 (Whisper) | 80 MB |
 | `models/whisper-small.en-timestamped/` | [`onnx-community/whisper-small.en_timestamped`](https://huggingface.co/onnx-community/whisper-small.en_timestamped) | `main` @ 2026-07 | Apache-2.0 (Whisper) | 252 MB |
+| `webm-muxer/webm-muxer.js` | [`webm-muxer`](https://www.npmjs.com/package/webm-muxer) (`build/webm-muxer.js`, global/UMD build) | 5.1.4 | MIT (`webm-muxer/LICENSE`) | 47 KB |
+
+`webm-muxer` pairs WebCodecs' `VideoEncoder`/`AudioEncoder` output into a playable
+`.webm` container — used by the editor's export pipeline (`editor.js`,
+`renderComposition()`), which encodes frame-by-frame via WebCodecs rather than
+real-time `MediaRecorder`, so it isn't at the mercy of the compositor throttling
+that broke real-time export (see the `EXPORT_DESIGN` note at the top of that
+function). Loaded as a plain global script (`window.WebMMuxer`), not an ESM import,
+same as everything else here — no build step.
 
 ### Two file choices that are easy to get wrong
 
@@ -149,6 +158,18 @@ The other `*_quantized.onnx` files in those repos (`decoder_model_quantized.onnx
 `decoder_with_past_model_quantized.onnx`) are **not** needed: the *merged* decoder covers
 both the first pass and the with-past passes, and vendoring the others would add ~200 MB
 that never gets read.
+
+`webm-muxer` is a single file fetched directly (no `npm`/build step needed for it):
+
+```sh
+curl -sL "https://unpkg.com/webm-muxer@<version>/build/webm-muxer.js" -o vendor/webm-muxer/webm-muxer.js
+curl -sL "https://raw.githubusercontent.com/Vanilagy/webm-muxer/main/LICENSE" -o vendor/webm-muxer/LICENSE
+```
+
+Pin `<version>` rather than trusting `@latest` for a reproducible, reviewable diff.
+`build/webm-muxer.js` specifically (not `build/webm-muxer.mjs`) — the `.js` one is the
+global/UMD build this project's plain-`<script>` loading style expects; the `.mjs` one
+requires an ESM `import`.
 
 ## Backend: WASM, not WebGPU
 

@@ -228,6 +228,8 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 }
 .ghost.wide { width: 100%; justify-content: center; }
 .ghost svg { flex-shrink: 0; }
+.ghost:disabled { opacity: 0.4; cursor: default; pointer-events: none; }
+.ghost.icon-only { padding: 6px 8px; }
 
 .danger-ghost { color: #c2373b; border-color: #f0cdce; }
 .danger-ghost:hover { background: #fdf1f1; color: #ad2f33; border-color: #e4b4b6; }

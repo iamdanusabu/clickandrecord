@@ -197,6 +197,108 @@ const stage = {
   trimBars: true,
 };
 
+// ---------- undo / redo ----------
+//
+// One snapshot before each edit that changes something a person would want to take
+// back: split, delete, trim, speed, zoom keyframes, captions, per-clip webcam
+// visibility. Global style preferences (background, frame, webcam bubble look, mask,
+// caption look) are deliberately not covered — those are settings being tuned, not
+// content being lost, and covering every slider in the rail would be a much bigger
+// feature than "let me undo a split."
+//
+// project.sources is the one field kept as a shallow copy rather than deep-cloned:
+// its entries hold a live <video> element and Blob, which can't be cloned and don't
+// need to be — undoing never needs a *different* video, only a different edit of it.
+
+const UNDO_LIMIT = 100;
+let undoStack = [];
+let redoStack = [];
+let restoringHistory = false; // true while undo()/redo() itself applies a snapshot
+
+function snapshotState() {
+  return {
+    sources: [...project.sources],
+    segments: structuredClone(project.segments),
+    zoomKeyframes: structuredClone(project.zoomKeyframes),
+    captions: structuredClone(project.captions),
+    selectedSegmentId,
+    selectedKeyframeId,
+  };
+}
+
+function restoreSnapshot(snap) {
+  project.sources = snap.sources;
+  project.segments = snap.segments;
+  project.zoomKeyframes = snap.zoomKeyframes;
+  project.captions = snap.captions;
+  selectedSegmentId = snap.selectedSegmentId;
+  selectedKeyframeId = snap.selectedKeyframeId;
+
+  invalidateCamera();
+  pause();
+
+  // Clamped *before* reading the segment at that index — project.segments may now be
+  // shorter (undoing a split, say), and getCurrentSegment() on a stale, now-out-of-
+  // bounds index returns null, silently skipping the resync below and leaving the
+  // playhead pointing past the end of the restored timeline.
+  playhead.segIndex = Math.min(playhead.segIndex, project.segments.length - 1);
+  const cur = getCurrentSegment();
+  if (cur) {
+    playhead.localMs = Math.min(Math.max(playhead.localMs, cur.seg.in), cur.seg.out);
+    seekTo(cur.src.videoEl, playhead.localMs / 1000).then(() => {
+      resyncPlayheadToActualFrame(cur.src);
+      renderFrame();
+    });
+  }
+
+  layoutTimeline();
+  renderTimeline();
+  renderClipPanel();
+  renderZoomSettings();
+  renderCaptionList();
+  renderCaptionLane();
+  renderFrame();
+}
+
+// Call before any mutation that should be undoable — snapshots the state as it
+// stood *before* the edit that's about to happen.
+function pushHistory() {
+  if (restoringHistory) return;
+  undoStack.push(snapshotState());
+  if (undoStack.length > UNDO_LIMIT) undoStack.shift();
+  redoStack = []; // a fresh edit abandons whatever branch redo would have reached
+  updateUndoRedoButtons();
+}
+
+function undo() {
+  if (!undoStack.length) { setStatus('Nothing to undo'); return; }
+  redoStack.push(snapshotState());
+  const snap = undoStack.pop();
+  restoringHistory = true;
+  restoreSnapshot(snap);
+  restoringHistory = false;
+  updateUndoRedoButtons();
+  setStatus('Undid last edit');
+}
+
+function redo() {
+  if (!redoStack.length) { setStatus('Nothing to redo'); return; }
+  undoStack.push(snapshotState());
+  const snap = redoStack.pop();
+  restoringHistory = true;
+  restoreSnapshot(snap);
+  restoringHistory = false;
+  updateUndoRedoButtons();
+  setStatus('Redid edit');
+}
+
+function updateUndoRedoButtons() {
+  const undoBtn = document.getElementById('btn-undo');
+  const redoBtn = document.getElementById('btn-redo');
+  if (undoBtn) undoBtn.disabled = undoStack.length === 0;
+  if (redoBtn) redoBtn.disabled = redoStack.length === 0;
+}
+
 window.addEventListener('error', (e) => setStatus(`Error: ${e.message}`));
 window.addEventListener('unhandledrejection', (e) => {
   setStatus(`Error: ${(e.reason && e.reason.message) || e.reason}`);
@@ -746,7 +848,10 @@ function seekToGlobalElapsed(globalMs) {
   playhead.segIndex = target.index;
   playhead.localMs = target.localMs;
   syncWebcamSeek(target.localMs);
-  seekTo(target.src.videoEl, target.localMs / 1000).then(renderFrame);
+  seekTo(target.src.videoEl, target.localMs / 1000).then(() => {
+    resyncPlayheadToActualFrame(target.src);
+    renderFrame();
+  });
 }
 
 // ---------- camera ----------
@@ -1850,6 +1955,7 @@ function findKeyframeForClick(click) {
 }
 
 function toggleZoomKeyframe(click) {
+  pushHistory();
   const idx = findKeyframeForClick(click);
   if (idx >= 0) {
     const removed = project.zoomKeyframes.splice(idx, 1)[0];
@@ -1871,6 +1977,7 @@ function addZoomAtPlayhead() {
     setStatus('Zooms apply to the screen recording, not to added clips.');
     return;
   }
+  pushHistory();
   const kf = {
     id: `kf-manual-${nextKeyframeId++}`,
     manual: true,
@@ -1928,12 +2035,16 @@ function renderZoomSettings() {
   `;
   const scaleInput = panel.querySelector('.kf-scale');
   const durationInput = panel.querySelector('.kf-duration');
+  // pushHistory on mousedown, once per drag gesture — not on 'input', which fires on
+  // every tick of the drag and would make undo revert one slider-step at a time.
+  scaleInput.addEventListener('mousedown', pushHistory);
   scaleInput.addEventListener('input', (e) => {
     kf.scale = parseFloat(e.target.value);
     e.target.nextElementSibling.textContent = `${kf.scale.toFixed(2)}×`;
     invalidateCamera();
     renderFrame();
   });
+  durationInput.addEventListener('mousedown', pushHistory);
   durationInput.addEventListener('input', (e) => {
     kf.duration = parseInt(e.target.value, 10);
     e.target.nextElementSibling.textContent = `${(kf.duration / 1000).toFixed(1)}s`;
@@ -1941,6 +2052,7 @@ function renderZoomSettings() {
     renderFrame();
   });
   panel.querySelector('.del-kf').addEventListener('click', () => {
+    pushHistory();
     const idx = project.zoomKeyframes.findIndex((k) => k.id === kf.id);
     if (idx >= 0) project.zoomKeyframes.splice(idx, 1);
     selectedKeyframeId = null;
@@ -1956,6 +2068,7 @@ function bindTrimHandle(handle, view, side) {
   handle.addEventListener('mousedown', (e) => {
     e.stopPropagation();
     e.preventDefault();
+    pushHistory(); // once per drag gesture, not per mousemove — undo reverts the whole trim
     const track = document.getElementById('timeline-track');
     dragging = { view, side };
     handle.classList.add('dragging');
@@ -2069,12 +2182,33 @@ function requestScrubSeek(src, seconds) {
   if (!seekInFlight) pumpSeek();
 }
 
+// Seeking a compressed format (WebM/VP8/VP9, what this app records) is not
+// frame-exact — the browser lands on the nearest keyframe rather than the exact
+// requested time, and MediaRecorder output can go a meaningful fraction of a second
+// between keyframes. Left uncorrected, playhead.localMs stays at the *requested*
+// time while the frame actually painted on screen is a *different* one — so
+// splitting (or anything else keyed off playhead.localMs) doesn't match what was
+// visibly on screen when the decision was made. Resyncing to the actual landed
+// time after a seek settles means "split here" always splits the frame that's
+// actually showing, not the pixel the ruler happened to be dragged to.
+function resyncPlayheadToActualFrame(src) {
+  const cur = getCurrentSegment();
+  if (!cur || cur.src !== src) return; // superseded by a newer seek or segment change
+  playhead.localMs = Math.min(Math.max(src.videoEl.currentTime * 1000, cur.seg.in), cur.seg.out);
+  updatePlayhead();
+  updateTimeLabel();
+}
+
 function pumpSeek() {
   if (!pendingSeek) { seekInFlight = false; return; }
   const { src, seconds } = pendingSeek;
   pendingSeek = null;
   seekInFlight = true;
   seekTo(src.videoEl, seconds).then(() => {
+    // Only once truly settled — a mid-drag intermediate seek resyncing would show
+    // as the time label briefly jumping backward to whatever keyframe it landed on
+    // before the next requested position overwrites it a moment later.
+    if (!pendingSeek) resyncPlayheadToActualFrame(src);
     renderFrame();
     pumpSeek();
   });
@@ -2212,6 +2346,7 @@ function initZoomTargetDrag() {
     e.stopPropagation();
     const kf = selectedKeyframe();
     if (!kf) return;
+    pushHistory(); // once per drag gesture, not per mousemove
 
     const onMove = (ev) => {
       const map = previewMapping();
@@ -2674,6 +2809,7 @@ function splitAtPlayhead() {
     setStatus('Too close to the clip edge to split.');
     return;
   }
+  pushHistory();
   // The right half shares the source; only the in/out window differs. That's the
   // whole trick that makes per-range speed and mid-take deletion possible.
   const right = {
@@ -2699,6 +2835,7 @@ function deleteSegment(id) {
   }
   const idx = project.segments.findIndex((s) => s.id === id);
   if (idx < 0) return;
+  pushHistory();
   project.segments.splice(idx, 1);
   releaseUnusedSources();
 
@@ -2730,6 +2867,8 @@ function releaseUnusedSources() {
 }
 
 function setSegmentSpeed(seg, speed) {
+  if (seg.speed === speed) return; // re-clicking the already-active speed — nothing to undo
+  pushHistory();
   seg.speed = speed;
   // The video element may be mid-playback on this segment.
   const cur = getCurrentSegment();
@@ -2766,6 +2905,7 @@ function renderClipPanel() {
   const camSeg = panel.querySelector('.cam-seg');
   if (camSeg) {
     camSeg.addEventListener('change', (e) => {
+      pushHistory();
       seg.webcam = e.target.checked;
       renderFrame();
     });
@@ -3093,6 +3233,7 @@ document.getElementById('btn-crop-reset').addEventListener('click', () => {
 
 document.getElementById('btn-zoom-all').addEventListener('click', () => {
   if (!isLoaded()) return;
+  pushHistory();
   autoApplyZooms();
   renderTimeline();
   renderZoomSettings();
@@ -3102,6 +3243,7 @@ document.getElementById('btn-zoom-all').addEventListener('click', () => {
 
 document.getElementById('btn-zoom-none').addEventListener('click', () => {
   if (!isLoaded()) return;
+  pushHistory();
   project.zoomKeyframes = [];
   selectedKeyframeId = null;
   invalidateCamera();
@@ -3275,6 +3417,8 @@ function initDropTarget() {
 
 document.getElementById('btn-split').addEventListener('click', splitAtPlayhead);
 document.getElementById('btn-add-zoom').addEventListener('click', addZoomAtPlayhead);
+document.getElementById('btn-undo').addEventListener('click', undo);
+document.getElementById('btn-redo').addEventListener('click', redo);
 
 // Keyboard shortcuts, skipped while typing in a field.
 window.addEventListener('keydown', (e) => {
@@ -3289,6 +3433,25 @@ window.addEventListener('keydown', (e) => {
   } else if (e.key === ' ') {
     e.preventDefault();
     if (playing) pause(); else play();
+  }
+});
+
+// Undo/redo get their own listener: the one above bails out on any modifier key,
+// which is exactly the case this needs. Still skipped while typing in a field, so
+// Ctrl/Cmd+Z in a caption text box uses the browser's native text-field undo
+// instead of reaching into the project history.
+window.addEventListener('keydown', (e) => {
+  if (!isLoaded()) return;
+  const tag = (e.target.tagName || '').toLowerCase();
+  if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
+  if (!(e.metaKey || e.ctrlKey)) return;
+
+  if (e.key === 'z' || e.key === 'Z') {
+    e.preventDefault();
+    if (e.shiftKey) redo(); else undo();
+  } else if (e.key === 'y' || e.key === 'Y') {
+    e.preventDefault();
+    redo();
   }
 });
 
@@ -3802,6 +3965,7 @@ async function addManualCue() {
     manual: true,
   };
 
+  pushHistory();
   project.captions.push(cue);
   project.captions.sort((a, b) => a.t - b.t);
   focusCueId = cue.id;
@@ -3849,6 +4013,9 @@ function renderCaptionList() {
     text.className = 'sub-text';
     text.value = cue.text;
     text.placeholder = 'Caption text…';
+    // Once per editing session (focus), not per keystroke ('input' fires on every
+    // one) — undo reverts the whole edit back to what it read before this pass.
+    text.addEventListener('focus', () => pushHistory());
     // Commit on every keystroke for a hand-typed cue, so the preview shows the words
     // appearing as they're typed rather than only on blur.
     text.addEventListener('input', () => {
@@ -3873,6 +4040,7 @@ function renderCaptionList() {
     del.textContent = '✕';
     del.title = 'Delete text';
     del.addEventListener('click', () => {
+      pushHistory();
       project.captions = project.captions.filter((c) => c.id !== cue.id);
       saveCaptions();
       renderCaptionList();
@@ -4499,6 +4667,16 @@ function renderExportDialog() {
     + `Rendered in real time, so it takes roughly ${secs ? `${secs}s` : 'as long as the video'}.`;
 
   document.getElementById('export-go').disabled = !plan.format || !plan.durationMs;
+
+  // WebM renders via the WebCodecs pipeline (renderCompositionWebCodecs), which isn't
+  // gated on the tab staying visible or the display staying awake at all — it just
+  // keeps going. MP4 still goes through the older real-time MediaRecorder path, which
+  // is the one that actually needs the "safe to switch tabs" reassurance (true, but
+  // only because of the pause/resume + stall-watchdog machinery guarding it).
+  const usesWebCodecs = plan.format && plan.format.id === 'webm' && supportsWebCodecsExport();
+  document.getElementById('export-hint').textContent = usesWebCodecs
+    ? 'Runs in the background — switching tabs, letting your screen lock, or your computer sleeping the display won’t interrupt it.'
+    : 'This renders in real time, so it takes about as long as the final video’s length. It’s safe to switch tabs — export pauses and picks back up exactly where it left off.';
 }
 
 // Set by the Cancel button on the export overlay and read by the render loop. A whole
@@ -4571,7 +4749,278 @@ document.getElementById('export-go').addEventListener('click', async () => {
 // Renders the whole composition — trims, zooms, stage look, appended clips — in
 // real time and returns it as a Blob. Both Export and Save-to-Drive go through
 // here, so Drive gets the *edited* video rather than the raw capture.
+// WebCodecs (VideoEncoder/AudioEncoder/MediaStreamTrackProcessor) is what makes
+// renderCompositionWebCodecs() below possible — real, direct browser support, not a
+// polyfill — but it's Chromium-only, so MP4 (whose muxer isn't vendored — see
+// site/vendor/README.md) still goes through the older real-time MediaRecorder path.
+// WebM is this app's own native format already (every recording and webcam track is
+// already WebM), so it's the one that got the rebuild.
 async function renderComposition(plan = exportPlan()) {
+  if (plan.format.id === 'webm' && supportsWebCodecsExport()) {
+    return renderCompositionWebCodecs(plan);
+  }
+  return renderCompositionRealtime(plan);
+}
+
+function supportsWebCodecsExport() {
+  return typeof VideoEncoder !== 'undefined'
+    && typeof AudioEncoder !== 'undefined'
+    && typeof MediaStreamTrackProcessor !== 'undefined'
+    && typeof window.WebMMuxer !== 'undefined';
+}
+
+// ---------- export: WebCodecs pipeline (WebM) ----------
+//
+// Frame-by-frame encoding instead of real-time MediaRecorder capture. The previous
+// design played the source in real time, drew each requestAnimationFrame tick to a
+// canvas, and captured that canvas with MediaRecorder — which meant export was
+// entirely at the mercy of anything that could throttle rAF (a hidden tab, a sleeping
+// display, heavy system load): drawing would silently stall while the recorder and
+// the underlying <video> kept running, producing a file with a frozen picture and
+// perfectly normal audio for the rest of its length. A watchdog band-aid papered
+// over the *known* trigger (display sleep); this removes the dependency instead.
+//
+// Video is driven by requestVideoFrameCallback rather than requestAnimationFrame.
+// Unlike rAF, rVFC is tied to the media decode pipeline, not to compositing, so it
+// keeps firing regardless of tab visibility or display state — the same property
+// this codebase already relies on in extension/offscreen.js to keep the webcam
+// pipeline alive in a hidden offscreen document. Each callback draws the frame that
+// actually just arrived (via renderInto(), unchanged — same function the live
+// preview uses) and hands it to a VideoEncoder.
+//
+// Audio still comes from the existing real-time Web Audio graph (editorAudioCtx +
+// connectForExport()) — it was never the broken part; the bug report itself
+// describes audio playing normally throughout the freeze. It's bridged into
+// WebCodecs via MediaStreamTrackProcessor, which turns the live MediaStreamTrack
+// into a stream of AudioData the AudioEncoder can consume. Because both video and
+// audio are ultimately driven by the same real <video> elements playing at their
+// configured per-segment speed, they stay coupled to one real-time clock and can't
+// drift apart — the same reason this doesn't attempt a faster-than-real-time export.
+// That would need each source's audio decoded into a buffer up front and rescheduled
+// in an OfflineAudioContext, decoupled from real-time playback entirely; a real
+// improvement, but a separate, larger project from fixing the freeze.
+//
+// Muxing is the one piece WebCodecs doesn't provide — MediaRecorder did that for
+// free. site/vendor/webm-muxer (MIT, Vanilagy/webm-muxer) packages the encoders'
+// output into a standard, playable .webm.
+async function renderCompositionWebCodecs(plan) {
+  if (!('requestVideoFrameCallback' in HTMLVideoElement.prototype)) {
+    throw new Error('This browser supports WebCodecs but not requestVideoFrameCallback — cannot export.');
+  }
+
+  pause();
+  editorAudioCtx.resume();
+  const overlay = document.getElementById('export-overlay');
+  overlay.classList.remove('hidden');
+  document.getElementById('export-progress').textContent = '0%';
+  document.getElementById('export-headline').classList.remove('paused');
+  document.getElementById('export-spinner').classList.remove('paused');
+
+  exportAbort.requested = false;
+  const cancelBtn = document.getElementById('btn-export-cancel');
+  cancelBtn.disabled = false;
+  cancelBtn.textContent = 'Cancel export';
+
+  const w = plan.width;
+  const h = plan.height;
+
+  const exportDest = editorAudioCtx.createMediaStreamDestination();
+  project.sources.forEach((src) => connectForExport(src.videoEl, exportDest));
+
+  const outCanvas = document.createElement('canvas');
+  outCanvas.width = w;
+  outCanvas.height = h;
+  const octx = outCanvas.getContext('2d', { alpha: false });
+
+  const audioTrack = exportDest.stream.getAudioTracks()[0];
+  const audioSettings = audioTrack.getSettings();
+  // createMediaStreamDestination() always exposes exactly one audio track (silent if
+  // nothing's connected to it), so these fall back to editorAudioCtx's own rate/a
+  // sane default rather than ever being genuinely absent.
+  const sampleRate = Math.round(audioSettings.sampleRate) || editorAudioCtx.sampleRate;
+  const numberOfChannels = audioSettings.channelCount || 2;
+
+  let cancelled = false;
+  let blob = null;
+
+  // Everything from here down can throw (an unsupported encoder config, an encoder
+  // error mid-export) in ways the older real-time path never could. Without this,
+  // throwing out of the middle of the function would skip the teardown below
+  // entirely — leaving the export overlay stuck open and, worse, every source's
+  // audio still routed to exportDest instead of the speakers, silent until reload.
+  try {
+    const videoConfig = {
+      codec: 'vp09.00.10.08', // VP9 profile 0, level 1.0, 8-bit — broad Chromium support
+      width: w,
+      height: h,
+      bitrate: plan.videoBitsPerSecond,
+      framerate: EXPORT_FPS,
+    };
+    const audioConfig = { codec: 'opus', sampleRate, numberOfChannels, bitrate: plan.audioBitsPerSecond };
+
+    const [videoSupport, audioSupport] = await Promise.all([
+    VideoEncoder.isConfigSupported(videoConfig),
+    AudioEncoder.isConfigSupported(audioConfig),
+  ]);
+  if (!videoSupport.supported) throw new Error(`This browser can't encode VP9 at ${w}×${h} — try a smaller export size.`);
+  if (!audioSupport.supported) throw new Error(`This browser can't encode Opus audio at ${sampleRate}Hz.`);
+
+  const target = new WebMMuxer.ArrayBufferTarget();
+  const muxer = new WebMMuxer.Muxer({
+    target,
+    video: { codec: 'V_VP9', width: w, height: h, frameRate: EXPORT_FPS },
+    audio: { codec: 'A_OPUS', sampleRate, numberOfChannels },
+    // AudioData timestamps come from the live capture graph's own clock, not from
+    // zero — 'strict' (the muxer's default) throws the moment the first audio chunk
+    // doesn't start at exactly 0. 'offset' normalizes each track's first timestamp
+    // to 0 instead, which is what every other timestamp below assumes.
+    firstTimestampBehavior: 'offset',
+  });
+
+  let encoderError = null;
+  const videoEncoder = new VideoEncoder({
+    output: (chunk, meta) => muxer.addVideoChunk(chunk, meta),
+    error: (err) => { encoderError = err; },
+  });
+  videoEncoder.configure(videoConfig);
+
+  const audioEncoder = new AudioEncoder({
+    output: (chunk, meta) => muxer.addAudioChunk(chunk, meta),
+    error: (err) => { encoderError = err; },
+  });
+  audioEncoder.configure(audioConfig);
+
+  // Runs concurrently with the video capture loop below, not sequentially — audio
+  // keeps flowing in real time regardless of how the video side paces itself.
+  const audioProcessor = new MediaStreamTrackProcessor({ track: audioTrack });
+  const audioReader = audioProcessor.readable.getReader();
+  const audioPumpDone = (async () => {
+    for (;;) {
+      let result;
+      try {
+        result = await audioReader.read();
+      } catch (_) {
+        return; // reader errors out once the track is stopped below — expected, not a failure
+      }
+      if (result.done) return;
+      audioEncoder.encode(result.value);
+      result.value.close();
+    }
+  })();
+
+  playhead.segIndex = 0;
+  const first = getSegmentByIndex(0);
+  playhead.localMs = first.seg.in;
+  await seekTo(first.src.videoEl, first.seg.in / 1000);
+  applySpeed(first);
+  syncWebcamSeek(first.seg.in);
+  const totalMs = totalOutputDurationMs();
+
+  await first.src.videoEl.play();
+  syncWebcamPlayback(first);
+
+  let frameIndex = 0;
+  const KEYFRAME_INTERVAL_FRAMES = EXPORT_FPS * 2; // a hint, not a hard requirement — see below
+
+  await new Promise((resolve, reject) => {
+    function captureNext() {
+      const cur = getCurrentSegment();
+      if (!cur) { resolve(); return; }
+      if (exportAbort.requested) { cancelled = true; resolve(); return; }
+      if (encoderError) { reject(encoderError); return; }
+
+      cur.src.videoEl.requestVideoFrameCallback((_now, metadata) => {
+        // The segment can have changed while this callback was in flight (a seek
+        // between segments resolving) — that path already re-enters captureNext()
+        // itself below, so a stale callback here just steps aside.
+        const live = getCurrentSegment();
+        if (!live || live.src !== cur.src) return;
+        if (exportAbort.requested) { cancelled = true; resolve(); return; }
+        if (encoderError) { reject(encoderError); return; }
+
+        // metadata.mediaTime is the presentation time of the frame that's actually
+        // ready right now — more accurate than reading videoEl.currentTime
+        // separately, which could tick further between this callback firing and
+        // the read.
+        playhead.localMs = (metadata.mediaTime != null ? metadata.mediaTime * 1000 : live.src.videoEl.currentTime * 1000);
+        syncWebcamPlayback(live);
+        renderInto(octx, w, h);
+
+        const outputMs = currentOutputElapsedMs();
+        const frame = new VideoFrame(outCanvas, { timestamp: Math.round(outputMs * 1000) });
+        videoEncoder.encode(frame, { keyFrame: frameIndex % KEYFRAME_INTERVAL_FRAMES === 0 });
+        frame.close();
+        frameIndex += 1;
+
+        document.getElementById('export-progress').textContent =
+          `${Math.min(100, Math.round((outputMs / totalMs) * 100))}%`;
+
+        const advance = () => {
+          // Cheap backpressure: on hardware where encoding can't keep up with
+          // capture, let the queue drain a little rather than piling up VideoFrames
+          // (each one holds a full frame of raw pixel data) faster than they can be
+          // consumed.
+          if (videoEncoder.encodeQueueSize > 30) {
+            setTimeout(captureNext, 30);
+          } else {
+            captureNext();
+          }
+        };
+
+        if (playhead.localMs >= live.seg.out - 15) {
+          const nextIndex = live.index + 1;
+          if (nextIndex >= segmentCount()) { resolve(); return; }
+          const next = getSegmentByIndex(nextIndex);
+          playhead.segIndex = nextIndex;
+          const contiguous = next.src === live.src
+            && Math.abs(next.seg.in - live.seg.out) < 40
+            && speedOf(next.seg) === speedOf(live.seg);
+          if (contiguous) { advance(); return; }
+          live.src.videoEl.pause();
+          applySpeed(next);
+          syncWebcamSeek(next.seg.in);
+          seekTo(next.src.videoEl, next.seg.in / 1000).then(() => {
+            next.src.videoEl.play();
+            captureNext();
+          });
+          return;
+        }
+        advance();
+      });
+    }
+    captureNext();
+  });
+
+    audioTrack.stop(); // ends the processor's readable stream, letting audioPumpDone resolve
+    await audioPumpDone;
+
+    await videoEncoder.flush();
+    videoEncoder.close();
+    await audioEncoder.flush();
+    audioEncoder.close();
+    muxer.finalize();
+
+    blob = cancelled ? null : new Blob([target.buffer], { type: 'video/webm' });
+  } finally {
+    project.sources.forEach((src) => {
+      src.videoEl.pause();
+      disconnectForExport(src.videoEl, exportDest);
+      src.videoEl.playbackRate = 1;
+    });
+    pauseWebcam();
+
+    await rewindToStart();
+    renderFrame();
+
+    overlay.classList.add('hidden');
+    exportAbort.requested = false;
+  }
+
+  return blob;
+}
+
+// ---------- export: real-time MediaRecorder pipeline (MP4, and the WebCodecs fallback) ----------
+async function renderCompositionRealtime(plan) {
   pause();
   editorAudioCtx.resume();
   const overlay = document.getElementById('export-overlay');
@@ -4689,7 +5138,26 @@ async function renderComposition(plan = exportPlan()) {
   // starting condition too, rather than only reacting to a later transition.
   if (document.hidden) pauseForHidden();
 
+  // visibilitychange only reliably fires for switching tabs/apps — it does *not*
+  // reliably fire when the display itself sleeps (a laptop's screen-idle timeout)
+  // while this tab stays the nominal foreground one, and that throttles/stops rAF
+  // exactly the same way a hidden tab does. Watching a static export-progress
+  // screen for several minutes without touching the mouse or keyboard is exactly
+  // when that idle timeout hits — so this can't be treated as an edge case.
+  // setInterval is the backstop: unlike rAF, it isn't tied to compositing, so it
+  // keeps a heartbeat regardless of *why* rendering stalled, and pauses/resumes
+  // the same recorder+video lockstep loop() otherwise only reaches via that one
+  // DOM event.
+  let lastTickAt = performance.now();
+  const STALL_THRESHOLD_MS = 500; // generous vs. a single slow frame under normal load
+  const watchdogId = setInterval(() => {
+    const stalled = performance.now() - lastTickAt > STALL_THRESHOLD_MS;
+    if (stalled) pauseForHidden();
+    else if (!document.hidden) resumeFromHidden();
+  }, 250);
+
   function loop() {
+    lastTickAt = performance.now();
     pendingFrame = null;
     // Belt and braces alongside the cancel-on-hide above: if some scheduling
     // order let a tick through right at the hidden/visible boundary, bail
@@ -4744,6 +5212,7 @@ async function renderComposition(plan = exportPlan()) {
   });
 
   document.removeEventListener('visibilitychange', onVisibilityChange);
+  clearInterval(watchdogId);
   // recorder.state is never 'paused' here: finish() is only reachable from inside
   // loop(), and loop() returns immediately without doing anything while
   // pausedForVisibility is true — so reaching this line already implies we are not
