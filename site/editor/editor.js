@@ -23,6 +23,10 @@ const project = {
                 //   duration, crop, thumbs, peaks }
   segments: [], // { id, sourceId, in, out, speed, webcam }
   clicks: [],
+  // Typing-burst intervals ({ start, end }, recording-source ms) — used only to
+  // extend an auto-zoom's hold through a burst it overlaps. Never rendered, never
+  // exported: this is timing metadata, not content.
+  typing: [],
   zoomKeyframes: [],
   // Separate webcam track, composited here rather than burned into the recording:
   // { videoEl, url, duration, startOffsetMs }. Null for recordings made before the
@@ -58,7 +62,12 @@ const webcamStyle = {
   enabled: true,
   x: 0.86,
   y: 0.82,
-  size: 0.22,      // of the content rect's smaller side
+  size: 0.22,      // of the content rect's smaller side, at rest (no zoom active)
+  // The bubble's size during a full-strength zoom (see bubbleShrinkAmount below) — a
+  // full-size bubble sitting over a zoomed-in screen reads as too large for the frame.
+  // Setting this equal to size effectively turns the shrink off, so that's the "off"
+  // state rather than a separate toggle.
+  minSize: 0.14,
   shape: 'circle', // 'circle' | 'rounded'
   border: true,
   shadow: true,
@@ -111,12 +120,46 @@ const SNAP_PX = 8;
 // The zoom starts slightly *before* the click so the viewer is already
 // looking at the right place when it lands.
 const ZOOM_SCALE = 1.5;
-const ZOOM_HOLD_MS = 1200;
+// Ceiling of the per-keyframe zoom slider (see the .kf-scale range below) — also
+// what the webcam bubble's shrink-on-zoom is normalized against, so "fully shrunk"
+// lines up with "as zoomed in as a keyframe can go."
+const KEYFRAME_MAX_ZOOM = 2.5;
+// How long a new zoom holds at full scale before easing back out. Bumped up from
+// 1200 — 1.2s read as too quick to actually take in what got zoomed into before it
+// let go again. Per-zoom Hold slider (.kf-duration) still overrides this for anyone
+// who wants a particular zoom shorter or longer, and durationForClick() below
+// overrides it automatically when a typing burst follows the click.
+const ZOOM_HOLD_MS = 1800;
+// Ceiling of the per-keyframe Hold slider. Well above ZOOM_HOLD_MS because
+// durationForClick() can push a click-derived zoom's duration past the default to
+// cover an entire typing burst — this has to comfortably fit a long one.
+const KEYFRAME_MAX_HOLD_MS = 20000;
 const ZOOM_LEAD_IN_MS = 250;
 const ZOOM_EASE_MS = 500;
-// Two zooms closer together than this pan from one to the other at full
-// magnification instead of zooming out and straight back in.
-const ZOOM_LINK_GAP_MS = 700;
+// Two zooms link into a pan — camera slides between them while staying magnified —
+// instead of resetting to full frame and zooming back in, when the gap between them
+// is short enough to read as "still looking at roughly the same place" rather than
+// two separate moments. 700 (the original value) was tuned for a fast double-click,
+// not for how people actually click through a UI: clicking one button, registering
+// what happened, then clicking the next one is routinely 1-2+ seconds even when the
+// two things are right next to each other, so it almost never linked and every
+// click read as its own zoom-out-then-in. Two clicks close together *in space* get
+// a longer allowance, since a slow pan between neighbours still reads as one
+// continuous look; two clicks far apart only link if they're genuinely rapid, since
+// a fast pan clear across the frame reads as its own jarring moment, not a
+// continuation.
+const ZOOM_LINK_GAP_MS = 1500;
+const ZOOM_LINK_NEAR_DIST = 0.2; // fraction of the frame's diagonal — "right next to it"
+const ZOOM_LINK_NEAR_BONUS_MS = 1500;
+
+// Whether zoom `a` (which ends first) should link into a pan with zoom `b`.
+function zoomsShouldLink(a, b) {
+  const gap = b.t - (a.t + a.duration);
+  if (gap <= 0) return true; // already overlapping — nothing sane to reset between
+  const dist = Math.hypot(b.x - a.x, b.y - a.y);
+  const allowance = ZOOM_LINK_GAP_MS + (dist < ZOOM_LINK_NEAR_DIST ? ZOOM_LINK_NEAR_BONUS_MS : 0);
+  return gap < allowance;
+}
 
 let clipViews = [];
 let dragging = null; // { view, side }
@@ -226,6 +269,9 @@ async function init() {
     speed: 1,
   });
   project.clicks = clicks;
+  // Set before autoApplyZooms() below — it reads project.typing to decide how long
+  // each auto-generated zoom should hold.
+  project.typing = rec.typing || [];
   selectedSegmentId = project.segments[0].id;
 
   baseOutputSize = { w: canvas.width, h: canvas.height };
@@ -391,6 +437,7 @@ async function loadSession(id) {
       blob: rec.blob,
       meta: rec.meta || {},
       clicks: info.clicks || [],
+      typing: info.typing || [],
       pageUrl: info.pageUrl || '',
       pageTitle: info.pageTitle || '',
       source: info.source || 'tab',
@@ -405,6 +452,7 @@ function loadViaBridge(id) {
       blob: msg.blob,
       meta: msg.meta || {},
       clicks: msg.clicks || [],
+      typing: msg.typing || [],
       pageUrl: msg.pageUrl || '',
       pageTitle: msg.pageTitle || '',
       source: msg.source || 'tab',
@@ -730,8 +778,8 @@ function buildCameraTrack() {
     const end = kf.t + kf.duration;
     const prev = kfs[i - 1];
     const next = kfs[i + 1];
-    const linkedFromPrev = prev && kf.t - (prev.t + prev.duration) < ZOOM_LINK_GAP_MS;
-    const linkedToNext = next && next.t - end < ZOOM_LINK_GAP_MS;
+    const linkedFromPrev = prev && zoomsShouldLink(prev, kf);
+    const linkedToNext = next && zoomsShouldLink(kf, next);
 
     // Ramp in from full-frame, unless we're already magnified from the
     // previous zoom — then the gap becomes a pan instead.
@@ -1051,7 +1099,7 @@ function renderInto(targetCtx, w, h) {
   // Drawn *after* the window clip is released, and positioned in canvas space, so
   // the bubble can be placed anywhere on the frame — over the inset screen, over
   // the background, or straddling the edge between them.
-  drawWebcamBubble(targetCtx, w, h, cur);
+  drawWebcamBubble(targetCtx, w, h, cur, cam ? cam.scale : 1);
 
   // After the webcam bubble, so a mask band also covers it if the bubble strays
   // into a redacted area, and before captions, which must stay legible on top of
@@ -1272,10 +1320,25 @@ function drawMasks(targetCtx, w, h) {
   targetCtx.restore();
 }
 
+// 0 at rest, 1 at the keyframe slider's max — how far into "zoomed" the bubble
+// should read. Keyframe scale never drops below 1 (see the .kf-scale range), so
+// this can't go negative; a null/undefined camScale (no zoom active) reads as 1.
+function bubbleShrinkAmount(camScale) {
+  if (!camScale || camScale <= 1) return 0;
+  return Math.min(1, (camScale - 1) / (KEYFRAME_MAX_ZOOM - 1));
+}
+
 // Geometry of the bubble in canvas space. Also used by the drag hit-test, so what
-// you grab is exactly what's drawn.
-function webcamRect(w, h) {
-  const d = webcamStyle.size * Math.min(w, h);
+// you grab is exactly what's drawn. camScale is the active zoom's current scale
+// (1, or omitted, when no zoom is active) — the bubble shrinks toward minSize as
+// it climbs toward KEYFRAME_MAX_ZOOM, and grows back once the zoom eases out,
+// following the same eased timeline the screen zoom itself already uses.
+function webcamRect(w, h, camScale = 1) {
+  // minSize > size would grow the bubble on zoom instead of shrinking it — clamp
+  // to a no-op (size stays constant) rather than let that read as a bug.
+  const minD = Math.min(webcamStyle.minSize, webcamStyle.size);
+  const sizeFrac = webcamStyle.size - (webcamStyle.size - minD) * bubbleShrinkAmount(camScale);
+  const d = sizeFrac * Math.min(w, h);
   return {
     x: webcamStyle.x * w - d / 2,
     y: webcamStyle.y * h - d / 2,
@@ -1291,12 +1354,12 @@ function webcamVisibleFor(cur) {
   return cur.seg.webcam !== false; // per-clip toggle
 }
 
-function drawWebcamBubble(targetCtx, w, h, cur) {
+function drawWebcamBubble(targetCtx, w, h, cur, camScale = 1) {
   if (!webcamVisibleFor(cur)) return;
   const videoEl = project.webcam.videoEl;
   if (!videoEl.videoWidth) return;
 
-  const { x, y, d } = webcamRect(w, h);
+  const { x, y, d } = webcamRect(w, h, camScale);
   const radius = webcamStyle.shape === 'circle' ? d / 2 : d * 0.18;
 
   targetCtx.save();
@@ -1391,7 +1454,20 @@ function updatePlayhead() {
 // source* time, offset by however long after the screen recorder it started:
 //   webcamTime = recordingSourceMs - startOffsetMs
 
-const WEBCAM_DRIFT_TOLERANCE_MS = 120;
+// The webcam and the main recording are two independently-decoded <video> elements
+// with no shared clock — small drift between them is normal. Below HARD_RESYNC, that
+// drift is corrected by nudging playbackRate a few percent instead of seeking: a jump
+// for a few frames of drift would be more noticeable than the drift itself, and a
+// continuous small-rate correction converges just as fast without one. Only a drift
+// bigger than that (a scrub, a segment change) gets a hard seek, since nudging could
+// never catch up to a jump that size within a reasonable time anyway.
+const WEBCAM_HARD_RESYNC_MS = 250;
+// Drift below this is within normal frame-timing noise — nudging away noise that small
+// would mean the rate never actually settles at 1x.
+const WEBCAM_SOFT_CORRECT_MS = 15;
+// Caps how aggressively the rate is pulled back into line, so the correction itself
+// stays inaudible/invisible rather than becoming its own artifact.
+const WEBCAM_MAX_RATE_NUDGE = 0.05;
 
 function webcamTimeFor(sourceMs) {
   return Math.max(0, sourceMs - project.webcam.startOffsetMs);
@@ -1406,7 +1482,6 @@ function syncWebcamSeek(sourceMs) {
 }
 
 // Used during playback: let it run, and only correct when it has actually drifted.
-// Seeking every frame would stutter and never settle.
 function syncWebcamPlayback(cur) {
   if (!project.webcam) return;
   const videoEl = project.webcam.videoEl;
@@ -1415,10 +1490,19 @@ function syncWebcamPlayback(cur) {
     return;
   }
   const expected = webcamTimeFor(playhead.localMs);
-  if (Math.abs(videoEl.currentTime * 1000 - expected) > WEBCAM_DRIFT_TOLERANCE_MS) {
+  const baseRate = speedOf(cur.seg);
+  // Positive: the webcam clip is ahead of where it should be (needs to slow down).
+  const driftMs = videoEl.currentTime * 1000 - expected;
+
+  if (Math.abs(driftMs) > WEBCAM_HARD_RESYNC_MS) {
     videoEl.currentTime = expected / 1000;
+    videoEl.playbackRate = baseRate;
+  } else if (Math.abs(driftMs) > WEBCAM_SOFT_CORRECT_MS) {
+    const nudge = Math.max(-WEBCAM_MAX_RATE_NUDGE, Math.min(WEBCAM_MAX_RATE_NUDGE, driftMs / 1000));
+    videoEl.playbackRate = baseRate * (1 - nudge);
+  } else {
+    videoEl.playbackRate = baseRate;
   }
-  videoEl.playbackRate = speedOf(cur.seg);
   if (videoEl.paused) videoEl.play().catch(() => {});
 }
 
@@ -1731,6 +1815,24 @@ function renderRuler() {
   }
 }
 
+// How soon after the click typing has to start to count as "typing into what was
+// just clicked" rather than an unrelated later burst.
+const TYPING_LINK_GAP_MS = 1200;
+// Small buffer after the last keystroke before releasing the zoom, so it doesn't
+// cut away the instant the cursor stops.
+const TYPING_HOLD_TAIL_MS = 500;
+
+// The default hold, unless a typing burst follows the click closely enough to count
+// as typing into whatever was clicked — then it holds through the whole burst
+// instead of cutting away on a fixed timer while someone's still mid-sentence.
+function durationForClick(click) {
+  const typing = (project.typing || []).find(
+    (iv) => iv.start >= click.t && iv.start - click.t < TYPING_LINK_GAP_MS
+  );
+  if (!typing) return ZOOM_HOLD_MS;
+  return Math.max(ZOOM_HOLD_MS, (typing.end - click.t) + TYPING_HOLD_TAIL_MS);
+}
+
 function makeKeyframe(click) {
   return {
     id: `kf-${click.t}`,
@@ -1738,7 +1840,7 @@ function makeKeyframe(click) {
     t: Math.max(0, click.t - ZOOM_LEAD_IN_MS),
     x: click.x,
     y: click.y,
-    duration: ZOOM_HOLD_MS,
+    duration: durationForClick(click),
     scale: ZOOM_SCALE,
   };
 }
@@ -1820,8 +1922,8 @@ function renderZoomSettings() {
     document.querySelector('.timeline-panel').insertAdjacentElement('afterend', panel);
   }
   panel.innerHTML = `
-    <label>Zoom <input type="range" min="1.1" max="2.5" step="0.05" value="${kf.scale}" class="kf-scale" /><span class="kf-val">${kf.scale.toFixed(2)}×</span></label>
-    <label>Hold <input type="range" min="600" max="4000" step="100" value="${kf.duration}" class="kf-duration" /><span class="kf-val">${(kf.duration / 1000).toFixed(1)}s</span></label>
+    <label>Zoom <input type="range" min="1.1" max="${KEYFRAME_MAX_ZOOM}" step="0.05" value="${kf.scale}" class="kf-scale" /><span class="kf-val">${kf.scale.toFixed(2)}×</span></label>
+    <label>Hold <input type="range" min="600" max="${KEYFRAME_MAX_HOLD_MS}" step="100" value="${kf.duration}" class="kf-duration" /><span class="kf-val">${(kf.duration / 1000).toFixed(1)}s</span></label>
     <button type="button" class="del-kf">Remove zoom</button>
   `;
   const scaleInput = panel.querySelector('.kf-scale');
@@ -2201,6 +2303,9 @@ function renderWebcamControls() {
   const size = document.getElementById('cam-size');
   size.value = webcamStyle.size;
   document.getElementById('cam-size-val').textContent = `${Math.round(webcamStyle.size * 100)}%`;
+  const minSize = document.getElementById('cam-min-size');
+  minSize.value = webcamStyle.minSize;
+  document.getElementById('cam-min-size-val').textContent = `${Math.round(webcamStyle.minSize * 100)}%`;
   document.getElementById('cam-enabled').checked = webcamStyle.enabled;
   document.getElementById('cam-border').checked = webcamStyle.border;
   document.getElementById('cam-shadow').checked = webcamStyle.shadow;
@@ -2211,6 +2316,11 @@ function bindWebcamControls() {
   document.getElementById('cam-size').addEventListener('input', (e) => {
     webcamStyle.size = parseFloat(e.target.value);
     document.getElementById('cam-size-val').textContent = `${Math.round(webcamStyle.size * 100)}%`;
+    renderFrame();
+  });
+  document.getElementById('cam-min-size').addEventListener('input', (e) => {
+    webcamStyle.minSize = parseFloat(e.target.value);
+    document.getElementById('cam-min-size-val').textContent = `${Math.round(webcamStyle.minSize * 100)}%`;
     renderFrame();
   });
   [['cam-enabled', 'enabled'], ['cam-border', 'border'], ['cam-shadow', 'shadow'], ['cam-mirror', 'mirror']]
@@ -2268,13 +2378,16 @@ function initCaptionDrag() {
 function initWebcamDrag() {
   canvas.addEventListener('mousedown', (e) => {
     if (cropping) return; // crop handles own the preview in that mode
-    if (!webcamVisibleFor(getCurrentSegment())) return;
+    const cur = getCurrentSegment();
+    if (!webcamVisibleFor(cur)) return;
 
     const map = clientToCanvasNorm(e.clientX, e.clientY);
     if (!map) return;
 
-    // Hit-test in canvas pixels against the rect the renderer uses.
-    const bubble = webcamRect(canvas.width, canvas.height);
+    // Hit-test in canvas pixels against the rect the renderer uses — including
+    // whatever the bubble is currently shrunk to, if a zoom is active right now.
+    const cam = cur.type === 'recording' ? getCamera(cur.src.videoEl.currentTime * 1000) : null;
+    const bubble = webcamRect(canvas.width, canvas.height, cam ? cam.scale : 1);
     const px = (e.clientX - map.clientRect.left) / map.scale;
     const py = (e.clientY - map.clientRect.top) / map.scale;
     if (px < bubble.x || px > bubble.x + bubble.d || py < bubble.y || py > bubble.y + bubble.d) return;

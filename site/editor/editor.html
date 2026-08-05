@@ -226,6 +226,8 @@
             <div class="field-sub">Position</div>
             <div class="frame-options" id="cam-corners"></div>
             <label class="field"><span class="field-label">Size</span><input type="range" id="cam-size" min="0.1" max="0.45" step="0.01" /><span class="kf-val" id="cam-size-val"></span></label>
+            <label class="field"><span class="field-label">Size when zoomed</span><input type="range" id="cam-min-size" min="0.05" max="0.45" step="0.01" /><span class="kf-val" id="cam-min-size-val"></span></label>
+            <p class="field-hint">The bubble shrinks toward this size as a click-zoom kicks in, and grows back once it eases out. Set it equal to Size to keep the bubble fixed. Scrub to a zoomed moment on the timeline to preview it.</p>
             <div class="field-sub">Shape</div>
             <div class="frame-options" id="cam-shapes"></div>
             <div class="check-row">
