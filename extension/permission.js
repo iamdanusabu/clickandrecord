@@ -60,9 +60,14 @@ async function alreadyGranted() {
 async function request() {
   errorEl.classList.add('hidden');
   retryBtn.classList.add('hidden');
+  // Chrome and Brave both offer a duration choice on this prompt (e.g. "Allow
+  // this time" vs "Allow on every visit"). A time-limited grant expires mid-
+  // recording — the webcam track just stops with no error — so steer people
+  // toward the persistent option instead of the default-looking temporary one.
+  const durationHint = 'If it offers a choice of how long, pick "Allow on every visit" (or at least 1 day) — not "Allow this time only," or the camera will stop partway through recording.';
   hintEl.textContent = isMac
-    ? `Chrome will ask for access — macOS may also show its own system dialog the first time. Choose Allow on both so your ${label} can be recorded.`
-    : `Chrome will ask for access. Choose Allow so your ${label} can be recorded.`;
+    ? `Chrome will ask for access — macOS may also show its own system dialog the first time. Choose Allow on both so your ${label} can be recorded. ${durationHint}`
+    : `Chrome will ask for access. Choose Allow so your ${label} can be recorded. ${durationHint}`;
 
   try {
     const stream = await navigator.mediaDevices.getUserMedia({

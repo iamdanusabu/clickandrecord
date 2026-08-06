@@ -195,6 +195,7 @@ button:disabled{cursor:default;opacity:.6}
 .warn-note strong{color:var(--text)}
 .warn-note code{font-family:var(--mono);font-size:10.5px;background:rgba(20,22,28,.06);
   padding:1px 4px;border-radius:4px}
+.warn-note a{color:inherit;text-decoration:underline;text-decoration-color:#c9931f}
 .warn-note button{width:auto;padding:6px 12px;font-size:12px;margin-top:9px}
 
 /* ── countdown & recording ────────────────────────────────────────────────── */

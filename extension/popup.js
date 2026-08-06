@@ -35,6 +35,13 @@ document.getElementById('btn-dismiss-brave-notice').addEventListener('click', ()
   chrome.storage.local.set({ [BRAVE_NOTICE_DISMISSED_KEY]: true }).catch(() => {});
 });
 
+// A plain href="brave://..." link gets silently blocked by the browser as an
+// unsafe navigation when clicked, so open it as a new tab via the tabs API instead.
+document.getElementById('link-brave-shields').addEventListener('click', (e) => {
+  e.preventDefault();
+  chrome.tabs.create({ url: 'brave://settings/shields' }).catch(() => {});
+});
+
 // The in-recording reminder: not dismissible and not gated on the onboarding banner
 // having been seen, because this is the moment the Brave cutoff actually bites —
 // worth repeating even if the earlier notice was dismissed a dozen recordings ago.
