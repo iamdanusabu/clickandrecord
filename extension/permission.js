@@ -58,11 +58,13 @@ async function alreadyGranted() {
   }
 }
 
-// Chrome and Brave both offer a duration choice on this prompt (e.g. "Allow
-// this time" vs "Allow on every visit"). A time-limited grant expires mid-
-// recording — the webcam track just stops with no error — so steer people
-// toward the persistent option instead of the default-looking temporary one.
-const durationHint = 'If it offers a choice of how long, pick "Allow on every visit" (or at least 1 day) — not "Allow this time only," or the camera will stop partway through recording.';
+// Chrome and Brave both offer a duration dropdown on this prompt — Brave's
+// options are "until I close this site" (its default, and the one to avoid),
+// "for 24 hours", "for 1 week" and "forever"; Chrome's are worded differently
+// but split the same way. A grant that expires mid-recording just stops the
+// webcam track with no error, so steer people off the default-looking
+// temporary option and onto the persistent one.
+const durationHint = 'If it offers a dropdown for how long, change it from the default "until I close this site" to "forever" (or at least "for 1 week") — otherwise the camera can stop partway through recording.';
 
 // Chrome's own permission bubble renders on top of this entire window the
 // instant getUserMedia is called, covering the hint text before anyone can
