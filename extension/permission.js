@@ -21,6 +21,7 @@ const titleEl = document.getElementById('title');
 const hintEl = document.getElementById('hint');
 const errorEl = document.getElementById('error');
 const retryBtn = document.getElementById('btn-retry');
+const continueBtn = document.getElementById('btn-continue');
 
 const label = wantVideo && wantAudio ? 'camera & microphone'
   : wantVideo ? 'camera' : 'microphone';
@@ -57,17 +58,32 @@ async function alreadyGranted() {
   }
 }
 
-async function request() {
-  errorEl.classList.add('hidden');
-  retryBtn.classList.add('hidden');
-  // Chrome and Brave both offer a duration choice on this prompt (e.g. "Allow
-  // this time" vs "Allow on every visit"). A time-limited grant expires mid-
-  // recording — the webcam track just stops with no error — so steer people
-  // toward the persistent option instead of the default-looking temporary one.
-  const durationHint = 'If it offers a choice of how long, pick "Allow on every visit" (or at least 1 day) — not "Allow this time only," or the camera will stop partway through recording.';
+// Chrome and Brave both offer a duration choice on this prompt (e.g. "Allow
+// this time" vs "Allow on every visit"). A time-limited grant expires mid-
+// recording — the webcam track just stops with no error — so steer people
+// toward the persistent option instead of the default-looking temporary one.
+const durationHint = 'If it offers a choice of how long, pick "Allow on every visit" (or at least 1 day) — not "Allow this time only," or the camera will stop partway through recording.';
+
+// Chrome's own permission bubble renders on top of this entire window the
+// instant getUserMedia is called, covering the hint text before anyone can
+// read it — the exact "the warning was there but I never saw it" reports
+// this exists to fix. So: show the instructions first, behind a Continue
+// button, and only call getUserMedia once the user has actually read them and
+// clicked through. The bubble still covers the page after that, but by then
+// the point has already landed.
+function showInstructions() {
   hintEl.textContent = isMac
     ? `Chrome will ask for access — macOS may also show its own system dialog the first time. Choose Allow on both so your ${label} can be recorded. ${durationHint}`
     : `Chrome will ask for access. Choose Allow so your ${label} can be recorded. ${durationHint}`;
+  errorEl.classList.add('hidden');
+  retryBtn.classList.add('hidden');
+  continueBtn.classList.remove('hidden');
+}
+
+async function request() {
+  errorEl.classList.add('hidden');
+  retryBtn.classList.add('hidden');
+  continueBtn.classList.add('hidden');
 
   try {
     const stream = await navigator.mediaDevices.getUserMedia({
@@ -101,6 +117,7 @@ async function request() {
 }
 
 retryBtn.addEventListener('click', request);
+continueBtn.addEventListener('click', request);
 
 // Dismissing the window without granting is the user's answer — tell the
 // background so startRecording isn't left waiting.
@@ -117,5 +134,5 @@ window.addEventListener('unload', () => {
     window.close();
     return;
   }
-  request();
+  showInstructions();
 })();
