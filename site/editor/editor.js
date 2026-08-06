@@ -1587,7 +1587,10 @@ function syncWebcamSeek(sourceMs) {
 }
 
 // Used during playback: let it run, and only correct when it has actually drifted.
-function syncWebcamPlayback(cur) {
+// rateMultiplier is 1 for normal playback/real-time export; the fast export paths
+// pass EXPORT_DECODE_SPEEDUP so this tracks the main clip's cranked-up decode rate
+// instead of reading it as a huge desync and hard-resync-seeking every frame.
+function syncWebcamPlayback(cur, rateMultiplier = 1) {
   if (!project.webcam) return;
   const videoEl = project.webcam.videoEl;
   if (!webcamVisibleFor(cur)) {
@@ -1595,7 +1598,10 @@ function syncWebcamPlayback(cur) {
     return;
   }
   const expected = webcamTimeFor(playhead.localMs);
-  const baseRate = speedOf(cur.seg);
+  // Clamped the same way applyExportDecodeSpeed clamps the main video's rate, so the
+  // two can't diverge if EXPORT_DECODE_SPEEDUP is ever tuned past what keeps
+  // speedOf(seg) * rateMultiplier under the ceiling.
+  const baseRate = Math.min(16, speedOf(cur.seg) * rateMultiplier);
   // Positive: the webcam clip is ahead of where it should be (needs to slow down).
   const driftMs = videoEl.currentTime * 1000 - expected;
 
@@ -4581,6 +4587,14 @@ const EXPORT_QUALITIES = [
 const EXPORT_MAX_WIDTH = 2560;
 const EXPORT_FPS = 30;
 
+// How much faster than 1x the source <video> elements are played during the fast
+// export capture loop (see captureExportFrames). VideoFrame timestamps come from
+// the output timeline, not wall-clock, so this only changes throughput, never
+// correctness — it exists purely to get through decode+composite+encode faster
+// than real time. Not a validated ceiling, just a starting point: raise it if
+// hardware keeps up cleanly, lower it if frames start dropping.
+const EXPORT_DECODE_SPEEDUP = 4;
+
 let exportFormatId = null;   // resolved on first use, once support is known
 let exportQualityId = 'high';
 
@@ -4662,19 +4676,29 @@ function renderExportDialog() {
 
   const mbps = (plan.videoBitsPerSecond / 1_000_000).toFixed(1);
   const secs = Math.round(plan.durationMs / 1000);
+
+  // Both formats now prefer the WebCodecs fast path (renderCompositionWebCodecs /
+  // renderCompositionWebCodecsMp4) — offline audio pre-render + a cranked-up decode
+  // rate means neither is bound to the recording's own duration any more. This is a
+  // cheap synchronous approximation of mp4FastExportSupported() for the dialog's
+  // copy only; the real (async, codec-specific) check happens at export time in
+  // renderComposition(), which is what actually decides whether MP4 falls back to
+  // the real-time path.
+  const likelyFast = plan.format && supportsWebCodecs() && (
+    plan.format.id === 'webm' ? typeof window.WebMMuxer !== 'undefined'
+      : plan.format.id === 'mp4' ? typeof window.Mp4Muxer !== 'undefined'
+        : false
+  );
+
   document.getElementById('export-estimate').textContent =
     `${plan.width}×${plan.height} · ${mbps} Mbps · about ${fmtBytes(plan.estBytes)}. `
-    + `Rendered in real time, so it takes roughly ${secs ? `${secs}s` : 'as long as the video'}.`;
+    + (likelyFast
+      ? `Renders frame-by-frame rather than in real time, so it usually finishes well before the video’s own length (${secs ? `${secs}s` : 'its length'}).`
+      : `Rendered in real time, so it takes roughly ${secs ? `${secs}s` : 'as long as the video'}.`);
 
   document.getElementById('export-go').disabled = !plan.format || !plan.durationMs;
 
-  // WebM renders via the WebCodecs pipeline (renderCompositionWebCodecs), which isn't
-  // gated on the tab staying visible or the display staying awake at all — it just
-  // keeps going. MP4 still goes through the older real-time MediaRecorder path, which
-  // is the one that actually needs the "safe to switch tabs" reassurance (true, but
-  // only because of the pause/resume + stall-watchdog machinery guarding it).
-  const usesWebCodecs = plan.format && plan.format.id === 'webm' && supportsWebCodecsExport();
-  document.getElementById('export-hint').textContent = usesWebCodecs
+  document.getElementById('export-hint').textContent = likelyFast
     ? 'Runs in the background — switching tabs, letting your screen lock, or your computer sleeping the display won’t interrupt it.'
     : 'This renders in real time, so it takes about as long as the final video’s length. It’s safe to switch tabs — export pauses and picks back up exactly where it left off.';
 }
@@ -4746,39 +4770,73 @@ document.getElementById('export-go').addEventListener('click', async () => {
   }
 });
 
-// Renders the whole composition — trims, zooms, stage look, appended clips — in
-// real time and returns it as a Blob. Both Export and Save-to-Drive go through
-// here, so Drive gets the *edited* video rather than the raw capture.
-// WebCodecs (VideoEncoder/AudioEncoder/MediaStreamTrackProcessor) is what makes
-// renderCompositionWebCodecs() below possible — real, direct browser support, not a
-// polyfill — but it's Chromium-only, so MP4 (whose muxer isn't vendored — see
-// site/vendor/README.md) still goes through the older real-time MediaRecorder path.
-// WebM is this app's own native format already (every recording and webcam track is
-// already WebM), so it's the one that got the rebuild.
+// Renders the whole composition — trims, zooms, stage look, appended clips — and
+// returns it as a Blob. Both Export and Save-to-Drive go through here, so Drive
+// gets the *edited* video rather than the raw capture.
+// WebM prefers the WebCodecs pipeline (renderCompositionWebCodecs) whenever
+// VideoEncoder/AudioEncoder/WebMMuxer are available — real, direct browser support,
+// not a polyfill. MP4 prefers its own WebCodecs pipeline
+// (renderCompositionWebCodecsMp4, site/vendor/mp4-muxer) but only once its specific
+// AAC/H.264 codec support is confirmed; otherwise both fall back to the older
+// real-time MediaRecorder path (renderCompositionRealtime), which always works.
 async function renderComposition(plan = exportPlan()) {
   if (plan.format.id === 'webm' && supportsWebCodecsExport()) {
     return renderCompositionWebCodecs(plan);
   }
+  // MP4's fast path needs its own AAC/H.264 capability probe (checked here, before
+  // any UI/pause side effects) rather than the WebM branch's — a browser can have
+  // WebCodecs without supporting this particular codec pair, and the fallback below
+  // needs to be silent, not a half-started export that then throws.
+  if (plan.format.id === 'mp4' && await mp4FastExportSupported(plan)) {
+    return renderCompositionWebCodecsMp4(plan);
+  }
   return renderCompositionRealtime(plan);
 }
 
-function supportsWebCodecsExport() {
-  return typeof VideoEncoder !== 'undefined'
-    && typeof AudioEncoder !== 'undefined'
-    && typeof MediaStreamTrackProcessor !== 'undefined'
-    && typeof window.WebMMuxer !== 'undefined';
+function supportsWebCodecs() {
+  return typeof VideoEncoder !== 'undefined' && typeof AudioEncoder !== 'undefined';
 }
 
-// ---------- export: WebCodecs pipeline (WebM) ----------
+function supportsWebCodecsExport() {
+  return supportsWebCodecs() && typeof window.WebMMuxer !== 'undefined';
+}
+
+async function mp4FastExportSupported(plan) {
+  if (typeof window.Mp4Muxer === 'undefined' || !supportsWebCodecs()) return false;
+  const videoConfig = {
+    codec: 'avc1.640028',
+    width: plan.width,
+    height: plan.height,
+    bitrate: plan.videoBitsPerSecond,
+    framerate: EXPORT_FPS,
+  };
+  const audioConfig = {
+    codec: 'mp4a.40.2',
+    sampleRate: editorAudioCtx.sampleRate,
+    numberOfChannels: 2,
+    bitrate: plan.audioBitsPerSecond,
+  };
+  try {
+    const [videoSupport, audioSupport] = await Promise.all([
+      VideoEncoder.isConfigSupported(videoConfig),
+      AudioEncoder.isConfigSupported(audioConfig),
+    ]);
+    return videoSupport.supported && audioSupport.supported;
+  } catch (_) {
+    return false;
+  }
+}
+
+// ---------- export: WebCodecs pipeline (WebM + MP4), faster than real time ----------
 //
-// Frame-by-frame encoding instead of real-time MediaRecorder capture. The previous
-// design played the source in real time, drew each requestAnimationFrame tick to a
-// canvas, and captured that canvas with MediaRecorder — which meant export was
-// entirely at the mercy of anything that could throttle rAF (a hidden tab, a sleeping
-// display, heavy system load): drawing would silently stall while the recorder and
-// the underlying <video> kept running, producing a file with a frozen picture and
-// perfectly normal audio for the rest of its length. A watchdog band-aid papered
-// over the *known* trigger (display sleep); this removes the dependency instead.
+// Frame-by-frame encoding instead of real-time MediaRecorder capture. The original
+// motivation: the previous design played the source in real time, drew each
+// requestAnimationFrame tick to a canvas, and captured that canvas with
+// MediaRecorder — which meant export was entirely at the mercy of anything that
+// could throttle rAF (a hidden tab, a sleeping display, heavy system load):
+// drawing would silently stall while the recorder and the underlying <video> kept
+// running, producing a file with a frozen picture and perfectly normal audio for
+// the rest of its length.
 //
 // Video is driven by requestVideoFrameCallback rather than requestAnimationFrame.
 // Unlike rAF, rVFC is tied to the media decode pipeline, not to compositing, so it
@@ -4788,136 +4846,155 @@ function supportsWebCodecsExport() {
 // actually just arrived (via renderInto(), unchanged — same function the live
 // preview uses) and hands it to a VideoEncoder.
 //
-// Audio still comes from the existing real-time Web Audio graph (editorAudioCtx +
-// connectForExport()) — it was never the broken part; the bug report itself
-// describes audio playing normally throughout the freeze. It's bridged into
-// WebCodecs via MediaStreamTrackProcessor, which turns the live MediaStreamTrack
-// into a stream of AudioData the AudioEncoder can consume. Because both video and
-// audio are ultimately driven by the same real <video> elements playing at their
-// configured per-segment speed, they stay coupled to one real-time clock and can't
-// drift apart — the same reason this doesn't attempt a faster-than-real-time export.
-// That would need each source's audio decoded into a buffer up front and rescheduled
-// in an OfflineAudioContext, decoupled from real-time playback entirely; a real
-// improvement, but a separate, larger project from fixing the freeze.
+// Audio used to come from the live Web Audio graph via MediaStreamTrackProcessor,
+// which coupled export to real-time playback: both video and audio were driven by
+// the same real <video> elements, so nothing could run faster than the recording's
+// own duration. renderExportAudio() below decodes every source once and mixes the
+// whole timeline through an OfflineAudioContext instead — the same
+// decodeAudioData + OfflineAudioContext primitive extractSpeechAudio() already uses
+// to prep Whisper's input — which renders at CPU speed, not wall-clock speed. With
+// audio decoupled, the video side no longer has anything real-time to stay in sync
+// with either, so captureExportFrames() plays each source at
+// EXPORT_DECODE_SPEEDUP× during capture; VideoFrame timestamps come from the output
+// timeline (currentOutputElapsedMs), not wall-clock, so decoding faster only changes
+// throughput, never correctness.
+//
+// One accepted trade: AudioBufferSourceNode.playbackRate doesn't preserve pitch the
+// way the live <video> path's preservesPitch did, so a segment with a manual speed
+// change (speedOf(seg) != 1) will sound pitch-shifted in the export. Segments at 1x
+// are unaffected.
 //
 // Muxing is the one piece WebCodecs doesn't provide — MediaRecorder did that for
-// free. site/vendor/webm-muxer (MIT, Vanilagy/webm-muxer) packages the encoders'
-// output into a standard, playable .webm.
-async function renderCompositionWebCodecs(plan) {
-  if (!('requestVideoFrameCallback' in HTMLVideoElement.prototype)) {
-    throw new Error('This browser supports WebCodecs but not requestVideoFrameCallback — cannot export.');
+// free. site/vendor/webm-muxer and site/vendor/mp4-muxer (MIT, both
+// Vanilagy/*-muxer, same author/API) package the encoders' output into a standard,
+// playable file.
+
+const decodedAudioCache = new WeakMap(); // source -> decoded AudioBuffer, reused across exports
+
+async function decodedAudioFor(src) {
+  const blob = src.blob || src.file;
+  if (!blob) return null; // a source with no audio track
+  if (decodedAudioCache.has(src)) return decodedAudioCache.get(src);
+  const arrayBuffer = await blob.arrayBuffer();
+  const decodeCtx = new AudioContext();
+  let decoded;
+  try {
+    decoded = await decodeCtx.decodeAudioData(arrayBuffer.slice(0));
+  } finally {
+    decodeCtx.close();
+  }
+  decodedAudioCache.set(src, decoded);
+  return decoded;
+}
+
+// Pre-renders the whole output timeline's audio in one shot instead of capturing it
+// live off playing <video> elements — see the pipeline note above for why this is
+// what actually unlocks faster-than-real-time export.
+async function renderExportAudio(plan) {
+  const sampleRate = editorAudioCtx.sampleRate;
+  const numberOfChannels = 2;
+  const totalFrames = Math.max(1, Math.ceil((plan.durationMs / 1000) * sampleRate));
+  const offline = new OfflineAudioContext(numberOfChannels, totalFrames, sampleRate);
+
+  for (let i = 0; i < segmentCount(); i += 1) {
+    const { seg, src } = getSegmentByIndex(i);
+    const decoded = await decodedAudioFor(src);
+    if (!decoded) continue;
+    const offsetS = seg.in / 1000;
+    if (offsetS >= decoded.duration) continue;
+    const node = offline.createBufferSource();
+    node.buffer = decoded;
+    node.playbackRate.value = speedOf(seg); // accepted pitch-shift trade for sped segments
+    node.connect(offline.destination);
+    const durationS = Math.min((seg.out - seg.in) / 1000, decoded.duration - offsetS);
+    node.start(segmentOffsetMs(i) / 1000, offsetS, durationS);
   }
 
-  pause();
-  editorAudioCtx.resume();
-  const overlay = document.getElementById('export-overlay');
-  overlay.classList.remove('hidden');
-  document.getElementById('export-progress').textContent = '0%';
-  document.getElementById('export-headline').classList.remove('paused');
-  document.getElementById('export-spinner').classList.remove('paused');
+  return offline.startRendering();
+}
 
-  exportAbort.requested = false;
-  const cancelBtn = document.getElementById('btn-export-cancel');
-  cancelBtn.disabled = false;
-  cancelBtn.textContent = 'Cancel export';
+// Feeds a fully-rendered AudioBuffer into a WebCodecs AudioEncoder. Runs once,
+// before the video capture loop rather than interleaved with it — there's no live
+// stream to keep pace with any more, so there's nothing gained by overlapping them.
+async function pumpAudioBufferToEncoder(audioEncoder, audioBuffer) {
+  const channels = audioBuffer.numberOfChannels;
+  const totalFrames = audioBuffer.length;
+  const chunkFrames = Math.max(1, Math.round(audioBuffer.sampleRate * 0.02)); // ~20ms
 
+  for (let start = 0; start < totalFrames; start += chunkFrames) {
+    const frames = Math.min(chunkFrames, totalFrames - start);
+    const data = new Float32Array(frames * channels);
+    for (let ch = 0; ch < channels; ch += 1) {
+      audioBuffer.copyFromChannel(data.subarray(ch * frames, (ch + 1) * frames), ch, start);
+    }
+    const audioData = new AudioData({
+      format: 'f32-planar',
+      sampleRate: audioBuffer.sampleRate,
+      numberOfFrames: frames,
+      numberOfChannels: channels,
+      timestamp: Math.round((start / audioBuffer.sampleRate) * 1_000_000),
+      data,
+    });
+    audioEncoder.encode(audioData);
+    audioData.close();
+    if (audioEncoder.encodeQueueSize > 30) await new Promise((resolve) => setTimeout(resolve, 10));
+  }
+}
+
+// The fast paths never route audio through the live graph, but the sources still
+// get played back (muted) at EXPORT_DECODE_SPEEDUP for their video frames — silence
+// them the same way connectForExport/disconnectForExport used to, or export blasts
+// sped-up, chipmunked audio out the speakers for no reason.
+function silenceSourcesForFastExport() {
+  project.sources.forEach((src) => {
+    src.videoEl.muted = true;
+    const gain = audioGainByVideo.get(src.videoEl);
+    if (gain) { try { gain.disconnect(editorAudioCtx.destination); } catch (_) {} }
+  });
+}
+
+function restoreSourcesAfterFastExport() {
+  project.sources.forEach((src) => {
+    src.videoEl.muted = false;
+    const gain = audioGainByVideo.get(src.videoEl);
+    if (gain) { try { gain.connect(editorAudioCtx.destination); } catch (_) {} }
+  });
+}
+
+// preservesPitch is irrelevant here (this element's audio is never used — see
+// renderExportAudio), but harmless to leave set. Rate is clamped to Chrome's
+// practical playbackRate ceiling.
+function applyExportDecodeSpeed(info) {
+  info.src.videoEl.preservesPitch = true;
+  info.src.videoEl.playbackRate = Math.min(16, speedOf(info.seg) * EXPORT_DECODE_SPEEDUP);
+}
+
+// Shared by both fast export paths (WebM and MP4) — walks the output timeline
+// exactly once, handing each composited frame to whichever VideoEncoder the caller
+// configured. The webcam bubble's own drift-correction (syncWebcamPlayback) is told
+// about the same EXPORT_DECODE_SPEEDUP so it doesn't mistake the sped-up main clip
+// for a huge desync and hard-resync-seek itself into a stall.
+async function captureExportFrames(plan, videoEncoder, errorBox) {
   const w = plan.width;
   const h = plan.height;
-
-  const exportDest = editorAudioCtx.createMediaStreamDestination();
-  project.sources.forEach((src) => connectForExport(src.videoEl, exportDest));
+  const totalMs = plan.durationMs;
 
   const outCanvas = document.createElement('canvas');
   outCanvas.width = w;
   outCanvas.height = h;
   const octx = outCanvas.getContext('2d', { alpha: false });
 
-  const audioTrack = exportDest.stream.getAudioTracks()[0];
-  const audioSettings = audioTrack.getSettings();
-  // createMediaStreamDestination() always exposes exactly one audio track (silent if
-  // nothing's connected to it), so these fall back to editorAudioCtx's own rate/a
-  // sane default rather than ever being genuinely absent.
-  const sampleRate = Math.round(audioSettings.sampleRate) || editorAudioCtx.sampleRate;
-  const numberOfChannels = audioSettings.channelCount || 2;
-
   let cancelled = false;
-  let blob = null;
-
-  // Everything from here down can throw (an unsupported encoder config, an encoder
-  // error mid-export) in ways the older real-time path never could. Without this,
-  // throwing out of the middle of the function would skip the teardown below
-  // entirely — leaving the export overlay stuck open and, worse, every source's
-  // audio still routed to exportDest instead of the speakers, silent until reload.
-  try {
-    const videoConfig = {
-      codec: 'vp09.00.10.08', // VP9 profile 0, level 1.0, 8-bit — broad Chromium support
-      width: w,
-      height: h,
-      bitrate: plan.videoBitsPerSecond,
-      framerate: EXPORT_FPS,
-    };
-    const audioConfig = { codec: 'opus', sampleRate, numberOfChannels, bitrate: plan.audioBitsPerSecond };
-
-    const [videoSupport, audioSupport] = await Promise.all([
-    VideoEncoder.isConfigSupported(videoConfig),
-    AudioEncoder.isConfigSupported(audioConfig),
-  ]);
-  if (!videoSupport.supported) throw new Error(`This browser can't encode VP9 at ${w}×${h} — try a smaller export size.`);
-  if (!audioSupport.supported) throw new Error(`This browser can't encode Opus audio at ${sampleRate}Hz.`);
-
-  const target = new WebMMuxer.ArrayBufferTarget();
-  const muxer = new WebMMuxer.Muxer({
-    target,
-    video: { codec: 'V_VP9', width: w, height: h, frameRate: EXPORT_FPS },
-    audio: { codec: 'A_OPUS', sampleRate, numberOfChannels },
-    // AudioData timestamps come from the live capture graph's own clock, not from
-    // zero — 'strict' (the muxer's default) throws the moment the first audio chunk
-    // doesn't start at exactly 0. 'offset' normalizes each track's first timestamp
-    // to 0 instead, which is what every other timestamp below assumes.
-    firstTimestampBehavior: 'offset',
-  });
-
-  let encoderError = null;
-  const videoEncoder = new VideoEncoder({
-    output: (chunk, meta) => muxer.addVideoChunk(chunk, meta),
-    error: (err) => { encoderError = err; },
-  });
-  videoEncoder.configure(videoConfig);
-
-  const audioEncoder = new AudioEncoder({
-    output: (chunk, meta) => muxer.addAudioChunk(chunk, meta),
-    error: (err) => { encoderError = err; },
-  });
-  audioEncoder.configure(audioConfig);
-
-  // Runs concurrently with the video capture loop below, not sequentially — audio
-  // keeps flowing in real time regardless of how the video side paces itself.
-  const audioProcessor = new MediaStreamTrackProcessor({ track: audioTrack });
-  const audioReader = audioProcessor.readable.getReader();
-  const audioPumpDone = (async () => {
-    for (;;) {
-      let result;
-      try {
-        result = await audioReader.read();
-      } catch (_) {
-        return; // reader errors out once the track is stopped below — expected, not a failure
-      }
-      if (result.done) return;
-      audioEncoder.encode(result.value);
-      result.value.close();
-    }
-  })();
 
   playhead.segIndex = 0;
   const first = getSegmentByIndex(0);
   playhead.localMs = first.seg.in;
   await seekTo(first.src.videoEl, first.seg.in / 1000);
-  applySpeed(first);
+  applyExportDecodeSpeed(first);
   syncWebcamSeek(first.seg.in);
-  const totalMs = totalOutputDurationMs();
 
   await first.src.videoEl.play();
-  syncWebcamPlayback(first);
+  syncWebcamPlayback(first, EXPORT_DECODE_SPEEDUP);
 
   let frameIndex = 0;
   const KEYFRAME_INTERVAL_FRAMES = EXPORT_FPS * 2; // a hint, not a hard requirement — see below
@@ -4927,7 +5004,7 @@ async function renderCompositionWebCodecs(plan) {
       const cur = getCurrentSegment();
       if (!cur) { resolve(); return; }
       if (exportAbort.requested) { cancelled = true; resolve(); return; }
-      if (encoderError) { reject(encoderError); return; }
+      if (errorBox.error) { reject(errorBox.error); return; }
 
       cur.src.videoEl.requestVideoFrameCallback((_now, metadata) => {
         // The segment can have changed while this callback was in flight (a seek
@@ -4936,14 +5013,14 @@ async function renderCompositionWebCodecs(plan) {
         const live = getCurrentSegment();
         if (!live || live.src !== cur.src) return;
         if (exportAbort.requested) { cancelled = true; resolve(); return; }
-        if (encoderError) { reject(encoderError); return; }
+        if (errorBox.error) { reject(errorBox.error); return; }
 
         // metadata.mediaTime is the presentation time of the frame that's actually
         // ready right now — more accurate than reading videoEl.currentTime
         // separately, which could tick further between this callback firing and
         // the read.
         playhead.localMs = (metadata.mediaTime != null ? metadata.mediaTime * 1000 : live.src.videoEl.currentTime * 1000);
-        syncWebcamPlayback(live);
+        syncWebcamPlayback(live, EXPORT_DECODE_SPEEDUP);
         renderInto(octx, w, h);
 
         const outputMs = currentOutputElapsedMs();
@@ -4977,7 +5054,7 @@ async function renderCompositionWebCodecs(plan) {
             && speedOf(next.seg) === speedOf(live.seg);
           if (contiguous) { advance(); return; }
           live.src.videoEl.pause();
-          applySpeed(next);
+          applyExportDecodeSpeed(next);
           syncWebcamSeek(next.seg.in);
           seekTo(next.src.videoEl, next.seg.in / 1000).then(() => {
             next.src.videoEl.play();
@@ -4991,29 +5068,179 @@ async function renderCompositionWebCodecs(plan) {
     captureNext();
   });
 
-    audioTrack.stop(); // ends the processor's readable stream, letting audioPumpDone resolve
-    await audioPumpDone;
+  return { cancelled };
+}
+
+function showExportOverlay() {
+  pause();
+  editorAudioCtx.resume();
+  const overlay = document.getElementById('export-overlay');
+  overlay.classList.remove('hidden');
+  document.getElementById('export-progress').textContent = '0%';
+  document.getElementById('export-headline').classList.remove('paused');
+  document.getElementById('export-spinner').classList.remove('paused');
+
+  exportAbort.requested = false;
+  const cancelBtn = document.getElementById('btn-export-cancel');
+  cancelBtn.disabled = false;
+  cancelBtn.textContent = 'Cancel export';
+  return overlay;
+}
+
+async function finishFastExport(overlay) {
+  restoreSourcesAfterFastExport();
+  project.sources.forEach((src) => {
+    src.videoEl.pause();
+    src.videoEl.playbackRate = 1;
+  });
+  pauseWebcam();
+
+  await rewindToStart();
+  renderFrame();
+
+  overlay.classList.add('hidden');
+  exportAbort.requested = false;
+}
+
+async function renderCompositionWebCodecs(plan) {
+  if (!('requestVideoFrameCallback' in HTMLVideoElement.prototype)) {
+    throw new Error('This browser supports WebCodecs but not requestVideoFrameCallback — cannot export.');
+  }
+
+  const overlay = showExportOverlay();
+  const w = plan.width;
+  const h = plan.height;
+  const sampleRate = editorAudioCtx.sampleRate;
+  const numberOfChannels = 2;
+
+  let blob = null;
+
+  // Everything from here down can throw (an unsupported encoder config, an encoder
+  // error mid-export) in ways the older real-time path never could. Without this,
+  // throwing out of the middle of the function would skip the teardown below
+  // entirely, leaving the export overlay stuck open and every source muted/silenced.
+  try {
+    const videoConfig = {
+      codec: 'vp09.00.10.08', // VP9 profile 0, level 1.0, 8-bit — broad Chromium support
+      width: w,
+      height: h,
+      bitrate: plan.videoBitsPerSecond,
+      framerate: EXPORT_FPS,
+    };
+    const audioConfig = { codec: 'opus', sampleRate, numberOfChannels, bitrate: plan.audioBitsPerSecond };
+
+    const [videoSupport, audioSupport] = await Promise.all([
+      VideoEncoder.isConfigSupported(videoConfig),
+      AudioEncoder.isConfigSupported(audioConfig),
+    ]);
+    if (!videoSupport.supported) throw new Error(`This browser can't encode VP9 at ${w}×${h} — try a smaller export size.`);
+    if (!audioSupport.supported) throw new Error(`This browser can't encode Opus audio at ${sampleRate}Hz.`);
+
+    const target = new WebMMuxer.ArrayBufferTarget();
+    const muxer = new WebMMuxer.Muxer({
+      target,
+      video: { codec: 'V_VP9', width: w, height: h, frameRate: EXPORT_FPS },
+      audio: { codec: 'A_OPUS', sampleRate, numberOfChannels },
+      // AudioData timestamps here start at 0 by construction (renderExportAudio
+      // builds one buffer for the whole timeline), but 'offset' costs nothing and
+      // guards against any future off-by-one at the seam.
+      firstTimestampBehavior: 'offset',
+    });
+
+    const errorBox = { error: null };
+    const videoEncoder = new VideoEncoder({
+      output: (chunk, meta) => muxer.addVideoChunk(chunk, meta),
+      error: (err) => { errorBox.error = err; },
+    });
+    videoEncoder.configure(videoConfig);
+
+    const audioEncoder = new AudioEncoder({
+      output: (chunk, meta) => muxer.addAudioChunk(chunk, meta),
+      error: (err) => { errorBox.error = err; },
+    });
+    audioEncoder.configure(audioConfig);
+
+    const audioBuffer = await renderExportAudio(plan);
+    await pumpAudioBufferToEncoder(audioEncoder, audioBuffer);
+    await audioEncoder.flush();
+    audioEncoder.close();
+
+    silenceSourcesForFastExport();
+    const { cancelled } = await captureExportFrames(plan, videoEncoder, errorBox);
 
     await videoEncoder.flush();
     videoEncoder.close();
-    await audioEncoder.flush();
-    audioEncoder.close();
     muxer.finalize();
 
     blob = cancelled ? null : new Blob([target.buffer], { type: 'video/webm' });
   } finally {
-    project.sources.forEach((src) => {
-      src.videoEl.pause();
-      disconnectForExport(src.videoEl, exportDest);
-      src.videoEl.playbackRate = 1;
+    await finishFastExport(overlay);
+  }
+
+  return blob;
+}
+
+// Structurally identical to renderCompositionWebCodecs above — same offline-audio
+// pre-render, same decode-speedup capture loop — just muxed as MP4 (H.264/AAC via
+// site/vendor/mp4-muxer) instead of WebM (VP9/Opus). Support (and therefore the
+// real-time fallback) is decided by mp4FastExportSupported() before this is ever
+// called, so no isConfigSupported check is repeated here.
+async function renderCompositionWebCodecsMp4(plan) {
+  const overlay = showExportOverlay();
+  const w = plan.width;
+  const h = plan.height;
+  const sampleRate = editorAudioCtx.sampleRate;
+  const numberOfChannels = 2;
+
+  let blob = null;
+
+  try {
+    const videoConfig = {
+      codec: 'avc1.640028', // High profile — matches the MP4 format's real-time mime choice
+      width: w,
+      height: h,
+      bitrate: plan.videoBitsPerSecond,
+      framerate: EXPORT_FPS,
+    };
+    const audioConfig = { codec: 'mp4a.40.2', sampleRate, numberOfChannels, bitrate: plan.audioBitsPerSecond };
+
+    const target = new Mp4Muxer.ArrayBufferTarget();
+    const muxer = new Mp4Muxer.Muxer({
+      target,
+      video: { codec: 'avc', width: w, height: h, frameRate: EXPORT_FPS },
+      audio: { codec: 'aac', numberOfChannels, sampleRate },
+      fastStart: 'in-memory',
+      firstTimestampBehavior: 'offset',
     });
-    pauseWebcam();
 
-    await rewindToStart();
-    renderFrame();
+    const errorBox = { error: null };
+    const videoEncoder = new VideoEncoder({
+      output: (chunk, meta) => muxer.addVideoChunk(chunk, meta),
+      error: (err) => { errorBox.error = err; },
+    });
+    videoEncoder.configure(videoConfig);
 
-    overlay.classList.add('hidden');
-    exportAbort.requested = false;
+    const audioEncoder = new AudioEncoder({
+      output: (chunk, meta) => muxer.addAudioChunk(chunk, meta),
+      error: (err) => { errorBox.error = err; },
+    });
+    audioEncoder.configure(audioConfig);
+
+    const audioBuffer = await renderExportAudio(plan);
+    await pumpAudioBufferToEncoder(audioEncoder, audioBuffer);
+    await audioEncoder.flush();
+    audioEncoder.close();
+
+    silenceSourcesForFastExport();
+    const { cancelled } = await captureExportFrames(plan, videoEncoder, errorBox);
+
+    await videoEncoder.flush();
+    videoEncoder.close();
+    muxer.finalize();
+
+    blob = cancelled ? null : new Blob([target.buffer], { type: 'video/mp4' });
+  } finally {
+    await finishFastExport(overlay);
   }
 
   return blob;

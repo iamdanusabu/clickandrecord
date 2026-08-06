@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Click & Record \u2014 Screen Recorder with Auto Zoom",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Record a tab, window or screen. Every click becomes an automatic zoom. On-device subtitles, network capture, and MP4 or WebM export.",
   "permissions": [
     "tabCapture",

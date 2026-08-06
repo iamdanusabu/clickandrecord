@@ -22,14 +22,21 @@ disconnecting the network and generating subtitles: it still works.
 | `models/whisper-base.en-timestamped/` | [`onnx-community/whisper-base.en_timestamped`](https://huggingface.co/onnx-community/whisper-base.en_timestamped) | `main` @ 2026-07 | Apache-2.0 (Whisper) | 80 MB |
 | `models/whisper-small.en-timestamped/` | [`onnx-community/whisper-small.en_timestamped`](https://huggingface.co/onnx-community/whisper-small.en_timestamped) | `main` @ 2026-07 | Apache-2.0 (Whisper) | 252 MB |
 | `webm-muxer/webm-muxer.js` | [`webm-muxer`](https://www.npmjs.com/package/webm-muxer) (`build/webm-muxer.js`, global/UMD build) | 5.1.4 | MIT (`webm-muxer/LICENSE`) | 47 KB |
+| `mp4-muxer/mp4-muxer.js` | [`mp4-muxer`](https://www.npmjs.com/package/mp4-muxer) (`build/mp4-muxer.js`, global/UMD build) | 5.2.2 | MIT (`mp4-muxer/LICENSE`) | 72 KB |
 
-`webm-muxer` pairs WebCodecs' `VideoEncoder`/`AudioEncoder` output into a playable
-`.webm` container — used by the editor's export pipeline (`editor.js`,
-`renderComposition()`), which encodes frame-by-frame via WebCodecs rather than
-real-time `MediaRecorder`, so it isn't at the mercy of the compositor throttling
-that broke real-time export (see the `EXPORT_DESIGN` note at the top of that
-function). Loaded as a plain global script (`window.WebMMuxer`), not an ESM import,
-same as everything else here — no build step.
+`webm-muxer` and `mp4-muxer` (sister libraries, same author) pair WebCodecs'
+`VideoEncoder`/`AudioEncoder` output into a playable `.webm`/`.mp4` container —
+used by the editor's export pipeline (`editor.js`, `renderCompositionWebCodecs()`
+and `renderCompositionWebCodecsMp4()`), which encodes frame-by-frame via WebCodecs
+rather than real-time `MediaRecorder`, so it isn't at the mercy of the compositor
+throttling that broke real-time export, and (with audio pre-rendered offline
+instead of captured live — see the pipeline comment above those functions) can run
+faster than the recording's own duration. Both are loaded as plain global scripts
+(`window.WebMMuxer`, `window.Mp4Muxer`), not ESM imports, same as everything else
+here — no build step. `mp4-muxer` is deprecated upstream in favor of a much larger,
+ESM/bundler-oriented successor (`mediabunny`); this project stays on the old
+single-file build deliberately — it's frozen, not broken, and fits the no-build-step
+constraint the successor doesn't.
 
 ### Two file choices that are easy to get wrong
 
@@ -170,6 +177,13 @@ Pin `<version>` rather than trusting `@latest` for a reproducible, reviewable di
 `build/webm-muxer.js` specifically (not `build/webm-muxer.mjs`) — the `.js` one is the
 global/UMD build this project's plain-`<script>` loading style expects; the `.mjs` one
 requires an ESM `import`.
+
+`mp4-muxer` the same way:
+
+```sh
+curl -sL "https://unpkg.com/mp4-muxer@<version>/build/mp4-muxer.js" -o vendor/mp4-muxer/mp4-muxer.js
+curl -sL "https://raw.githubusercontent.com/Vanilagy/mp4-muxer/main/LICENSE" -o vendor/mp4-muxer/LICENSE
+```
 
 ## Backend: WASM, not WebGPU
 

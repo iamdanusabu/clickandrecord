@@ -406,6 +406,10 @@
      renderComposition() in editor.js. Vendored (site/vendor/README.md): MV3 forbids
      loading a remote script from a CDN, so this ships with the app. -->
 <script src="../vendor/webm-muxer/webm-muxer.js"></script>
+<!-- Same idea, MP4 instead of WebM — used by renderCompositionWebCodecsMp4() so
+     MP4 export can also run faster than real time, falling back to the real-time
+     MediaRecorder path if this browser's WebCodecs AAC/H.264 support is missing. -->
+<script src="../vendor/mp4-muxer/mp4-muxer.js"></script>
 <!-- db.js is loaded on demand, and only when running inside the extension —
      the hosted copy of this page gets its recording through bridge.html
      instead, so it needs nothing but editor.js/.css to be served. -->

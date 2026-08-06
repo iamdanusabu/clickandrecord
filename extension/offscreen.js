@@ -12,6 +12,7 @@
 let rec = {
   sessionId: null,
   tabStream: null,
+  tabVideoEl: null,
   webcamStream: null,
   webcamVideoEl: null,
   webcamRecorder: null,
@@ -87,14 +88,14 @@ const MAX_CAPTURE_HEIGHT = 1600;
 // footage looks fine around 0.1 bits per pixel; UI text needs roughly twice that before
 // it stops looking soft. Scaled by pixel count rather than fixed, so a 2560-wide capture
 // isn't starved at the same bitrate a 1280-wide one is comfortable at.
-const BITS_PER_PIXEL = 0.22;
+const BITS_PER_PIXEL = 0.32;
 const CAPTURE_FPS = 30;
 
 function videoBitrateFor(width, height) {
   const target = width * height * CAPTURE_FPS * BITS_PER_PIXEL;
   // Floor keeps small captures from looking worse than they used to; ceiling keeps a
   // large display from asking for a bitrate the encoder can't sustain in real time.
-  return Math.round(Math.min(40_000_000, Math.max(8_000_000, target)));
+  return Math.round(Math.min(60_000_000, Math.max(8_000_000, target)));
 }
 
 // One entry point, two genuinely different mechanisms. A tab is captured from an id minted
@@ -335,6 +336,7 @@ async function prepareCaptureInner(streamId, options) {
   tabVideoEl.muted = true;
   await tabVideoEl.play();
   await waitForVideoMetadata(tabVideoEl);
+  rec.tabVideoEl = tabVideoEl;
 
   const width = tabVideoEl.videoWidth || 1280;
   const height = tabVideoEl.videoHeight || 720;
@@ -387,7 +389,7 @@ async function prepareCaptureInner(streamId, options) {
   if (rec.webcamStream) {
     rec.webcamRecorder = new MediaRecorder(rec.webcamStream, {
       mimeType: pickMimeType(),
-      videoBitsPerSecond: 2_500_000, // a small bubble doesn't need screen-grade bitrate
+      videoBitsPerSecond: 5_000_000,
     });
     rec.webcamChunks = [];
     rec.webcamRecorder.ondataavailable = (e) => {
@@ -451,17 +453,36 @@ function waitForVideoMetadata(videoEl) {
 }
 
 // Just the tab now — the webcam bubble is composited in the editor, not here.
+//
+// Driven by requestVideoFrameCallback rather than a fixed-interval timer: rVFC
+// fires once per frame the tab stream actually delivers, so every draw paints a
+// frame that just arrived instead of whatever happened to be on screen when a
+// wall-clock tick landed — a plain interval can double-draw a stale frame or
+// miss one outright, which reads as judder independent of bitrate. rVFC is
+// driven by the media pipeline itself (the same reason pumpVideoFrames uses it
+// for the webcam keep-alive above), so it fires regardless of this hidden
+// document's visibility, same as the setInterval it replaces.
+// Self-reschedules until tabVideoEl.srcObject is cleared (teardownStreams does
+// that), same pattern as pumpVideoFrames.
 function drawLoop(tabVideoEl) {
   const { ctx, canvas } = rec;
 
-  // Offscreen documents have no visible compositor surface, so
-  // requestAnimationFrame is throttled/never fires here. Drive the loop with
-  // setInterval instead, or the canvas never gets drawn to and
-  // captureStream() feeds MediaRecorder nothing (0-byte output).
   function frame() {
     if (!rec.paused) ctx.drawImage(tabVideoEl, 0, 0, canvas.width, canvas.height);
   }
-  rec.rafId = setInterval(frame, 1000 / CAPTURE_FPS);
+
+  if (!tabVideoEl.requestVideoFrameCallback) {
+    console.warn('[demo-recorder] requestVideoFrameCallback unavailable, falling back to a fixed-interval draw loop');
+    rec.rafId = setInterval(frame, 1000 / CAPTURE_FPS);
+    return;
+  }
+
+  function tick() {
+    if (!tabVideoEl.srcObject) return;
+    frame();
+    tabVideoEl.requestVideoFrameCallback(tick);
+  }
+  tabVideoEl.requestVideoFrameCallback(tick);
 }
 
 function waitForRecorderStop(recorder) {
@@ -536,8 +557,10 @@ async function stopCapture() {
 // released and the draw loop cleared, so no device is left held open.
 function teardownStreams() {
   if (rec.rafId) clearInterval(rec.rafId);
-  // Clears srcObject first so pumpVideoFrames's rVFC loop sees it and stops
-  // rescheduling itself, rather than firing once more against a dead element.
+  // Clears srcObject first so the rVFC loops (drawLoop and pumpVideoFrames) see it
+  // and stop rescheduling themselves, rather than firing once more against a dead
+  // element.
+  if (rec.tabVideoEl) rec.tabVideoEl.srcObject = null;
   if (rec.webcamVideoEl) rec.webcamVideoEl.srcObject = null;
   [rec.tabStream, rec.webcamStream, rec.micStream].forEach((s) => {
     if (s) s.getTracks().forEach((t) => t.stop());
