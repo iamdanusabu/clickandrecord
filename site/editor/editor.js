@@ -4707,12 +4707,25 @@ function renderExportDialog() {
 // object rather than a bare boolean so the loop closes over a stable reference.
 const exportAbort = { requested: false };
 
+// Whichever WebCodecs encoder is currently inside its own flush() — set only for the
+// duration of that await, by the WebCodecs export paths below. captureExportFrames
+// polls exportAbort every frame and stops within one rVFC tick on its own, so it
+// doesn't need this. flush() is different: once frame capture is done, nothing is left
+// polling the flag, so a flush that stalls (seen on some hardware/GPU combinations)
+// left Cancel permanently inert — the button read "Cancelling…" forever. Forcing the
+// encoder closed aborts a pending flush() (it rejects, which the export paths treat as
+// a cancellation rather than a failure) and unblocks teardown either way.
+let currentExportEncoder = null;
+
 function requestExportCancel() {
   if (exportAbort.requested) return;
   exportAbort.requested = true;
   const btn = document.getElementById('btn-export-cancel');
   btn.disabled = true;
   btn.textContent = 'Cancelling…';
+  if (currentExportEncoder && currentExportEncoder.state !== 'closed') {
+    try { currentExportEncoder.close(); } catch (_) { /* already closing */ }
+  }
 }
 
 function openExportDialog() {
@@ -5162,17 +5175,35 @@ async function renderCompositionWebCodecs(plan) {
 
     const audioBuffer = await renderExportAudio(plan);
     await pumpAudioBufferToEncoder(audioEncoder, audioBuffer);
-    await audioEncoder.flush();
-    audioEncoder.close();
+    currentExportEncoder = audioEncoder;
+    try {
+      await audioEncoder.flush();
+    } catch (err) {
+      if (!exportAbort.requested) throw err; // a real encoder failure, not a Cancel-triggered abort
+    } finally {
+      currentExportEncoder = null;
+    }
+    if (audioEncoder.state !== 'closed') audioEncoder.close();
 
     silenceSourcesForFastExport();
     const { cancelled } = await captureExportFrames(plan, videoEncoder, errorBox);
 
-    await videoEncoder.flush();
-    videoEncoder.close();
-    muxer.finalize();
+    if (cancelled) {
+      if (videoEncoder.state !== 'closed') videoEncoder.close();
+    } else {
+      currentExportEncoder = videoEncoder;
+      try {
+        await videoEncoder.flush();
+      } catch (err) {
+        if (!exportAbort.requested) throw err;
+      } finally {
+        currentExportEncoder = null;
+      }
+      if (videoEncoder.state !== 'closed') videoEncoder.close();
+      if (!exportAbort.requested) muxer.finalize();
+    }
 
-    blob = cancelled ? null : new Blob([target.buffer], { type: 'video/webm' });
+    blob = (cancelled || exportAbort.requested) ? null : new Blob([target.buffer], { type: 'video/webm' });
   } finally {
     await finishFastExport(overlay);
   }
@@ -5228,17 +5259,35 @@ async function renderCompositionWebCodecsMp4(plan) {
 
     const audioBuffer = await renderExportAudio(plan);
     await pumpAudioBufferToEncoder(audioEncoder, audioBuffer);
-    await audioEncoder.flush();
-    audioEncoder.close();
+    currentExportEncoder = audioEncoder;
+    try {
+      await audioEncoder.flush();
+    } catch (err) {
+      if (!exportAbort.requested) throw err; // a real encoder failure, not a Cancel-triggered abort
+    } finally {
+      currentExportEncoder = null;
+    }
+    if (audioEncoder.state !== 'closed') audioEncoder.close();
 
     silenceSourcesForFastExport();
     const { cancelled } = await captureExportFrames(plan, videoEncoder, errorBox);
 
-    await videoEncoder.flush();
-    videoEncoder.close();
-    muxer.finalize();
+    if (cancelled) {
+      if (videoEncoder.state !== 'closed') videoEncoder.close();
+    } else {
+      currentExportEncoder = videoEncoder;
+      try {
+        await videoEncoder.flush();
+      } catch (err) {
+        if (!exportAbort.requested) throw err;
+      } finally {
+        currentExportEncoder = null;
+      }
+      if (videoEncoder.state !== 'closed') videoEncoder.close();
+      if (!exportAbort.requested) muxer.finalize();
+    }
 
-    blob = cancelled ? null : new Blob([target.buffer], { type: 'video/mp4' });
+    blob = (cancelled || exportAbort.requested) ? null : new Blob([target.buffer], { type: 'video/mp4' });
   } finally {
     await finishFastExport(overlay);
   }
