@@ -454,35 +454,20 @@ function waitForVideoMetadata(videoEl) {
 
 // Just the tab now — the webcam bubble is composited in the editor, not here.
 //
-// Driven by requestVideoFrameCallback rather than a fixed-interval timer: rVFC
-// fires once per frame the tab stream actually delivers, so every draw paints a
-// frame that just arrived instead of whatever happened to be on screen when a
-// wall-clock tick landed — a plain interval can double-draw a stale frame or
-// miss one outright, which reads as judder independent of bitrate. rVFC is
-// driven by the media pipeline itself (the same reason pumpVideoFrames uses it
-// for the webcam keep-alive above), so it fires regardless of this hidden
-// document's visibility, same as the setInterval it replaces.
-// Self-reschedules until tabVideoEl.srcObject is cleared (teardownStreams does
-// that), same pattern as pumpVideoFrames.
+// Offscreen documents have no visible compositor surface, so requestAnimationFrame
+// is throttled/never fires here — and requestVideoFrameCallback rides the same
+// compositor pipeline, so it doesn't reliably fire either despite being driven by
+// the media pipeline in a normal (visible) document. A version of this loop tried
+// rVFC on the theory that it fires "regardless of visibility"; in practice the canvas
+// never got drawn to and captureStream() fed MediaRecorder nothing, producing a
+// 0-byte recording. setInterval is what actually ticks in this document — use it.
 function drawLoop(tabVideoEl) {
   const { ctx, canvas } = rec;
 
   function frame() {
     if (!rec.paused) ctx.drawImage(tabVideoEl, 0, 0, canvas.width, canvas.height);
   }
-
-  if (!tabVideoEl.requestVideoFrameCallback) {
-    console.warn('[demo-recorder] requestVideoFrameCallback unavailable, falling back to a fixed-interval draw loop');
-    rec.rafId = setInterval(frame, 1000 / CAPTURE_FPS);
-    return;
-  }
-
-  function tick() {
-    if (!tabVideoEl.srcObject) return;
-    frame();
-    tabVideoEl.requestVideoFrameCallback(tick);
-  }
-  tabVideoEl.requestVideoFrameCallback(tick);
+  rec.rafId = setInterval(frame, 1000 / CAPTURE_FPS);
 }
 
 function waitForRecorderStop(recorder) {
@@ -557,9 +542,9 @@ async function stopCapture() {
 // released and the draw loop cleared, so no device is left held open.
 function teardownStreams() {
   if (rec.rafId) clearInterval(rec.rafId);
-  // Clears srcObject first so the rVFC loops (drawLoop and pumpVideoFrames) see it
-  // and stop rescheduling themselves, rather than firing once more against a dead
-  // element.
+  // Clears srcObject first so pumpVideoFrames's rVFC loop sees it and stops
+  // rescheduling itself, rather than firing once more against a dead element.
+  // drawLoop's own setInterval is already cleared above.
   if (rec.tabVideoEl) rec.tabVideoEl.srcObject = null;
   if (rec.webcamVideoEl) rec.webcamVideoEl.srcObject = null;
   [rec.tabStream, rec.webcamStream, rec.micStream].forEach((s) => {

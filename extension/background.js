@@ -443,12 +443,33 @@ function qaCaptureSupported(source) {
 // an id from the service worker, because Chrome ties `chrome.tabCapture` to the click that
 // opened the popup.
 
+// chrome.tabCapture.getMediaStreamId happily mints an id for a chrome://, the Chrome
+// Web Store, or the built-in PDF viewer, and getUserMedia happily redeems it — but Chrome
+// never delivers real frames for those origins, so the video track sits there producing
+// nothing and the take ends as a 0-byte file with no error anywhere in the pipeline. Same
+// restriction ensureContentScript already works around for click logging (see its comment
+// above); tab capture has no equivalent fallback, so it has to be refused up front instead.
+function isRestrictedTabUrl(url) {
+  if (!url) return true; // no readable url — Chrome hides it on the same restricted pages
+  return /^(chrome|edge|about|chrome-extension|devtools):/i.test(url)
+    || /^https:\/\/chrome\.google\.com\/webstore/i.test(url)
+    || /^https:\/\/chromewebstore\.google\.com/i.test(url);
+}
+
 async function setUpRecording(options) {
   const source = SOURCES.includes(options.source) ? options.source : 'tab';
   options = { ...options, source };
 
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   if (!tab) throw new Error('No active tab found.');
+
+  if (source === 'tab' && isRestrictedTabUrl(tab.url)) {
+    throw new Error(
+      "This tab can't be recorded — chrome:// pages, the Chrome Web Store and the PDF "
+      + 'viewer are off-limits to extensions. Switch to a regular tab, or record a window '
+      + 'or your screen instead.'
+    );
+  }
 
   // Only tab capture needs an id from here, and it must be taken on the click that opened
   // the popup — Chrome ties chrome.tabCapture to that user gesture. Window and screen ids
