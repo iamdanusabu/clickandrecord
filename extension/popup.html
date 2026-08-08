@@ -13,6 +13,19 @@
     </header>
 
     <div id="view-idle" class="view">
+      <!-- Shown only when background.js's orphan scan finds a recording that never
+           reached a clean stop (offscreen document crashed, browser force-quit,
+           extension reloaded mid-take). Visibility is driven purely by whether
+           pendingRecovery currently exists in storage — no "seen it, dismiss forever"
+           flag like brave-notice below, since every crash is its own event. -->
+      <div id="recovery-banner" class="warn-note hidden">
+        <p><strong>An unfinished recording was found.</strong> It looks like something interrupted Click &amp; Record before it could save — the video up to that point can still be recovered.</p>
+        <div class="btn-row">
+          <button id="btn-discard-recovery" class="secondary">Discard</button>
+          <button id="btn-recover-session" class="primary">Recover recording</button>
+        </div>
+      </div>
+
       <!-- Brave's privacy protections silently cut off the webcam mid-recording (see
            logTrackHealth() in offscreen.js — confirmed via a Brave-vs-Chrome A/B test
            that this is Brave-specific, not a bug here). Shown once, dismissible: it's

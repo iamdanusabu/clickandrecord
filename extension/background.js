@@ -77,6 +77,14 @@ const DR_STATE_KEY = 'recordingState';
 // history says that gets forgotten.
 const DR_LAST_ERROR_KEY = 'lastStartError';
 
+// Crash-recovery bookkeeping. Deliberately chrome.storage.local, not .session:
+// session storage is wiped when Chrome itself dies, which is exactly the case
+// this exists to survive — see checkForOrphanedRecording() below.
+const DR_PENDING_RECOVERY_KEY = 'pendingRecovery';
+function recSessionMetaKey(sessionId) {
+  return `recSessionMeta:${sessionId}`;
+}
+
 async function setLastError(error) {
   try {
     await chrome.storage.session.set({ [DR_LAST_ERROR_KEY]: { error, at: Date.now() } });
@@ -173,6 +181,163 @@ function resetState() {
   clearPersistedState();
 }
 
+// stopRecording()'s failure branch and the RECORDING_ERROR handler both discard
+// `state` outside the happy path — the one moment a take that's about to be
+// treated as an orphan still has its clicks/typing log sitting in memory.
+// resetState() (via clearPersistedState()) throws away chrome.storage.session
+// too, so anything worth keeping has to be copied out first, not after.
+async function harvestAndResetState() {
+  if (state.sessionId) {
+    try {
+      const key = recSessionMetaKey(state.sessionId);
+      const stored = await chrome.storage.local.get(key);
+      await chrome.storage.local.set({
+        [key]: { ...(stored[key] || {}), clicks: state.clicks, typing: state.typing },
+      });
+    } catch (err) {
+      console.warn('[demo-recorder/background] could not harvest state before reset', err);
+    }
+  }
+  resetState();
+}
+
+// Removes every trace of one session's crash-recovery artifacts: the durable
+// chunk rows, its chunkMeta row, its recSessionMeta snapshot, and — if it's the
+// one currently being offered — the pendingRecovery marker itself. Shared by
+// discard, a successful recovery, and the scan's own self-heal/expiry paths.
+async function cleanupOrphanArtifacts(sessionId) {
+  const results = await Promise.allSettled([
+    drDeleteChunks(sessionId),
+    drDeleteChunkMeta(sessionId),
+    chrome.storage.local.remove(recSessionMetaKey(sessionId)),
+  ]);
+  results.forEach((r) => {
+    if (r.status === 'rejected') {
+      console.warn('[demo-recorder/background] orphan cleanup step failed', r.reason);
+    }
+  });
+  try {
+    const stored = await chrome.storage.local.get(DR_PENDING_RECOVERY_KEY);
+    const pending = stored[DR_PENDING_RECOVERY_KEY];
+    if (pending && pending.sessionId === sessionId) {
+      await chrome.storage.local.remove(DR_PENDING_RECOVERY_KEY);
+    }
+  } catch (_) {
+    // storage unavailable — nothing to do
+  }
+}
+
+// Looks for a recording that never reached stopCapture()'s final save: the
+// offscreen document died, the browser crashed, or the extension got reloaded
+// mid-take. Chunk rows in IndexedDB (written incrementally by offscreen.js's
+// ondataavailable handlers) are the trail that's left behind — see db.js.
+//
+// Run after every service-worker (re)spawn and on every GET_STATE (i.e.
+// whenever the popup opens), unconditionally — not gated on state.phase, since
+// the offscreen-only-crash case is exactly state.phase reading 'recording'
+// while nothing backs it up any more. Safe to call whenever: a genuinely live
+// recording is never mistaken for an orphan (see the guards below).
+async function checkForOrphanedRecording() {
+  const ids = await drGetAllChunkMetaSessionIds().catch(() => []);
+  if (!ids.length) return;
+
+  // state.phase alone doesn't prove the offscreen document that owns it is
+  // still alive — only Chrome's own context list does. If state claims a
+  // recording is still going but the document is gone, state is stale; harvest
+  // whatever it still remembers before this loop treats that session as an
+  // orphan below.
+  if (state.phase !== 'idle' && !(await hasOffscreenDocument())) {
+    await harvestAndResetState();
+  }
+
+  for (const sessionId of ids) {
+    // Genuinely still recording or mid-stop — not an orphan.
+    if (state.phase !== 'idle' && state.sessionId === sessionId) continue;
+
+    const finalized = await drLoadRecording(sessionId);
+    if (finalized) {
+      // stopCapture()'s own chunk cleanup didn't finish — self-heal, no prompt.
+      await cleanupOrphanArtifacts(sessionId);
+      continue;
+    }
+
+    const rows = await drListChunks(sessionId);
+    if (!rows.some((r) => r.kind === 'screen')) {
+      // Crashed before the first ~1s timeslice ever flushed — nothing to recover.
+      await cleanupOrphanArtifacts(sessionId);
+      continue;
+    }
+
+    const meta = await drLoadChunkMeta(sessionId);
+    if (!meta || Date.now() - meta.startedAt > 48 * 60 * 60 * 1000) {
+      // No meta, or a crash old enough that surfacing it now would be more
+      // confusing than useful.
+      await cleanupOrphanArtifacts(sessionId);
+      continue;
+    }
+
+    await chrome.storage.local.set({
+      [DR_PENDING_RECOVERY_KEY]: { sessionId, meta, discoveredAt: Date.now() },
+    });
+    return; // surface one at a time — resolve it before looking for another
+  }
+}
+
+// Reassembles a crashed session's durable chunks into a normal finalized
+// recording — after this, it's indistinguishable from one that reached a clean
+// stop, and the existing editor hand-off works unchanged.
+async function recoverSession(sessionId) {
+  const meta = await drLoadChunkMeta(sessionId);
+  if (!meta) return { ok: false, error: 'Nothing to recover.' };
+
+  const rows = await drListChunks(sessionId);
+  const screenRows = rows.filter((r) => r.kind === 'screen').sort((a, b) => a.seq - b.seq);
+  const webcamRows = rows.filter((r) => r.kind === 'webcam').sort((a, b) => a.seq - b.seq);
+
+  if (!screenRows.length) {
+    await cleanupOrphanArtifacts(sessionId);
+    return { ok: false, error: 'The recording had not captured any frames yet.' };
+  }
+
+  const finalMeta = {
+    width: meta.width,
+    height: meta.height,
+    duration: Math.max(0, screenRows[screenRows.length - 1].ts - meta.startedAt),
+    mimeType: meta.mimeType,
+  };
+  const blob = new Blob(screenRows.map((r) => r.blob), { type: meta.mimeType });
+  await drSaveRecording(sessionId, blob, finalMeta);
+
+  if (meta.hasWebcam && webcamRows.length) {
+    const camBlob = new Blob(webcamRows.map((r) => r.blob), { type: meta.webcamMimeType });
+    await drSaveWebcam(sessionId, camBlob, {
+      mimeType: meta.webcamMimeType,
+      duration: Math.max(0, webcamRows[webcamRows.length - 1].ts - meta.webcamStartedAt),
+      startOffsetMs: Math.max(0, meta.webcamStartedAt - meta.startedAt),
+    });
+  }
+
+  // Same payload shape onRecordingSaved() writes, so the editor's loadSession()
+  // needs no idea this recording came from a crash rather than a clean stop.
+  const stored = await chrome.storage.local.get(recSessionMetaKey(sessionId));
+  const recMeta = stored[recSessionMetaKey(sessionId)] || {};
+  const payload = {
+    sessionId,
+    meta: finalMeta,
+    clicks: recMeta.clicks || [],
+    typing: recMeta.typing || [],
+    startTime: recMeta.startTime || meta.startedAt,
+    pageUrl: recMeta.pageUrl || '',
+    pageTitle: recMeta.pageTitle || '',
+    source: recMeta.source || 'tab',
+  };
+  await chrome.storage.session.set({ [`session:${sessionId}`]: payload });
+
+  await cleanupOrphanArtifacts(sessionId);
+  chrome.tabs.create({ url: await buildEditorUrl(sessionId) });
+  return { ok: true };
+}
+
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   // chrome.runtime.sendMessage delivers to every extension context with a listener,
   // including this one — so a message this file sent *to* offscreen.js (OFFSCREEN_*)
@@ -207,8 +372,29 @@ async function handleMessage(msg, sender) {
       } catch (_) {
         // storage unavailable — nothing to report
       }
+      // Unconditional, not gated on state.phase === 'idle': the offscreen-only-
+      // crash case is exactly `state.phase` reading 'recording' while nothing
+      // backs it up any more — checkForOrphanedRecording() has to be allowed to
+      // notice that itself (via hasOffscreenDocument()), or it never gets the
+      // chance to. It never mistakes a genuinely live recording for an orphan;
+      // see its own guards.
+      await checkForOrphanedRecording().catch((err) => {
+        console.warn('[demo-recorder/background] orphan scan failed', err);
+      });
       return { ...state, clickCount: state.clicks.length, lastError };
     }
+
+    case 'GET_PENDING_RECOVERY': {
+      const stored = await chrome.storage.local.get(DR_PENDING_RECOVERY_KEY).catch(() => ({}));
+      return { pending: stored[DR_PENDING_RECOVERY_KEY] || null };
+    }
+
+    case 'RECOVER_SESSION':
+      return recoverSession(msg.sessionId);
+
+    case 'DISCARD_RECOVERY':
+      await cleanupOrphanArtifacts(msg.sessionId);
+      return { ok: true };
 
     case 'START_RECORDING':
       return startRecording(msg.options);
@@ -305,7 +491,10 @@ async function handleMessage(msg, sender) {
 
     case 'RECORDING_ERROR':
       drCapStop();
-      resetState();
+      await harvestAndResetState();
+      checkForOrphanedRecording().catch((err) => {
+        console.warn('[demo-recorder/background] orphan scan failed', err);
+      });
       return { ok: true };
 
     default:
@@ -584,6 +773,23 @@ async function setUpRecording(options) {
     pageTitle: source === 'tab' ? (tab.title || '') : '',
   };
 
+  // Durable snapshot of what a crash recovery would need to describe this take
+  // in the editor. Written now, not just harvested later, because a full
+  // browser crash wipes chrome.storage.session (where the rest of `state`
+  // normally lives) and leaves nothing else to harvest afterward — this is the
+  // only copy of pageUrl/pageTitle/source that can survive that case.
+  chrome.storage.local.set({
+    [recSessionMetaKey(sessionId)]: {
+      pageUrl: state.pageUrl,
+      pageTitle: state.pageTitle,
+      source,
+      startTime,
+      clicks: [],
+      typing: [],
+      savedAt: Date.now(),
+    },
+  }).catch(() => {});
+
   chrome.action.setBadgeText({ text: 'REC' });
   chrome.action.setBadgeBackgroundColor({ color: '#e53c48' });
   // The badge alone reads as "something is on", not "this is still recording even
@@ -706,7 +912,13 @@ async function stopRecording() {
   const stopResp = await sendToOffscreen({ type: 'OFFSCREEN_STOP' });
   if (!stopResp || !stopResp.ok) {
     drCapStop();
-    resetState();
+    await harvestAndResetState();
+    // A stop that failed after tape had actually started rolling can still
+    // leave a full set of durable chunks behind — surface it immediately
+    // rather than waiting for the popup to reopen.
+    checkForOrphanedRecording().catch((err) => {
+      console.warn('[demo-recorder/background] orphan scan failed', err);
+    });
     return { ok: false, error: (stopResp && stopResp.error) || 'Failed to finalize recording.' };
   }
   await onRecordingSaved(stopResp.sessionId, stopResp.meta);
@@ -810,6 +1022,28 @@ if (chrome.commands && chrome.commands.onCommand) {
   });
 }
 
+// A real browser restart is the clearest signal a previous take might have
+// been crashed rather than cleanly stopped — check for it as early as
+// possible rather than waiting for the popup to be opened. restoreState()
+// first: without it `state` is a fresh idleState() and checkForOrphanedRecording()
+// has nothing to compare hasOffscreenDocument() against, so a session that
+// chrome.storage.session still remembers as 'recording' would never be
+// recognised as stale here.
+chrome.runtime.onStartup.addListener(async () => {
+  await restoreState();
+  checkForOrphanedRecording().catch((err) => {
+    console.warn('[demo-recorder/background] orphan scan failed', err);
+  });
+});
+
+// Also run once on every service-worker (re)spawn, not just a full browser
+// restart — an offscreen-document-only crash leaves the browser running but
+// still orphans a chunk set, and the worker can respawn well before onStartup
+// would ever fire again. Best-effort: nothing here blocks message handling.
+restoreState().then(() => checkForOrphanedRecording()).catch((err) => {
+  console.warn('[demo-recorder/background] orphan scan failed', err);
+});
+
 async function onRecordingSaved(sessionId, meta) {
   // Snapshot before stopping — drCapStop only detaches listeners, but taking the
   // snapshot first means anything still in flight is included.
@@ -838,6 +1072,10 @@ async function onRecordingSaved(sessionId, meta) {
     source: (state.options && state.options.source) || 'tab',
   };
   await chrome.storage.session.set({ [`session:${sessionId}`]: payload });
+  // A clean save means offscreen.js's own stopCapture() already deleted the
+  // chunks/chunkMeta rows for this session; this is just the local-storage
+  // half of that same cleanup, so a completed recording leaves nothing behind.
+  chrome.storage.local.remove(recSessionMetaKey(sessionId)).catch(() => {});
   resetState();
   await closeOffscreenDocument();
 

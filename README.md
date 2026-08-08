@@ -362,7 +362,9 @@ extension's data, not a standalone app.
 - `background.js` — service worker; owns recording state, starts tab
   capture (`chrome.tabCapture.getMediaStreamId`), manages the offscreen
   document, and opens the editor tab when a recording finishes. It also owns
-  `COUNTDOWN_MS` and the recording's **epoch** — see below.
+  `COUNTDOWN_MS` and the recording's **epoch** — see below. Also runs the
+  crash-recovery orphan scan (`checkForOrphanedRecording()`) and the
+  `RECOVER_SESSION`/`DISCARD_RECOVERY` handlers — see **Crash recovery** below.
 - `offscreen.js` / `offscreen.html` — records the **screen** (tab video) and mixes
   tab + mic audio via Web Audio, plus the **webcam on a second, independent
   `MediaRecorder`** so it lands in its own file rather than being drawn onto the
@@ -372,7 +374,9 @@ extension's data, not a standalone app.
   camera here only works because `permission.html` obtains the grant first: an
   offscreen document has no UI, so Chrome refuses to *prompt* from one. Both
   recorders pause together, and the delta between their start times is stored as
-  `startOffsetMs` for the editor to align them.
+  `startOffsetMs` for the editor to align them. Every chunk from both recorders is
+  also written to IndexedDB as it arrives, independently of the final Blob saved
+  at Stop — see **Crash recovery** below.
 - **Where the window/screen picker runs** — inside the offscreen document, via the
   standard `navigator.mediaDevices.getDisplayMedia()`. Not `chrome.desktopCapture`: that
   API is unavailable in offscreen documents (they get only `chrome.runtime`), can't host a
@@ -423,7 +427,8 @@ self-view is in the popup, where checking your framing actually matters.
 - `db.js` — tiny IndexedDB wrapper shared by `offscreen.js`, `bridge.js`,
   `capture.js`'s persistence path, and `editor/editor.js`. Version 2 added a `logs`
   store for captures (far too large for `chrome.storage.session`); version 3 a
-  `webcam` store; version 4 a `captions` store. Each is separate rather than a field
+  `webcam` store; version 4 a `captions` store; version 5 added `chunkMeta` and
+  `chunks` (see **Crash recovery** below). Each is separate rather than a field
   on the recording because different contexts write them, and sharing one record
   would mean writers racing on a read-modify-write.
 - `bridge.html` / `bridge.js` — hidden iframe used only when the editor is
@@ -524,6 +529,41 @@ Consequences worth knowing:
   reason.
 - Stopping during the count-in cancels: the pending start is cleared, every stream is
   released, and nothing is written.
+
+## Crash recovery
+
+A recording no longer lives only in memory until you hit Stop. Each `MediaRecorder`
+chunk — screen and webcam, roughly once a second — is written durably to IndexedDB
+(`chunkMeta` + `chunks` in `db.js`) as it arrives, in addition to the in-memory
+arrays that still back the normal, fast Stop path. If the offscreen document
+crashes, the browser force-quits, or the extension gets reloaded mid-take, the
+video up to the last flushed chunk survives on disk.
+
+`background.js` looks for a recording that never reached a clean stop — on every
+service-worker (re)spawn, on `chrome.runtime.onStartup`, and whenever the popup
+opens — using `hasOffscreenDocument()` (Chrome's own context list) rather than its
+own `state.phase` to tell a genuinely live recording from a stale one, since an
+offscreen-only crash leaves `state` claiming a recording is still in progress with
+nothing left to back it up. When it finds one, the popup's idle view shows a
+**Recover / Discard** banner; Recover reassembles the durable chunks into a normal
+finalized recording and opens the editor exactly as a clean Stop would — the editor
+itself has no idea the difference exists.
+
+What does and doesn't come back:
+
+- **Video**: recovered up to the last flushed `MediaRecorder` timeslice — worst
+  case, about a second of tail loss.
+- **Clicks, typing (zooms), page URL/title**: recovered if the crash was
+  offscreen-document-only (the extension itself kept running) — harvested from
+  `chrome.storage.session`/in-memory state at the moment the scan notices it's
+  stale, before it's reset. **Lost** on a full browser crash, since
+  `chrome.storage.session` doesn't survive that; the editor still opens with the
+  right page URL/title (a small snapshot is written to `chrome.storage.local` at
+  recording *start*, for exactly this case), just with an empty click/zoom log.
+
+A clean Stop leaves no trace in either new store — cleanup runs immediately after
+the final Blob is saved, and self-heals on the next scan if that cleanup itself
+gets interrupted.
 
 ## Known limitations (MVP scope)
 

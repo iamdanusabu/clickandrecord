@@ -62,14 +62,28 @@ worker looks exactly like a broken change.
 | `manifest.json` | Reload the extension. |
 | `vendor/`, `fonts/` | Nothing, unless paths changed. Redeploy if the editor is hosted. |
 
-**Reloading the extension destroys any recording in progress**, and it clears
-`chrome.storage.session`. That second part bites: the video itself lives in IndexedDB and
-survives, but the click log, `pageUrl` and `source` live in session storage — so an editor
-URL opened after a reload still loads the video and silently has **no clicks and no
-zooms**. If a recording suddenly has no yellow dots, check whether you reloaded the
-extension since making it.
+**Reloading the extension no longer destroys a recording in progress** — chunks are
+now persisted incrementally to IndexedDB as they're captured (see README's
+**Crash recovery** section), so the video up to the last flushed chunk survives a
+reload and surfaces as a Recover/Discard banner in the popup the next time it
+opens. What reloading still costs: it clears `chrome.storage.session`, and that's
+where the click log (zooms) lives while recording — so a recovered session has the
+video but **no yellow dots**, same gotcha as the paragraph below. `pageUrl`/
+`pageTitle`/`source` come back regardless, from a small snapshot `background.js`
+writes to `chrome.storage.local` at recording *start* for exactly this case.
 
-Finish or abandon a recording before reloading.
+Reloading mid-recording is still worth avoiding when you can — recovery is a
+safety net for a real crash, not a substitute for a clean stop, and it always
+costs the last ~1s of video and the whole zoom log. Finish or abandon a recording
+before reloading if you have the choice.
+
+Separately, `chrome.storage.session` being wiped by a reload also affects a
+recording that already finished and was saved before you reloaded: the video
+itself lives in IndexedDB and survives, but the click log, `pageUrl` and `source`
+of that *already-saved* session live in session storage too — so re-opening that
+editor URL after a reload silently has **no clicks and no zooms**. If a recording
+suddenly has no yellow dots, check whether you reloaded the extension since
+making it.
 
 ---
 
@@ -191,6 +205,7 @@ Then, per area:
 | Export | Real take, focused window, watch it through. Compare duration, pacing, bubble position and caption timing against the preview |
 | Subtitles | Run against [`jfk.wav`](https://huggingface.co/datasets/Xenova/transformers.js-docs/resolve/main/jfk.wav), not your own voice — with a known clip you can tell *wrong* from merely *inaccurate*. Expect verbatim text and 20 word timings |
 | Any message type | Confirm both a sender and a handler exist: `grep -rn 'YOUR_MESSAGE' *.js` |
+| Crash recovery | Record ~15s with clicks on, then kill the offscreen document (`chrome://extensions` → Inspect views: offscreen.html → run `window.close()` in its console) rather than stopping normally. Reopen the popup: expect the Recover/Discard banner. Recover → editor opens with video up to the last flushed chunk and the clicks logged before the kill. Then repeat with several **normal** start/stop cycles in a row and confirm the banner never appears for those, and that the `chunks`/`chunkMeta` IndexedDB stores are empty right after each clean stop (DevTools → Application → IndexedDB, on the offscreen document) |
 
 `HANDOFF.md` tracks what is still unverified. Add to it rather than quietly assuming
 something works — a row saying "implemented, never run" is worth more than an optimistic
@@ -244,6 +259,26 @@ you add one *outside* it, remember the port may already be dead.
 (`DEFAULT_EDITOR_BASE_URL` or storage), `manifest.json` (`web_accessible_resources`
 matches), and `bridge.js` (`ALLOWED_PARENT_ORIGINS`). The last two are the security
 boundary — any origin listed can read recordings out of the extension, so keep both narrow.
+
+**`checkForOrphanedRecording()` must never be gated on `state.phase === 'idle'`.**
+It exists specifically to catch the case where `state.phase` is *lying* — an
+offscreen-document-only crash leaves `state` (in memory, or restored from
+`chrome.storage.session`) still saying `'recording'`, because nothing tells it
+otherwise. Its own internal check (`hasOffscreenDocument()`, Chrome's own context
+list, not `state.phase`) is what tells a stale `state` from a genuinely live one.
+A caller that only invokes it `if (state.phase === 'idle')` silently disables the
+one scenario it's for — this shipped broken once for exactly that reason before
+being caught in review; see `GET_STATE`'s handler in `background.js` for the fixed
+shape. It's always safe to call unconditionally: a truly live recording is never
+mistaken for an orphan.
+
+**A stale `state` has to be harvested before it's reset, not after.** `resetState()`
+(via `clearPersistedState()`) wipes `chrome.storage.session`, which is the only
+place a live take's click/typing log exists while recording. Any code path that
+might discard `state` outside a clean stop — the `RECORDING_ERROR` handler,
+`stopRecording()`'s failure branch, `checkForOrphanedRecording()`'s own
+staleness check — has to copy what it wants to keep (see `harvestAndResetState()`)
+in the same breath as detecting the problem, never in a later pass.
 
 **`site/` is the whole public surface.** Deploys ship that folder as-is — there is no
 ignore list to maintain, but it also means anything dropped into `site/` goes public.

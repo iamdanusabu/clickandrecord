@@ -41,6 +41,11 @@ The repo is live at **https://github.com/iamdanusabu/clickandrecord** (owner acc
 6. **Accurate model on the web**: not available via GitHub→Vercel (GitHub blocks the
    157 MB file). Options, wired and documented in DEPLOY.md: Vercel Pro + CLI deploy,
    or an R2/S3 bucket via `MODEL_BASE_URL` in `site/editor/editor.js`.
+7. **Crash recovery, added 2026-08-09, needs a real-browser pass before shipping** —
+   see "Verify these first" below for the three scenarios. It also touches
+   `extension/manifest.json` (`0.1.6` → `0.1.7`, plus a new `unlimitedStorage`
+   permission), so it needs a fresh Chrome Web Store submission and review once
+   verified — this can't ship via a `site/` redeploy alone.
 
 ## Where things stand
 
@@ -66,6 +71,7 @@ Everything below is implemented and loads without errors.
 | Recording name / rename | Working, verified in the browser |
 | Export format + quality dialog | Implemented; the plan maths verified, **the encode itself is unverified** — see below |
 | Two-folder packaging (`extension/` + `site/`) | Done 2026-07-28; routes and wiring verified after the move. Hosted "Accurate" model is git-ignored (GitHub 100 MB limit) and the editor hides it when absent |
+| Crash recovery for in-progress recordings | Added 2026-08-09: chunks persist incrementally to IndexedDB during capture; `background.js` scans for orphaned sessions and the popup offers Recover/Discard. `manifest.json` bumped to `0.1.7` (needs a new store submission), `unlimitedStorage` permission added. Code-verified only, **never run in a real browser** — see below |
 
 ## Verify these first — they are the real unknowns
 
@@ -104,6 +110,26 @@ Everything below is implemented and loads without errors.
    If it fails, **reopen the popup** — start failures are now stashed and shown there,
    because choosing a source closes the popup and the error used to reach nobody but the
    service worker console.
+6. **Crash recovery, 2026-08-09.** Entirely unrun — implemented, syntax-checked, and
+   reasoned through, but never exercised in a real browser this session. Three scenarios,
+   in order of how likely they are to expose a real bug:
+   1. Record ~15s with webcam+mic+clicks, then in `chrome://extensions` → Inspect views:
+      offscreen.html, run `window.close()` in that console (simulates an offscreen-only
+      crash without going through `stopCapture()`). Reopen the popup — expect the
+      Recover/Discard banner; Recover should open the editor with video up to the last
+      flushed chunk *and* the clicks logged before the kill.
+   2. Record ~15s, then `killall -9 "Google Chrome"` and relaunch (simulates a full
+      crash). Expect the banner; recovered session should have the right page URL/title
+      but an **empty** click log — that's expected loss, not a bug.
+   3. Record several takes with clean stops in a row, reopening the popup after each —
+      the banner should never appear, and the `chunks`/`chunkMeta` IndexedDB stores
+      should be empty right after each stop.
+
+   `WORKFLOW.md`'s "Before you call something done" table has the same three as a
+   checklist row. If scenario 1 doesn't recover clicks, look at `checkForOrphanedRecording()`
+   in `background.js` first — it was already caught and fixed once this session for being
+   wrongly gated behind `state.phase === 'idle'`, which silently disabled exactly this case
+   (see the trap below); worth double-checking that fix actually holds under a real crash.
 
 ## Traps already paid for — don't rediscover these
 
@@ -203,6 +229,15 @@ things most likely to be "fixed" back into bugs.
   into `chrome.storage.session` and restores it on every message; without that,
   stopping a recording had no `sessionId` and IndexedDB failed with "key path yielded
   a value that is not a valid key".
+- **`state.phase` cannot be trusted to prove a recording is actually still running.**
+  Added 2026-08-09, caught in review before shipping: the crash-recovery orphan scan
+  (`checkForOrphanedRecording()` in `background.js`) was first wired to only run
+  `if (state.phase === 'idle')` — which silently disabled it for the one scenario it
+  exists to catch, since an offscreen-document-only crash leaves `state.phase` still
+  reading `'recording'` (nothing tells it otherwise). The fix: call it unconditionally
+  and let its own `hasOffscreenDocument()` check (Chrome's actual context list) decide
+  staleness — never gate a liveness check behind the flag it's supposed to be
+  double-checking.
 - **Export monitoring has to be muted, not just tapped.** Each source's gain node is
   wired to the editor's speakers so you can hear the video while editing.
   `connectForExport` originally *added* the export destination without removing that, so an

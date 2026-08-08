@@ -35,6 +35,15 @@ broken for everyone else — and confirm that origin appears in BOTH
 `extension/manifest.json` (`web_accessible_resources` matches) and
 `extension/bridge.js` (`ALLOWED_PARENT_ORIGINS`).
 
+**Since `0.1.7` (crash recovery, 2026-08-09)** the manifest also requests
+`unlimitedStorage` — recorded chunks now write to IndexedDB continuously during
+capture rather than once at Stop, which roughly doubles sustained disk I/O for the
+length of a recording (see README's **Crash recovery** section). This is a new,
+user-visible permission line in the Chrome Web Store listing and its review, not
+just a version bump — budget review time accordingly, and don't drop it to save a
+permission-review round: without it, a long/high-bitrate capture is more likely to
+hit the default storage quota mid-take.
+
 Note that an unpacked extension's ID is derived from its path, so the move into
 `extension/` gives your dev install a **new extension ID**. If Drive OAuth suddenly
 fails with `redirect_uri_mismatch`, that's why — re-check the redirect URI.

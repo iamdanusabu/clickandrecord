@@ -28,6 +28,13 @@ let rec = {
   paused: false,
   startedAt: 0,
   pendingStart: null,
+  // Crash-recovery durability: each chunk is also written to IndexedDB as it
+  // arrives (see ondataavailable below), independently of the in-memory arrays
+  // above which remain the fast path for a normal stop. chunkDbPromise is one
+  // connection opened once per take and reused for every append.
+  chunkSeq: 0,
+  webcamChunkSeq: 0,
+  chunkDbPromise: null,
 };
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
@@ -251,7 +258,10 @@ async function prepareCapture(streamId, options) {
     // display stream or the camera held open by this document — which keeps Chrome's
     // sharing indicator and the camera light on for a recording that never started.
     teardownStreams();
-    rec = { paused: false, chunks: [], pendingStart: null, sessionId: rec.sessionId };
+    rec = {
+      paused: false, chunks: [], pendingStart: null, sessionId: rec.sessionId,
+      chunkSeq: 0, webcamChunkSeq: 0, chunkDbPromise: null,
+    };
     throw err;
   }
 }
@@ -379,7 +389,15 @@ async function prepareCaptureInner(streamId, options) {
     audioBitsPerSecond: 128_000,
   });
   rec.mediaRecorder.ondataavailable = (e) => {
-    if (e.data && e.data.size) rec.chunks.push(e.data);
+    if (!e.data || !e.data.size) return;
+    rec.chunks.push(e.data);
+    // seq is captured synchronously here (this handler fires as a normal,
+    // in-order DOM event) even though the write it kicks off is async and can
+    // land late — that's what keeps chunks reassemblable in order regardless.
+    const seq = rec.chunkSeq++;
+    rec.chunkDbPromise
+      ?.then((db) => drAppendChunk(rec.sessionId, 'screen', seq, e.data, db))
+      .catch((err) => console.warn('[demo-recorder] chunk append failed', err));
   };
   rec.mediaRecorder.onerror = (e) => {
     console.error('[demo-recorder] screen MediaRecorder error', e.error || e);
@@ -393,7 +411,12 @@ async function prepareCaptureInner(streamId, options) {
     });
     rec.webcamChunks = [];
     rec.webcamRecorder.ondataavailable = (e) => {
-      if (e.data && e.data.size) rec.webcamChunks.push(e.data);
+      if (!e.data || !e.data.size) return;
+      rec.webcamChunks.push(e.data);
+      const seq = rec.webcamChunkSeq++;
+      rec.chunkDbPromise
+        ?.then((db) => drAppendChunk(rec.sessionId, 'webcam', seq, e.data, db))
+        .catch((err) => console.warn('[demo-recorder] webcam chunk append failed', err));
     };
     rec.webcamRecorder.onerror = (e) => {
       console.error('[demo-recorder] webcam MediaRecorder error', e.error || e);
@@ -432,6 +455,23 @@ function beginCapture(startAt) {
       rec.webcamStartedAt = Date.now();
       rec.webcamRecorder.start(1000);
     }
+
+    // Open the durability connection now and record what a crash-recovery pass
+    // would need to reassemble this take, without ever calling stopCapture().
+    // Neither is awaited — roll() has to stay synchronous — but the connection
+    // promise is stashed so the first ondataavailable (~1s away) has something
+    // to chain off rather than racing its own open().
+    rec.chunkDbPromise = drOpenDb();
+    drSaveChunkMeta(rec.sessionId, {
+      width: rec.canvas.width,
+      height: rec.canvas.height,
+      mimeType: rec.mediaRecorder.mimeType,
+      startedAt: rec.startedAt,
+      hasWebcam: !!rec.webcamRecorder,
+      webcamMimeType: rec.webcamRecorder ? rec.webcamRecorder.mimeType : null,
+      webcamStartedAt: rec.webcamRecorder ? rec.webcamStartedAt : null,
+    }).catch((err) => console.error('[demo-recorder] chunkMeta write failed', err));
+
     // Report when tape *actually* started, rather than letting everyone assume it was
     // startAt. A hidden document's timers can fire a couple of hundred milliseconds
     // late, and that difference would show up as every zoom landing behind its click.
@@ -487,7 +527,9 @@ async function stopCapture() {
   if (!rec.startedAt) {
     if (rec.pendingStart) clearTimeout(rec.pendingStart);
     teardownStreams();
-    rec = { paused: false, chunks: [], pendingStart: null };
+    // roll() never ran, so no chunkMeta/chunks rows exist for this session —
+    // nothing to clean up in IndexedDB.
+    rec = { paused: false, chunks: [], pendingStart: null, chunkSeq: 0, webcamChunkSeq: 0, chunkDbPromise: null };
     return { ok: false, error: 'Cancelled before recording started — nothing was saved.' };
   }
 
@@ -533,7 +575,21 @@ async function stopCapture() {
   const meta = { width, height, duration, mimeType };
   await drSaveRecording(sessionId, blob, meta);
 
-  rec = { paused: false, chunks: [], pendingStart: null };
+  // The final blob is safely saved — the durable per-chunk copy that existed
+  // purely for crash recovery is no longer needed. A failure here must not fail
+  // the (already-successful) save; a leftover chunk set just self-heals on
+  // background.js's next orphan scan (it'll see a finalized recording already
+  // exists and sweep it up silently).
+  try {
+    const chunkDb = await rec.chunkDbPromise;
+    await drDeleteChunks(sessionId);
+    await drDeleteChunkMeta(sessionId);
+    chunkDb?.close();
+  } catch (err) {
+    console.warn('[demo-recorder] chunk cleanup failed (self-heals later)', err);
+  }
+
+  rec = { paused: false, chunks: [], pendingStart: null, chunkSeq: 0, webcamChunkSeq: 0, chunkDbPromise: null };
 
   return { ok: true, sessionId, meta };
 }

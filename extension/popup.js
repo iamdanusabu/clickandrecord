@@ -19,6 +19,37 @@ const isBravePromise = (async () => {
 
 const BRAVE_NOTICE_DISMISSED_KEY = 'braveNoticeDismissed';
 
+// Crash recovery: unlike the Brave notice, visibility is driven purely by
+// whether background.js currently has a pendingRecovery marker — no dismissed
+// flag, since every crash is its own event rather than one-time onboarding.
+let pendingRecoverySessionId = null;
+
+async function refreshRecoveryBanner() {
+  const banner = document.getElementById('recovery-banner');
+  const { pending } = await chrome.runtime.sendMessage({ type: 'GET_PENDING_RECOVERY' }).catch(() => ({}));
+  pendingRecoverySessionId = pending ? pending.sessionId : null;
+  banner.classList.toggle('hidden', !pending);
+}
+
+document.getElementById('btn-recover-session').addEventListener('click', async () => {
+  if (!pendingRecoverySessionId) return;
+  showView('processing');
+  const resp = await chrome.runtime
+    .sendMessage({ type: 'RECOVER_SESSION', sessionId: pendingRecoverySessionId })
+    .catch((err) => ({ ok: false, error: err.message || String(err) }));
+  if (!resp || !resp.ok) {
+    showError((resp && resp.error) || 'Could not recover the recording.');
+    return;
+  }
+  window.close(); // the editor opens in its own tab, same as a normal save
+});
+
+document.getElementById('btn-discard-recovery').addEventListener('click', async () => {
+  if (!pendingRecoverySessionId) return;
+  await chrome.runtime.sendMessage({ type: 'DISCARD_RECOVERY', sessionId: pendingRecoverySessionId }).catch(() => {});
+  await refreshRecoveryBanner();
+});
+
 // The idle-view onboarding banner: shown once per person, not once per open.
 async function refreshBraveNotice() {
   const notice = document.getElementById('brave-notice');
@@ -419,7 +450,14 @@ document.getElementById('btn-open-editor').addEventListener('click', async () =>
   window.close(); // the editor opens in a tab; leaving the popup up serves nothing
 });
 
-document.getElementById('btn-retry').addEventListener('click', () => showView('idle'));
+document.getElementById('btn-retry').addEventListener('click', () => {
+  showView('idle');
+  // A failed Stop can itself orphan a recording (see background.js's
+  // stopRecording() failure branch) and routes here rather than through
+  // refreshState(), so the banner needs its own refresh rather than waiting
+  // for a full popup close/reopen.
+  refreshRecoveryBanner().catch(() => {});
+});
 
 chrome.runtime.onMessage.addListener((msg) => {
   if (msg.type === 'CLICK_COUNT_UPDATE') {
@@ -443,5 +481,6 @@ applySourceUI();
     await refreshPermissionNotice();
     await maybeAutoRequestPermission();
     await refreshBraveNotice();
+    await refreshRecoveryBanner();
   }
 })();
