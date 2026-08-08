@@ -1,8 +1,10 @@
 // Post-recording editor. Loads the raw composited recording (screen +
 // webcam bubble, already baked in) from IndexedDB, lets the user trim it,
 // turn logged clicks into zoom-in keyframes, and append extra video clips.
-// Export re-plays the whole composition in real time onto an offscreen
-// canvas and records that with MediaRecorder — no ffmpeg/WebCodecs needed.
+// Export renders the whole composition onto an offscreen canvas, preferring
+// a frame-by-frame WebCodecs pipeline (see renderCompositionWebCodecs /
+// renderCompositionWebCodecsMp4 below) over the older real-time
+// MediaRecorder path, which now only runs as a fallback.
 
 const qs = new URLSearchParams(location.search);
 const sessionId = qs.get('session');
@@ -151,6 +153,15 @@ const ZOOM_EASE_MS = 500;
 const ZOOM_LINK_GAP_MS = 1500;
 const ZOOM_LINK_NEAR_DIST = 0.2; // fraction of the frame's diagonal — "right next to it"
 const ZOOM_LINK_NEAR_BONUS_MS = 1500;
+
+// Breathing room around a click cluster's bounding box (see makeClusterKeyframe),
+// as a multiplier on its span, so the zoom doesn't crop flush against the
+// outermost clicks.
+const CLUSTER_PADDING = 1.4;
+// A cluster spread wide enough that framing its box would need less zoom than
+// this isn't worth zooming for — the box already covers most of the frame, so
+// "zooming in" on it wouldn't draw the eye anywhere in particular.
+const CLUSTER_MIN_SCALE = 1.15;
 
 // Whether zoom `a` (which ends first) should link into a pan with zoom `b`.
 function zoomsShouldLink(a, b) {
@@ -2003,22 +2014,79 @@ function addZoomAtPlayhead() {
   setStatus('Zoom added — drag the crosshair on the preview to aim it');
 }
 
-// Turn every detected click into a zoom, skipping clicks that land inside a
-// zoom already in flight — otherwise a burst of clicks in one spot stacks up
-// into a jittery mess. Manually placed zooms are preserved: this rebuilds only
-// the click-derived ones.
+// The absolute time a lone click's zoom would still be holding until — same
+// lead-in/hold math as makeKeyframe, used both to decide whether the *next*
+// click lands inside a zoom already in flight and, once a cluster is done
+// growing, as that cluster's actual hold end.
+function clickBusyEnd(click) {
+  return Math.max(0, click.t - ZOOM_LEAD_IN_MS) + durationForClick(click);
+}
+
+// One click, or several absorbed into the same burst (see autoApplyZooms
+// below), framed as a single zoom. A lone click zooms to ZOOM_SCALE on its
+// own point, same as ever — a cluster's bounding box with span 0 reduces to
+// exactly that case. Several clicks get the bounding box of all of them,
+// centred on it and scaled just enough (plus CLUSTER_PADDING) to fit that box
+// in frame — capped at ZOOM_SCALE (a spread-out cluster should never zoom in
+// *more* than a single click would, only less) and dropped entirely, rather
+// than forced to a token zoom, if the box is too wide to frame meaningfully
+// (see CLUSTER_MIN_SCALE).
+function makeClusterKeyframe(cluster, busyEnd) {
+  const first = cluster[0];
+  const xs = cluster.map((c) => c.x);
+  const ys = cluster.map((c) => c.y);
+  const minX = Math.min(...xs);
+  const maxX = Math.max(...xs);
+  const minY = Math.min(...ys);
+  const maxY = Math.max(...ys);
+  const spanX = maxX - minX;
+  const spanY = maxY - minY;
+  const fitScale = Math.min(
+    spanX > 0 ? 1 / (spanX * CLUSTER_PADDING) : Infinity,
+    spanY > 0 ? 1 / (spanY * CLUSTER_PADDING) : Infinity,
+  );
+  const scale = Math.min(ZOOM_SCALE, fitScale);
+  if (scale < CLUSTER_MIN_SCALE) return null;
+  const t = Math.max(0, first.t - ZOOM_LEAD_IN_MS);
+  return {
+    id: `kf-${first.t}`,
+    clickT: first.t,
+    t,
+    x: (minX + maxX) / 2,
+    y: (minY + maxY) / 2,
+    duration: busyEnd - t,
+    scale,
+  };
+}
+
+// Turn detected clicks into zooms, absorbing any click that lands inside a
+// zoom already in flight into that same cluster instead of dropping it —
+// otherwise a burst of clicks stacks up into a jittery mess (each fighting
+// for its own zoom-in) or, if simply discarded, a burst spread across more
+// than one spot loses everything but its first click instead of being framed
+// together. Manually placed zooms are preserved: this rebuilds only the
+// click-derived ones.
 function autoApplyZooms() {
   const manual = project.zoomKeyframes.filter((kf) => kf.manual);
   const auto = [];
+  const sorted = [...project.clicks].sort((a, b) => a.t - b.t);
+  let cluster = [];
   let busyUntil = -Infinity;
-  [...project.clicks]
-    .sort((a, b) => a.t - b.t)
-    .forEach((c) => {
-      if (c.t < busyUntil) return;
-      const kf = makeKeyframe(c);
-      auto.push(kf);
-      busyUntil = kf.t + kf.duration;
-    });
+
+  const flush = () => {
+    if (!cluster.length) return;
+    const kf = makeClusterKeyframe(cluster, busyUntil);
+    if (kf) auto.push(kf);
+    cluster = [];
+  };
+
+  sorted.forEach((c) => {
+    if (c.t >= busyUntil) flush();
+    cluster.push(c);
+    busyUntil = Math.max(busyUntil, clickBusyEnd(c));
+  });
+  flush();
+
   project.zoomKeyframes = [...manual, ...auto].sort((a, b) => a.t - b.t);
   selectedKeyframeId = null;
   invalidateCamera();

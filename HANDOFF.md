@@ -69,13 +69,16 @@ Everything below is implemented and loads without errors.
 
 ## Verify these first — they are the real unknowns
 
-1. **Export.** The single biggest gap. `renderComposition()` in `editor/editor.js`
-   replays the whole composition through a *separate* path from the preview, and
-   nothing has confirmed the output file matches what you see. Test with the works:
-   split a clip, set one piece to 4×, delete another, add a webcam bubble, turn on
-   subtitles, then export and compare duration, pacing, bubble position and caption
-   timing. If duration is wrong, the segment-advance logic in that loop is where to
-   look.
+1. **Export.** The single biggest gap. `renderComposition()` in `editor/editor.js` picks
+   between three paths (WebCodecs WebM, WebCodecs MP4, real-time `MediaRecorder`
+   fallback) — all *separate* from the preview — and nothing has confirmed any of their
+   output files match what you see, or how fast the WebCodecs paths actually run. Test
+   with the works: split a clip, set one piece to 4×, delete another, add a webcam
+   bubble, turn on subtitles, then export and compare duration, pacing, bubble position
+   and caption timing — on whichever path your browser takes, and ideally both. If
+   duration is wrong, the segment-advance logic in that loop is where to look. Time the
+   export too, especially at 4K, since the WebCodecs speedup is currently just a code
+   constant (`EXPORT_DECODE_SPEEDUP`), not a measured result.
 2. **Webcam end-to-end.** Record with the webcam on and confirm the bubble appears
    in the editor *and* that switching **Show** off removes it — that's what proves
    it's composited rather than burned in. Then check sync while playing through a
@@ -294,13 +297,30 @@ things most likely to be "fixed" back into bugs.
   roll drift) — but nobody has yet recorded a real take and confirmed frame one is
   post-count-in. Do that before trusting it: record, then check the first frame and
   that a zoom lands *on* its click rather than just after.
+- **Click-burst zoom clustering is code-verified, not seen on a real recording.**
+  `autoApplyZooms`/`makeClusterKeyframe` (`editor/editor.js`) now frame the bounding box
+  of an entire click burst instead of keeping only its first click, tested with a
+  17-case throwaway Node harness (single click matches old behaviour exactly, tight
+  bursts stay capped at `ZOOM_SCALE`, spread bursts shrink to fit and stay centred on
+  the bbox midpoint, an absorbed non-first click's own trailing typing burst still
+  extends the hold, an overly-wide burst is dropped rather than forced into a token
+  zoom). Nobody has recorded a real rapid-click burst (e.g. hammering a button, or
+  clicking across a spread-out form quickly) and watched the export to confirm it reads
+  as a clean pan/frame rather than something worse. Do that next.
 - **Inset trades resolution**: padding shrinks the recording inside a fixed canvas,
   so a heavy inset softens the image. Rendering the export larger would fix it.
 - **Webcam sync is seek-based**, drift-corrected past ~120 ms; a loaded machine may
   show brief slippage.
-- **Export is real-time** (it replays the composition), so a 5-minute video takes
-  5 minutes. A WebCodecs path would fix that and is the biggest performance win
-  available — and would also remove the must-stay-visible constraint below.
+- ~~Export is real-time~~ **Rebuilt on WebCodecs 2026-08-05/06** (`cff1467`, `5dd65e9`).
+  `renderComposition()` now prefers `renderCompositionWebCodecs`/
+  `renderCompositionWebCodecsMp4` — frame-by-frame `VideoEncoder`/`AudioEncoder` encoding,
+  video decoded at `EXPORT_DECODE_SPEEDUP` (4×, capped 16×) via `requestVideoFrameCallback`,
+  audio pre-rendered offline via `OfflineAudioContext` instead of captured live. Falls back
+  to the old real-time `MediaRecorder` path (`renderCompositionRealtime`) only when the
+  browser/codec pairing lacks WebCodecs support. **Not yet benchmarked**: the 4× decode
+  target is a code-level constant, not a measured wall-clock figure, and nobody has timed
+  an actual export (especially at 4K, where decode/encode cost is heaviest) to confirm the
+  achieved speedup. Do that before quoting a number externally.
 - ~~The editor tab must stay visible during an export~~ **Fixed 2026-07-28.** This was
   the leading suspect for "the exported video isn't full" reports, and the mechanism
   checks out: `requestAnimationFrame` throttles or stops entirely in a hidden tab, but

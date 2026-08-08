@@ -174,12 +174,26 @@ Recording quality was raised too, on the same reasoning: capture is no longer ca
 1920), and the recorder's bitrate scales with pixel count instead of sitting at a flat
 8 Mbps.
 
-The render is **real time** — a 5-minute video takes 5 minutes — and it's driven by
+Export prefers a **WebCodecs fast path** (`renderCompositionWebCodecs` for WebM,
+`renderCompositionWebCodecsMp4` for MP4): it encodes frame-by-frame via `VideoEncoder`/
+`AudioEncoder` instead of replaying the composition in real time, so it's no longer bound
+to the recording's own duration. Video decodes at `EXPORT_DECODE_SPEEDUP` (4×, capped at
+16× if a segment is also manually sped up) driven by `requestVideoFrameCallback`, and
+audio is pre-rendered offline through an `OfflineAudioContext` rather than captured live —
+so tab visibility, a sleeping display or heavy system load can't stall it the way they
+used to. This is a code-level target, not a measured benchmark: actual throughput at 4K
+depends on the browser's decode/encode capacity on the machine running it.
+
+Not every browser/codec pairing supports this: WebM needs `VideoEncoder`/`AudioEncoder`
+plus `WebMMuxer`; MP4 additionally needs its AAC/H.264 codec pair confirmed via an async
+probe. Either falls back silently to the older **real-time** `MediaRecorder` path
+(`renderCompositionRealtime`) — a 5-minute video takes 5 minutes there, driven by
 `requestAnimationFrame`, which Chrome stops entirely in a hidden tab. **It's safe to
-switch tabs anyway**: export pauses the recorder and the source video together the
+switch tabs anyway**: that fallback pauses the recorder and the source video together the
 moment the tab is hidden, and resumes both together when it's visible again, so nothing
 is skipped or lost — it just takes longer. The overlay shows a distinct paused state so
-it's obvious nothing is stuck.
+it's obvious nothing is stuck. The WebCodecs path doesn't need this: `rVFC` keeps firing
+regardless of tab visibility, so it isn't throttled in the background to begin with.
 
 ## Subtitles
 
@@ -456,8 +470,15 @@ it — `currentOutputElapsedMs`, `segmentOffsetMs`, `recordingTimeToGlobal`, and
 Click-triggered zoom is deliberately **not** baked in during recording —
 it's applied as a post-process in the editor using the logged click
 timestamps, so it stays adjustable/removable after the fact. The editor
-applies it to every click on load (`autoApplyZooms`), skipping clicks that
-land inside a zoom already in flight so click bursts don't stack up.
+applies it to every click on load (`autoApplyZooms`), which absorbs any click
+landing inside a zoom already in flight into that same cluster rather than
+dropping it: `makeClusterKeyframe` frames the **bounding box** of every click
+in the burst, centred and scaled (padded, capped at the same `ZOOM_SCALE` a
+lone click gets — a cluster should never zoom in *more* than a single click
+would) to fit the whole box in frame. A cluster spread wide enough that
+framing it wouldn't zoom in on anything in particular (`CLUSTER_MIN_SCALE`)
+is left unzoomed rather than forced into a token zoom. A tight burst in one
+spot still reduces to one clean zoom on that spot, same as before.
 
 Two non-obvious things about MediaRecorder's WebM output, both of which
 caused hangs before being handled: the file has **no duration in its header**
@@ -516,9 +537,14 @@ Consequences worth knowing:
   window or desktop recording with one tab's network log is actively misleading in a bug
   hunt. Disabled for Window and Screen in the popup *and* in `background.js`, so a stale
   options object can't re-enable it.
-- Export is **real time**: a 5-minute video takes 5 minutes. Switching tabs no longer
-  risks the output — export pauses cleanly while hidden and resumes where it left off —
-  but it does mean a backgrounded export takes however much longer you were away.
+- Export prefers a **WebCodecs** fast path (frame-by-frame, decoupled from real time —
+  see the Export section above) and only falls back to the older **real-time**
+  `MediaRecorder` path when the browser or codec pairing doesn't support it, where a
+  5-minute video still takes 5 minutes. Switching tabs no longer risks the output either
+  way — the real-time fallback pauses cleanly while hidden and resumes where it left off,
+  and the WebCodecs path isn't throttled in the background to begin with — but on the
+  fallback a backgrounded export takes however much longer you were away. The WebCodecs
+  path's actual speedup hasn't been benchmarked end-to-end; see `HANDOFF.md`.
 - The editor is single-track: one screen recording plus any number of
   appended clips, played back-to-back — no overlays/picture-in-picture
   beyond the baked-in webcam bubble, no titles/annotations yet.

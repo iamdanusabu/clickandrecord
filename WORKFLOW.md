@@ -124,20 +124,30 @@ still maps clicks correctly.
 throttled to roughly 1/second and doesn't composite, so:
 
 - `canvas.captureStream()` produces a **0-byte** recording, and
-- `requestAnimationFrame` — which drives the export render loop — doesn't fire at all.
+- `requestAnimationFrame` — which drives the *real-time* export render loop — doesn't
+  fire at all.
 
 Measured: a `setInterval(33ms)` draw loop fired **twice in 1.5 s** in a hidden tab. So
-export cannot be verified from a background tab or from automation that backgrounds the
-page. Export has to be tested by hand, in a focused window, watching it.
+the real-time export path cannot be verified from a background tab or from automation
+that backgrounds the page. That path has to be tested by hand, in a focused window,
+watching it.
 
-As of 2026-07-28 the export loop pauses the recorder and the source video together on
-`document.visibilitychange` and resumes both together, specifically so a real user
-backgrounding the tab mid-export can no longer produce a truncated file (see HANDOFF.md
-— this was the leading suspect for "exported video isn't full" reports). That fix is
-**verified by two Node harnesses, not by a live browser** — this same limitation is why.
-When automation is available, the priority test is: export something with a
+As of 2026-07-28 the real-time export loop pauses the recorder and the source video
+together on `document.visibilitychange` and resumes both together, specifically so a
+real user backgrounding the tab mid-export can no longer produce a truncated file (see
+HANDOFF.md — this was the leading suspect for "exported video isn't full" reports). That
+fix is **verified by two Node harnesses, not by a live browser** — this same limitation
+is why. When automation is available, the priority test is: export something with a
 non-contiguous cut, switch tabs mid-export (including right as a cut happens), come
 back, and confirm the file is complete with no skipped or frozen stretch.
+
+**Since 2026-08-05/06 this is the fallback path, not the default one.** Export now
+prefers a WebCodecs pipeline (`renderCompositionWebCodecs` / `renderCompositionWebCodecsMp4`
+in `editor.js`) that drives video via `requestVideoFrameCallback` instead of `rAF` —
+`rVFC` is tied to the decode pipeline, not compositing, so it isn't throttled in a hidden
+tab and needs no pause/resume dance. That path is itself unverified end to end (see
+HANDOFF.md) — it just fails differently, so don't assume the hidden-tab caveats above
+carry over to it untested.
 
 ---
 
