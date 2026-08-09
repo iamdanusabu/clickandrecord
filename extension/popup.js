@@ -50,6 +50,23 @@ document.getElementById('btn-discard-recovery').addEventListener('click', async 
   await refreshRecoveryBanner();
 });
 
+// Always-available way back to the most recently completed recording, whether
+// or not anything went wrong — see background.js's GET_LAST_COMPLETED_SESSION.
+let lastCompletedSessionId = null;
+
+async function refreshLastSession() {
+  const btn = document.getElementById('btn-last-session');
+  const { last } = await chrome.runtime.sendMessage({ type: 'GET_LAST_COMPLETED_SESSION' }).catch(() => ({}));
+  lastCompletedSessionId = last ? last.sessionId : null;
+  btn.classList.toggle('hidden', !last);
+}
+
+document.getElementById('btn-last-session').addEventListener('click', async () => {
+  if (!lastCompletedSessionId) return;
+  await chrome.runtime.sendMessage({ type: 'OPEN_EDITOR', sessionId: lastCompletedSessionId }).catch(() => {});
+  window.close();
+});
+
 // The idle-view onboarding banner: shown once per person, not once per open.
 async function refreshBraveNotice() {
   const notice = document.getElementById('brave-notice');
@@ -482,5 +499,6 @@ applySourceUI();
     await maybeAutoRequestPermission();
     await refreshBraveNotice();
     await refreshRecoveryBanner();
+    await refreshLastSession();
   }
 })();

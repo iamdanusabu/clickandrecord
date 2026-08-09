@@ -77,13 +77,17 @@ safety net for a real crash, not a substitute for a clean stop, and it always
 costs the last ~1s of video and the whole zoom log. Finish or abandon a recording
 before reloading if you have the choice.
 
-Separately, `chrome.storage.session` being wiped by a reload also affects a
-recording that already finished and was saved before you reloaded: the video
-itself lives in IndexedDB and survives, but the click log, `pageUrl` and `source`
-of that *already-saved* session live in session storage too — so re-opening that
-editor URL after a reload silently has **no clicks and no zooms**. If a recording
-suddenly has no yellow dots, check whether you reloaded the extension since
-making it.
+**Fixed, no longer a gotcha**: a recording that already finished and was saved
+before you reloaded used to lose its click log, `pageUrl` and `source` on reload
+too — that `session:<id>` payload lived in `chrome.storage.session`, same as
+everything else above. It's now written to `chrome.storage.local` instead
+(`onRecordingSaved()`/`recoverSession()` in `background.js`, read back by
+`editor.js`'s `loadSession()` and `bridge.js`), specifically so "Continue with
+your last recording" in the popup keeps working across a reload *and* a full
+browser restart. If an *already-saved* recording somehow still comes back with no
+yellow dots, that's a real bug now, not this expected quirk — the quirk only
+applies to a recording still *in progress* at the moment of the reload (the
+paragraph above).
 
 ---
 

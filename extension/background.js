@@ -85,6 +85,12 @@ function recSessionMetaKey(sessionId) {
   return `recSessionMeta:${sessionId}`;
 }
 
+// Durable pointer to whichever session finished most recently (clean stop or
+// a crash recovery), so the popup can always offer a way back to it — even
+// across a browser restart, which is exactly why this is .local and not
+// .session (see the session:<id> payload below, migrated for the same reason).
+const DR_LAST_COMPLETED_KEY = 'lastCompletedSession';
+
 async function setLastError(error) {
   try {
     await chrome.storage.session.set({ [DR_LAST_ERROR_KEY]: { error, at: Date.now() } });
@@ -331,7 +337,14 @@ async function recoverSession(sessionId) {
     pageTitle: recMeta.pageTitle || '',
     source: recMeta.source || 'tab',
   };
-  await chrome.storage.session.set({ [`session:${sessionId}`]: payload });
+  // .local, not .session: this payload has to survive a browser restart, since
+  // "Continue with your last recording" (background.js's GET_LAST_COMPLETED_SESSION)
+  // and this session's own editor URL both rely on it being there indefinitely,
+  // not just for the rest of this browser session.
+  await chrome.storage.local.set({ [`session:${sessionId}`]: payload });
+  await chrome.storage.local.set({
+    [DR_LAST_COMPLETED_KEY]: { sessionId, savedAt: Date.now() },
+  });
 
   await cleanupOrphanArtifacts(sessionId);
   chrome.tabs.create({ url: await buildEditorUrl(sessionId) });
@@ -389,6 +402,18 @@ async function handleMessage(msg, sender) {
       return { pending: stored[DR_PENDING_RECOVERY_KEY] || null };
     }
 
+    case 'GET_LAST_COMPLETED_SESSION': {
+      const stored = await chrome.storage.local.get(DR_LAST_COMPLETED_KEY).catch(() => ({}));
+      const last = stored[DR_LAST_COMPLETED_KEY];
+      if (!last) return { last: null };
+      // Self-heal rather than hand the popup a link to a recording that's gone —
+      // there's no delete-recording feature today, but no reason to trust the
+      // pointer blindly when the check is this cheap.
+      const rec = await drLoadRecording(last.sessionId).catch(() => null);
+      if (!rec) return { last: null };
+      return { last };
+    }
+
     case 'RECOVER_SESSION':
       return recoverSession(msg.sessionId);
 
@@ -426,7 +451,7 @@ async function handleMessage(msg, sender) {
     }
 
     case 'OPEN_EDITOR':
-      await chrome.tabs.create({ url: await buildEditorUrl(null) });
+      await chrome.tabs.create({ url: await buildEditorUrl(msg.sessionId || null) });
       return { ok: true };
 
     case 'REQUEST_MEDIA_PERMISSION':
@@ -1071,7 +1096,12 @@ async function onRecordingSaved(sessionId, meta) {
     pageTitle: state.pageTitle || '',
     source: (state.options && state.options.source) || 'tab',
   };
-  await chrome.storage.session.set({ [`session:${sessionId}`]: payload });
+  // .local, not .session: has to survive a browser restart so a lost/closed editor
+  // tab is never a dead end — see DR_LAST_COMPLETED_KEY above.
+  await chrome.storage.local.set({ [`session:${sessionId}`]: payload });
+  await chrome.storage.local.set({
+    [DR_LAST_COMPLETED_KEY]: { sessionId, savedAt: Date.now() },
+  });
   // A clean save means offscreen.js's own stopCapture() already deleted the
   // chunks/chunkMeta rows for this session; this is just the local-storage
   // half of that same cleanup, so a completed recording leaves nothing behind.

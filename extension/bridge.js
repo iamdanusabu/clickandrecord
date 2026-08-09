@@ -37,7 +37,9 @@ window.addEventListener('message', async (event) => {
         return;
       }
       const key = `session:${msg.sessionId}`;
-      const stored = await chrome.storage.session.get(key);
+      // .local, not .session: this payload has to survive a browser restart —
+      // see background.js's onRecordingSaved()/recoverSession() for why.
+      const stored = await chrome.storage.local.get(key);
       const info = stored[key] || {};
       reply({
         type: 'DR_RECORDING',

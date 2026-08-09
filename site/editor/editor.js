@@ -544,7 +544,9 @@ async function loadSession(id) {
     if (typeof drLoadRecording !== 'function') await loadScript('../db.js');
     const rec = await drLoadRecording(id);
     if (!rec) return null;
-    const stored = await chrome.storage.session.get(`session:${id}`);
+    // .local, not .session: this payload has to survive a browser restart —
+    // see background.js's onRecordingSaved()/recoverSession() for why.
+    const stored = await chrome.storage.local.get(`session:${id}`);
     const info = stored[`session:${id}`] || {};
     return {
       blob: rec.blob,
