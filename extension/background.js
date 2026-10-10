@@ -112,9 +112,32 @@ async function restoreState() {
   try {
     const stored = await chrome.storage.session.get(DR_STATE_KEY);
     const saved = stored[DR_STATE_KEY];
+    // Re-checked after the await: on a worker respawn the top-level restore and the
+    // first message handler's restore run concurrently, and whichever resolves second
+    // would otherwise replace a state the first one has already pushed a click into
+    // with the older stored copy — silently dropping that click.
+    if (state.phase !== 'idle') return;
     if (saved && saved.phase && saved.phase !== 'idle') state = saved;
   } catch (_) {
     // storage unavailable — nothing to restore
+  }
+}
+
+// The click/typing log also goes into the durable recSessionMeta snapshot, not just
+// chrome.storage.session. Session storage is wiped by a browser crash *and* by an
+// extension reload/update — the two most common reasons a take ends up recovered —
+// and recoverSession() reads clicks from recSessionMeta only. Without this, every
+// recovered recording opened with "no clicks were detected" however many there were.
+async function persistDurableLog() {
+  if (!state.sessionId) return;
+  try {
+    const key = recSessionMetaKey(state.sessionId);
+    const stored = await chrome.storage.local.get(key);
+    await chrome.storage.local.set({
+      [key]: { ...(stored[key] || {}), clicks: state.clicks, typing: state.typing },
+    });
+  } catch (_) {
+    // storage unavailable — the session copy is still there for the normal path
   }
 }
 
@@ -489,6 +512,7 @@ async function handleMessage(msg, sender) {
         // Persisted per click so a worker restart can't lose the click log — these
         // arrive at human pace, so the write volume is trivial.
         await persistState();
+        await persistDurableLog();
         chrome.runtime.sendMessage({ type: 'CLICK_COUNT_UPDATE', count: state.clicks.length }).catch(() => {});
       }
       return { ok: true };
@@ -503,6 +527,7 @@ async function handleMessage(msg, sender) {
         const end = Math.max(start, msg.interval.end);
         state.typing.push({ start, end });
         await persistState();
+        await persistDurableLog();
       }
       return { ok: true };
 

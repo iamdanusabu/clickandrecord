@@ -4775,7 +4775,7 @@ function renderExportDialog() {
 
 // Set by the Cancel button on the export overlay and read by the render loop. A whole
 // object rather than a bare boolean so the loop closes over a stable reference.
-const exportAbort = { requested: false };
+const exportAbort = { requested: false, onRequest: null };
 
 // Whichever WebCodecs encoder is currently inside its own flush() — set only for the
 // duration of that await, by the WebCodecs export paths below. captureExportFrames
@@ -4793,6 +4793,7 @@ function requestExportCancel() {
   const btn = document.getElementById('btn-export-cancel');
   btn.disabled = true;
   btn.textContent = 'Cancelling…';
+  if (exportAbort.onRequest) exportAbort.onRequest();
   if (currentExportEncoder && currentExportEncoder.state !== 'closed') {
     try { currentExportEncoder.close(); } catch (_) { /* already closing */ }
   }
@@ -5083,13 +5084,66 @@ async function captureExportFrames(plan, videoEncoder, errorBox) {
   const KEYFRAME_INTERVAL_FRAMES = EXPORT_FPS * 2; // a hint, not a hard requirement — see below
 
   await new Promise((resolve, reject) => {
+    // Cancel must be able to break out even while we're parked waiting on a frame
+    // callback that may never come (see onEnded below) — not only between frames.
+    exportAbort.onRequest = () => { cancelled = true; resolve(); };
+
+    // Moves on from a segment whose out point has been reached (or whose source ran
+    // out of frames first). Resolves the whole capture after the last segment.
+    function finishSegment(live, advance) {
+      const nextIndex = live.index + 1;
+      if (nextIndex >= segmentCount()) { resolve(); return; }
+      const next = getSegmentByIndex(nextIndex);
+      playhead.segIndex = nextIndex;
+      const contiguous = next.src === live.src
+        && !live.src.videoEl.ended
+        && Math.abs(next.seg.in - live.seg.out) < 40
+        && speedOf(next.seg) === speedOf(live.seg);
+      if (contiguous) { advance(); return; }
+      live.src.videoEl.pause();
+      applyExportDecodeSpeed(next);
+      syncWebcamSeek(next.seg.in);
+      // seekToOrGiveUp, not seekTo: a WebM without a duration header can refuse a
+      // seek and never fire 'seeked', which would hang the export right here.
+      seekToOrGiveUp(next.src.videoEl, next.seg.in / 1000, 5000).then(() => {
+        next.src.videoEl.play().catch(() => {});
+        captureNext();
+      });
+    }
+
     function captureNext() {
       const cur = getCurrentSegment();
       if (!cur) { resolve(); return; }
       if (exportAbort.requested) { cancelled = true; resolve(); return; }
       if (errorBox.error) { reject(errorBox.error); return; }
 
-      cur.src.videoEl.requestVideoFrameCallback((_now, metadata) => {
+      const videoEl = cur.src.videoEl;
+      let settled = false;
+
+      // The source can run out of frames before playhead.localMs ever reaches
+      // seg.out - 15. Screen recordings are variable-frame-rate (a static screen
+      // emits almost no frames), and the container duration — which is what the
+      // last segment's out point is — is often later than the final video frame,
+      // or is the recorder's wall-clock fallback outright. Once the element hits
+      // 'ended', requestVideoFrameCallback never fires again, so without this the
+      // export sat at ~99% forever (and Cancel, only checked inside that
+      // callback, did nothing). Long recordings hit it far more often.
+      const onEnded = () => {
+        if (settled) return;
+        settled = true;
+        const live = getCurrentSegment();
+        if (!live || live.src !== cur.src) return;
+        if (exportAbort.requested) { cancelled = true; resolve(); return; }
+        playhead.localMs = live.seg.out;
+        finishSegment(live, captureNext);
+      };
+      if (videoEl.ended) { onEnded(); return; }
+      videoEl.addEventListener('ended', onEnded, { once: true });
+
+      videoEl.requestVideoFrameCallback((_now, metadata) => {
+        if (settled) return;
+        settled = true;
+        videoEl.removeEventListener('ended', onEnded);
         // The segment can have changed while this callback was in flight (a seek
         // between segments resolving) — that path already re-enters captureNext()
         // itself below, so a stale callback here just steps aside.
@@ -5127,29 +5181,12 @@ async function captureExportFrames(plan, videoEncoder, errorBox) {
           }
         };
 
-        if (playhead.localMs >= live.seg.out - 15) {
-          const nextIndex = live.index + 1;
-          if (nextIndex >= segmentCount()) { resolve(); return; }
-          const next = getSegmentByIndex(nextIndex);
-          playhead.segIndex = nextIndex;
-          const contiguous = next.src === live.src
-            && Math.abs(next.seg.in - live.seg.out) < 40
-            && speedOf(next.seg) === speedOf(live.seg);
-          if (contiguous) { advance(); return; }
-          live.src.videoEl.pause();
-          applyExportDecodeSpeed(next);
-          syncWebcamSeek(next.seg.in);
-          seekTo(next.src.videoEl, next.seg.in / 1000).then(() => {
-            next.src.videoEl.play();
-            captureNext();
-          });
-          return;
-        }
+        if (playhead.localMs >= live.seg.out - 15) { finishSegment(live, advance); return; }
         advance();
       });
     }
     captureNext();
-  });
+  }).finally(() => { exportAbort.onRequest = null; });
 
   return { cancelled };
 }
@@ -5522,7 +5559,9 @@ async function renderCompositionRealtime(plan) {
     // faster in real time, and MediaRecorder simply captures fewer seconds.
     playhead.localMs = cur.src.videoEl.currentTime * 1000;
     syncWebcamPlayback(cur);
-    if (playhead.localMs >= cur.seg.out - 15) {
+    // 'ended' too: if seg.out came from the recorder's wall-clock fallback it can
+    // sit past the element's real duration, and currentTime will never reach it.
+    if (playhead.localMs >= cur.seg.out - 15 || cur.src.videoEl.ended) {
       const nextIndex = playhead.segIndex + 1;
       if (nextIndex >= segmentCount()) { finish(); return; }
       const next = getSegmentByIndex(nextIndex);
@@ -5537,7 +5576,7 @@ async function renderCompositionRealtime(plan) {
       cur.src.videoEl.pause();
       applySpeed(next);
       syncWebcamSeek(next.seg.in);
-      seekTo(next.src.videoEl, next.seg.in / 1000).then(() => {
+      seekToOrGiveUp(next.src.videoEl, next.seg.in / 1000, 5000).then(() => {
         // The tab may have gone hidden while this seek was in flight; don't
         // resume playback (or schedule the next frame) into a paused export.
         if (pausedForVisibility) return;
