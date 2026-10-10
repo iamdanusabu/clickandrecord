@@ -9,9 +9,9 @@
     { "source": "/blog/:slug/", "destination": "/blog/:slug", "permanent": true }
   ],
   "rewrites": [
-    { "source": "/relay/static/:path*", "destination": "https://us-assets.i.posthog.com/static/:path*" },
-    { "source": "/relay/array/:path*", "destination": "https://us-assets.i.posthog.com/array/:path*" },
-    { "source": "/relay/:path*", "destination": "https://us.i.posthog.com/:path*" },
+    { "source": "/relay/static/(.*)", "destination": "https://us-assets.i.posthog.com/static/$1" },
+    { "source": "/relay/array/(.*)", "destination": "https://us-assets.i.posthog.com/array/$1" },
+    { "source": "/relay/(.*)", "destination": "https://us.i.posthog.com/$1" },
     { "source": "/privacy", "destination": "/privacy/index.html" },
     { "source": "/terms", "destination": "/terms/index.html" },
     { "source": "/blog", "destination": "/blog/index.html" },
