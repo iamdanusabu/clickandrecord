@@ -4848,6 +4848,8 @@ document.getElementById('export-go').addEventListener('click', async () => {
     }
     downloadBlob(blob, fileNameFor(plan.format.ext));
     setStatus(`Exported ${plan.width}×${plan.height} ${plan.format.name} · ${fmtBytes(blob.size)}`);
+    // review.js listens for this to decide whether to ask for a store review.
+    window.dispatchEvent(new CustomEvent('cr:exported'));
   } catch (err) {
     setStatus(`Export failed: ${err.message || err}`);
     console.error('[editor] export failed', err);
