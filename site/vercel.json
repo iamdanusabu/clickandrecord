@@ -1,6 +1,6 @@
 {
   "cleanUrls": false,
-  "buildCommand": "node -e \"const fs=require('fs');const k=(process.env.POSTHOG_KEY||'').replace(/[^A-Za-z0-9_]/g,'');fs.writeFileSync('analytics.js',fs.readFileSync('analytics.js','utf8').replace('__POSTHOG_KEY__',k));console.log(k?'PostHog key injected':'POSTHOG_KEY not set - analytics disabled')\"",
+  "buildCommand": "node -e \"const fs=require('fs');const k=process.env.POSTHOG_KEY||'';fs.writeFileSync('analytics.js',fs.readFileSync('analytics.js','utf8').replace('__POSTHOG_KEY__',k));console.log(k?'PostHog key injected':'POSTHOG_KEY not set')\"",
   "outputDirectory": ".",
   "redirects": [
     { "source": "/privacy/", "destination": "/privacy", "permanent": true },
