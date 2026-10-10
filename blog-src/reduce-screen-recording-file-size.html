@@ -1,0 +1,92 @@
+<!--meta
+{
+  "slug": "reduce-screen-recording-file-size",
+  "title": "How to Reduce Screen Recording File Size (Keep It Sharp)",
+  "h1": "How to reduce screen recording file size without making it unreadable",
+  "description": "Reduce screen recording file size by cutting dead time, cropping, choosing the right resolution, codec and bitrate. Practical settings that keep text sharp.",
+  "keyword": "reduce screen recording file size",
+  "category": "Subtitles & editing",
+  "faq": [
+    {"q": "Why are screen recordings so large?", "a": "Recorders often capture at high resolution and high bitrate so nothing is lost during recording. That raw file is meant for editing, not sharing, so re-exporting with sensible settings usually makes it much smaller."},
+    {"q": "Is MP4 or WebM smaller for screen recordings?", "a": "At the same visual quality, VP9 in WebM is often more efficient than H.264 in MP4, but results vary with the content. MP4 plays almost everywhere, so pick it when compatibility matters more than a few megabytes."},
+    {"q": "What resolution should I export a screen recording at?", "a": "1080p is a good default for most tutorials and demos. Go lower only if the interface text stays readable, and keep higher resolutions for very dense UIs or when viewers will watch full screen on large displays."},
+    {"q": "Does cropping reduce file size?", "a": "It can. Cropping removes pixels that would otherwise be encoded, such as empty space or toolbars, and lets you export a smaller frame or use more of the bitrate on the content that matters."}
+  ],
+  "related": ["mp4-vs-webm-screen-recording", "trim-and-split-video-in-browser", "how-to-write-a-bug-report-with-video"]
+}
+-->
+<p>To reduce screen recording file size, cut dead time first, crop away empty areas, then re-export at a sensible resolution (often 1080p) with an efficient codec and a lower bitrate preset. File size is roughly bitrate multiplied by duration, so shortening the video and lowering bitrate are the two levers that matter most, and screen content compresses well when you choose the right settings.</p>
+<p>This guide explains which settings change size the most and how to shrink a file without turning small interface text into mush.</p>
+
+<h2>What actually determines file size</h2>
+<p>Video file size comes down to a simple relationship:</p>
+<blockquote><p><strong>File size ≈ bitrate × duration</strong></p></blockquote>
+<p>A 3-minute video at 8 Mbps is about 180 MB; the same video at 4 Mbps is about 90 MB, and trimming it to 2 minutes brings that to about 60 MB. Everything else, such as resolution, frame rate and codec, matters because it changes how much bitrate you need for the picture to look good.</p>
+<table>
+<thead><tr><th>Factor</th><th>Effect on size</th><th>Effect on quality</th></tr></thead>
+<tbody>
+<tr><td>Duration</td><td>Direct: half the length, roughly half the size</td><td>None, if you cut the right parts</td></tr>
+<tr><td>Bitrate</td><td>Direct: the main size control</td><td>Too low causes blocky text and smearing during scrolls</td></tr>
+<tr><td>Resolution</td><td>Higher resolution needs more bitrate</td><td>Too low makes small text unreadable</td></tr>
+<tr><td>Codec</td><td>More efficient codecs need less bitrate for the same look</td><td>Affects compatibility more than quality</td></tr>
+<tr><td>Content</td><td>Static UIs compress well; scrolling and video playback do not</td><td>Fast motion shows artifacts first</td></tr>
+</tbody>
+</table>
+
+<h2>Step 1: Make the video shorter</h2>
+<p>Duration is the easiest win and it makes the video better too.</p>
+<ul>
+<li>Trim the start and end.</li>
+<li>Split and delete mistakes, retries and tangents.</li>
+<li>Cut or speed up waits like loading spinners and builds.</li>
+</ul>
+<p>Our guides on <a href="/blog/trim-and-split-video-in-browser">trimming and splitting video in the browser</a> and <a href="/blog/speed-up-screen-recording">speeding up a screen recording</a> cover the techniques.</p>
+
+<h2>Step 2: Crop and choose the right resolution</h2>
+<p>If you recorded your whole screen but only one area matters, crop to it. Fewer pixels to encode means less bitrate is needed for the same sharpness. Cropping also removes your taskbar, toolbar and other clutter.</p>
+<p>Then pick an export resolution that suits where the video will be watched:</p>
+<ul>
+<li><strong>1080p</strong> is a solid default for tutorials, demos and docs.</li>
+<li><strong>720p</strong> works for short clips in chat or tickets if the text stays readable. Check at full screen before you send.</li>
+<li><strong>1440p or 4K</strong> only when the interface is very dense and viewers will watch on large displays.</li>
+</ul>
+<p>Frame rate matters less than people think for interface demos. Most UI movement reads fine at 30 frames per second, and a lower frame rate leaves more of the bitrate for sharp text. Keep higher frame rates for content with fast animation or smooth scrolling that viewers need to follow closely.</p>
+<p>Readability is the test. Pause on a frame with the smallest text in the video. If you cannot read it, the resolution or bitrate is too low.</p>
+
+<h2>Step 3: Pick the codec and format</h2>
+<p>The two common choices for screen recordings:</p>
+<ul>
+<li><strong>MP4 (H.264 + AAC)</strong> plays almost everywhere: browsers, phones, Slack, email, video editors.</li>
+<li><strong>WebM (VP9 + Opus)</strong> is often more efficient at the same quality and plays in modern browsers, but support in some apps and devices is weaker.</li>
+</ul>
+<p>If the file will be embedded on the web or attached somewhere you know handles WebM, try both and compare. When in doubt, MP4 is the safe choice. Our <a href="/blog/mp4-vs-webm-screen-recording">MP4 vs WebM comparison</a> goes deeper.</p>
+
+<h2>How to reduce screen recording file size in the browser</h2>
+<p><a href="/">Click &amp; Record</a>'s export dialog is designed for exactly this. It shows the resolution, bitrate and estimated file size before you export, so you can adjust settings and see the effect without rendering several versions. If your video came from another recorder, open it in <a href="/editor/editor.html">the free browser editor</a>; it runs locally, so even large files are not uploaded.</p>
+<ol>
+<li><strong>Open the recording</strong> in the editor.</li>
+<li><strong>Trim, split and speed up</strong> slow sections to cut duration.</li>
+<li><strong>Crop</strong> to the area that matters. The editor can also detect letterbox bars so you do not waste pixels on black borders.</li>
+<li><strong>Choose MP4 or WebM</strong> depending on where it is going.</li>
+<li><strong>Pick a quality preset</strong> and watch the estimated size update.</li>
+<li><strong>Choose the aspect ratio:</strong> source, 16:9, 9:16, 1:1 or 4:5.</li>
+<li><strong>Export</strong>, then open the file and check the smallest text at full screen.</li>
+</ol>
+<p>Export renders faster than real time in supported browsers, so trying a second preset is not a big time cost.</p>
+
+<h2>Tips for specific destinations</h2>
+<ul>
+<li><strong>Bug reports and tickets:</strong> keep clips short and focused on the reproduction. Platforms often have attachment size limits, so check them first. See <a href="/blog/how-to-write-a-bug-report-with-video">how to write a bug report with video</a> for what to include.</li>
+<li><strong>Email:</strong> attachment limits are usually tight. A short 720p or 1080p MP4 at a lower preset often fits, or share via a drive link instead.</li>
+<li><strong>Website embeds:</strong> smaller files load faster. Consider a WebM with an MP4 fallback.</li>
+<li><strong>Video platforms:</strong> they re-encode anyway, so upload at good quality rather than squeezing the file.</li>
+</ul>
+
+<h2>Avoid these size traps</h2>
+<ul>
+<li><strong>Compressing twice.</strong> Each lossy re-encode loses detail. Keep your original and always export from it.</li>
+<li><strong>Exporting at a higher resolution than you recorded.</strong> Upscaling adds size without adding detail.</li>
+<li><strong>Recording things you do not need.</strong> Recording a single tab instead of a large display gives you a smaller, cleaner source from the start.</li>
+<li><strong>Leaving pauses in.</strong> Long silent stretches still cost bytes.</li>
+</ul>
+<p>Shorter, cropped and sensibly encoded beats heavily compressed every time. Click &amp; Record shows you the size before you export, so you can reduce screen recording file size by choice rather than by trial and error.</p>

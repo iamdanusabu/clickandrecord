@@ -1,0 +1,78 @@
+<!--meta
+{
+  "slug": "screen-recording-tips-for-crisp-video",
+  "title": "Screen Recording Quality: 12 Tips for Crisp, Sharp Video",
+  "h1": "12 tips to improve screen recording quality and get crisp video",
+  "description": "Blurry text in your screen recordings? These 12 tips fix screen recording quality: resolution, scaling, window size, frame rate, bitrate, zoom and export.",
+  "keyword": "screen recording quality",
+  "category": "Recording techniques",
+  "faq": [
+    {"q": "Why does my screen recording look blurry?", "a": "The usual causes are a small capture area being scaled up, a low export bitrate, or a platform re-compressing the upload. Record at a higher resolution, export at the source size with a sensible bitrate, and check your page zoom."},
+    {"q": "Should I record screen video at 30 or 60 fps?", "a": "For most software demos 30 fps is plenty and keeps files smaller. Use 60 fps if you show fast scrolling, animation or games, where smooth motion matters."},
+    {"q": "Does zooming in make a screen recording blurry?", "a": "It can, because zoom enlarges existing pixels. Keep zooms around 1.5x to 2x and record on a high-resolution display so zoomed text stays sharp."},
+    {"q": "Is MP4 or WebM better quality?", "a": "At sensible bitrates both look sharp for screen content. MP4 with H.264 is more widely compatible, while WebM with VP9 suits web embeds."}
+  ],
+  "related": ["reduce-screen-recording-file-size", "mp4-vs-webm-screen-recording", "how-to-zoom-in-on-a-screen-recording"]
+}
+-->
+<p>To improve screen recording quality, capture at a high resolution with readable UI, keep your page zoom and display scaling sensible, avoid upscaling, and export at the source resolution with a bitrate high enough for sharp text. Most blurry screen recordings come from a small capture area being stretched, or from aggressive compression on export or upload.</p>
+<p>Here are 12 practical tips, grouped by stage, that fix the common causes. None of them require expensive gear.</p>
+
+<h2>Before you record: set up for sharpness</h2>
+<h3>1. Record on your sharpest display</h3>
+<p>A high-DPI or Retina display packs more pixels into every button and letter. The same UI recorded on a 2560x1440 or Retina screen has far more detail to work with than on a 1366x768 laptop panel, especially if you plan to zoom.</p>
+<h3>2. Size the window for the output, not your habits</h3>
+<p>A browser window around 1280 to 1600 CSS pixels wide is a good default for 16:9 video. Too wide and text becomes tiny when viewed on a phone; too narrow and layouts collapse into mobile views. Keep the same size across takes so your videos match.</p>
+<h3>3. Reset page zoom and bump font sizes</h3>
+<p>Set the browser's page zoom to 100% so text renders crisply (<code>Ctrl</code> or <code>Cmd</code> plus <code>0</code>). For code editors and terminals, raise the font size a few points above what you normally use. Viewers will thank you.</p>
+<h3>4. Clean the frame</h3>
+<p>Hide the bookmarks bar, close unrelated tabs, turn on Do Not Disturb and use demo data. Clutter does not reduce resolution, but it competes for attention and makes small details harder to spot.</p>
+<h3>5. Choose the narrowest source</h3>
+<p>Recording one tab or window instead of a 4K full screen means every pixel in the file is content. If the action is in the browser, record the tab; see <a href="/blog/how-to-record-a-chrome-tab">how to record a Chrome tab</a>.</p>
+
+<h2>While recording: move like the viewer is watching</h2>
+<h3>6. Move the cursor slowly and directly</h3>
+<p>Fast cursor sweeps create motion that compression handles poorly, and they are hard to follow. Move to each target in a straight line and pause briefly before clicking.</p>
+<h3>7. Pick a frame rate on purpose</h3>
+<p>For software demos, 30 fps is usually enough. If you scroll a lot, show animations, or demo something motion-heavy, 60 fps looks smoother at the cost of a bigger file.</p>
+<h3>8. Avoid needless scrolling</h3>
+<p>Scrolling forces every pixel on screen to change, which is the hardest case for video compression and often the moment text turns to mush. Use anchor links, keyboard shortcuts or search to jump instead, and scroll slowly when you must.</p>
+
+<h2>Editing: protect the pixels you captured</h2>
+<h3>9. Zoom moderately</h3>
+<p>Zoom is the best way to make small UI readable, but it enlarges pixels. A 1.5x to 2x zoom on a high-resolution recording stays sharp; 3x on a 1080p recording usually does not. Our guide on <a href="/blog/how-to-zoom-in-on-a-screen-recording">how to zoom in on a screen recording</a> covers strength and timing.</p>
+<h3>10. Crop and frame instead of shrinking</h3>
+<p>If the recording has empty space, crop to the area that matters rather than shrinking everything. A padded background and rounded corners can make a cropped window look intentional without losing resolution.</p>
+
+<h2>Export settings for better screen recording quality</h2>
+<h3>11. Export at the source resolution</h3>
+<p>Upscaling a 1080p capture to 4K adds no detail and quadruples the file size. Export at the recording's native resolution, or the closest standard size, and let the player scale it.</p>
+<h3>12. Give the encoder enough bitrate, once</h3>
+<p>Screen content is full of sharp edges, which need more bitrate than you might expect. As a rough starting point, many people find 8 to 12 Mbps sharp for 1080p at 30 fps, and more for higher resolutions or 60 fps. Equally important: avoid re-encoding the same video several times, because each pass loses detail. Edit everything in one tool and export once.</p>
+<table>
+<thead><tr><th>Symptom</th><th>Likely cause</th><th>Fix</th></tr></thead>
+<tbody>
+<tr><td>Soft text everywhere</td><td>Small capture scaled up</td><td>Larger window or high-DPI display, export at source size</td></tr>
+<tr><td>Text smears during scrolling</td><td>Bitrate too low for motion</td><td>Higher bitrate preset, scroll less</td></tr>
+<tr><td>Blurry only when zoomed</td><td>Zoom too strong for source</td><td>Reduce zoom to 1.5x to 2x</td></tr>
+<tr><td>Black bars around content</td><td>Aspect ratio mismatch</td><td>Crop, or export in the matching ratio</td></tr>
+<tr><td>Fine after export, bad after upload</td><td>Platform re-compression</td><td>Upload the highest quality version the platform allows</td></tr>
+</tbody>
+</table>
+<p>If your file ends up too large for where it is going, see <a href="/blog/reduce-screen-recording-file-size">how to reduce screen recording file size</a> for ways to shrink it without wrecking quality.</p>
+
+<h2>How Click &amp; Record helps with crisp output</h2>
+<p><a href="/">Click &amp; Record</a> is a free Chrome extension that records a tab, a window or a full screen and opens the result in an editor built around these tips. Automatic click zooms are adjustable, so you can soften any that push the source too far. The editor has crop and letterbox detection to remove black bars, plus backgrounds, padding and frames.</p>
+<p>On export you choose MP4 (H.264 + AAC) or WebM (VP9 + Opus), a quality preset and an aspect ratio, and the dialog shows resolution, bitrate and estimated file size before you commit, so you can see the trade-off instead of guessing. Recording, editing and export all run locally, so there is no upload round trip that re-compresses your video. Unsure which format to pick? Read <a href="/blog/mp4-vs-webm-screen-recording">MP4 vs WebM for screen recordings</a>.</p>
+<p>Already have a recording from another tool? <a href="/editor/editor.html">The free browser editor</a> opens any video file for cropping, zooms and export without installing anything.</p>
+
+<h2>Quick checklist</h2>
+<ul>
+<li>High-DPI display, page zoom at 100%, larger fonts</li>
+<li>Window 1280 to 1600 px wide, same size every take</li>
+<li>Tab or window source rather than a huge full screen</li>
+<li>Slow, direct cursor movement and minimal scrolling</li>
+<li>Zooms at 1.5x to 2x</li>
+<li>Export once, at source resolution, with a generous bitrate</li>
+</ul>
+<p>Good screen recording quality comes mostly from setup, not software. Get the pixels right before you press record, protect them during editing, and you will spend far less time fighting blurry text.</p>

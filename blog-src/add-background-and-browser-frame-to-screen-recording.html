@@ -1,0 +1,79 @@
+<!--meta
+{
+  "slug": "add-background-and-browser-frame-to-screen-recording",
+  "title": "Add a Background and Browser Frame to a Screen Recording",
+  "h1": "How to add a background and browser frame to a screen recording",
+  "description": "Add a screen recording background and a mock browser frame to make plain captures look polished. Padding, corner radius, shadow and URL tips, free.",
+  "keyword": "screen recording background",
+  "category": "Subtitles & editing",
+  "faq": [
+    {"q": "Can I add a background to a screen recording after recording it?", "a": "Yes. In the Click & Record editor, backgrounds, padding, corner radius, shadow and browser frames are editing settings, not part of the original capture, so you can add or change them on any recording, including files from other recorders opened in the free browser editor."},
+    {"q": "What is a mock browser frame?", "a": "It is a drawn browser window, with tabs, buttons and an address bar, placed around your recording. It makes a tab recording look like a clean browser window without your real toolbar, bookmarks or extensions."},
+    {"q": "Can I change the URL shown in the browser frame?", "a": "Yes. The URL bar in Click & Record's mock frame is editable, so you can show a clean marketing URL, a shortened path, or hide a staging or internal address."},
+    {"q": "Will a background work for vertical video?", "a": "Yes. Choose 9:16, 1:1 or 4:5 on export and the background fills the extra space around the recording, which is often better than cropping the interface."}
+  ],
+  "related": ["landing-page-hero-video", "vertical-screen-recording-reels-shorts-tiktok", "hide-sensitive-information-in-screen-recordings"]
+}
+-->
+<p>To add a background and browser frame to a screen recording, open it in an editor that supports padding around the video, pick a gradient or image as the screen recording background, then wrap the capture in a mock browser window and set corner radius and shadow. It takes about a minute and turns a raw capture into something that looks at home on a landing page, in a launch post or a slide.</p>
+<p>Below are the design choices that matter, the settings that work well, and how to do it for free in the browser.</p>
+
+<h2>Why a plain capture looks unfinished</h2>
+<p>A raw screen recording runs edge to edge. It shows your real browser chrome, your bookmarks bar, your extension icons and whatever happened to be in the tab strip. On a web page or in a social feed, it blends into the surrounding content with no clear edge.</p>
+<p>Adding a frame and background fixes several things at once:</p>
+<ul>
+<li><strong>Separation.</strong> Padding and a shadow lift the product off the page so it reads as a distinct object.</li>
+<li><strong>Consistency.</strong> Every video in a series gets the same look, even if recorded on different machines.</li>
+<li><strong>Clean chrome.</strong> A mock browser frame replaces your personal toolbar with a neutral one.</li>
+<li><strong>Brand fit.</strong> A background in your brand colors ties the video to the rest of your site.</li>
+</ul>
+
+<h2>The building blocks of a polished frame</h2>
+<table>
+<thead><tr><th>Setting</th><th>What it does</th><th>A sensible starting point</th></tr></thead>
+<tbody>
+<tr><td>Background</td><td>Fills the canvas behind the recording</td><td>A soft two-color gradient, or a subtle brand image</td></tr>
+<tr><td>Inset / padding</td><td>Space between the recording and the canvas edge</td><td>Enough that the background reads as a border, not a sliver</td></tr>
+<tr><td>Corner radius</td><td>Rounds the recording's corners</td><td>Small to medium; large radii look toy-like on dense UIs</td></tr>
+<tr><td>Shadow</td><td>Adds depth under the recording</td><td>Soft and diffuse rather than hard and dark</td></tr>
+<tr><td>Browser frame</td><td>Draws a mock window around the capture</td><td>macOS or Windows style to match your audience</td></tr>
+<tr><td>Aspect ratio</td><td>Sets the output canvas shape</td><td>16:9 for sites and YouTube; 9:16, 1:1 or 4:5 for social</td></tr>
+</tbody>
+</table>
+
+<h2>Choosing a screen recording background</h2>
+<p>The background should support the product, not compete with it. A few guidelines:</p>
+<ul>
+<li><strong>Low detail wins.</strong> Gradients and soft textures work. Busy photos pull attention away from the interface.</li>
+<li><strong>Contrast with the UI.</strong> A light app looks crisp on a mid-tone or dark background; a dark-mode app pops on a lighter or saturated one.</li>
+<li><strong>Use brand colors sparingly.</strong> A gradient between two brand-adjacent tones usually looks better than a flat primary color.</li>
+<li><strong>Match the destination.</strong> If the video will sit on a landing page, sample the page's colors so it feels native. See <a href="/blog/landing-page-hero-video">landing page hero video</a> tips for more.</li>
+</ul>
+
+<h2>Using a mock browser frame (and editing the URL)</h2>
+<p>If you recorded a single browser tab, the video contains only the page content. A mock browser frame adds the familiar window around it, which tells viewers "this is a website" at a glance. It also hides everything personal about your real browser.</p>
+<p>The address bar is the detail people forget. Your real URL might show a staging subdomain, a localhost port, a long query string or an internal path. In Click &amp; Record's frame, the URL bar is editable, so you can:</p>
+<ul>
+<li>Show your public domain instead of <code>staging.</code> or <code>localhost:3000</code></li>
+<li>Shorten a long path to something readable like <code>app.example.com/reports</code></li>
+<li>Remove tracking parameters or IDs</li>
+<li>Leave it blank if the URL does not matter</li>
+</ul>
+<p>Pick the macOS or Windows frame style based on your audience. If you sell mostly to one platform's users, match it; otherwise either works.</p>
+
+<h2>How to add a background and frame step by step</h2>
+<p>These steps use <a href="/">Click &amp; Record</a>, a free Chrome extension whose editor opens after every recording. If you already have a video from another recorder, open it in <a href="/editor/editor.html">the free browser editor</a> instead; backgrounds and frames work the same way there, with no upload.</p>
+<ol>
+<li><strong>Crop first if needed.</strong> If the recording includes your real browser toolbar or black letterbox bars, crop to just the page content. The editor can detect letterboxing for you.</li>
+<li><strong>Choose a background.</strong> Pick a gradient or load your own image.</li>
+<li><strong>Set the inset.</strong> Increase padding until the background frames the recording evenly.</li>
+<li><strong>Round the corners and add shadow.</strong> Adjust corner radius and shadow until the recording looks like it sits above the background.</li>
+<li><strong>Add the browser frame.</strong> Choose macOS or Windows style and edit the URL bar text.</li>
+<li><strong>Pick the aspect ratio.</strong> 16:9 for most uses; 9:16, 1:1 or 4:5 for social feeds. The background fills the extra canvas.</li>
+<li><strong>Export.</strong> MP4 for broad compatibility or WebM for the web. The dialog shows resolution and estimated file size before you render.</li>
+</ol>
+
+<h2>Frames, zooms and vertical formats</h2>
+<p>Backgrounds and frames combine with the editor's click zooms, so you keep the polished framing and still guide the eye to each action. Preview a few zooms before exporting to check the result suits your layout. If you plan to post vertically, a background is often better than cropping: the full interface stays visible in the middle of a 9:16 canvas, with room above and below for captions. Our guide to <a href="/blog/vertical-screen-recording-reels-shorts-tiktok">vertical screen recordings for Reels, Shorts and TikTok</a> covers that format in depth.</p>
+<p>One caution: a frame is cosmetic. Editing the URL bar hides the address, but it does not hide anything inside the page. If customer data or secrets appear in the content itself, read <a href="/blog/hide-sensitive-information-in-screen-recordings">how to hide sensitive information in screen recordings</a> before you publish.</p>
+<p>A good screen recording background and a clean browser frame are among the cheapest upgrades you can make to a demo. Click &amp; Record applies them in the same editor where you trim, zoom and caption, free and without a watermark.</p>

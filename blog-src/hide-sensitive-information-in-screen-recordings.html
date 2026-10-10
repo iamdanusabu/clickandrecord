@@ -1,0 +1,91 @@
+<!--meta
+{
+  "slug": "hide-sensitive-information-in-screen-recordings",
+  "title": "How to Hide Sensitive Information in Screen Recordings",
+  "h1": "How to hide sensitive information in screen recordings",
+  "description": "Hide sensitive information in screen recordings by preparing a clean setup, recording one tab, then cropping, cutting and masking the URL before you share.",
+  "keyword": "hide sensitive information in screen recordings",
+  "category": "Subtitles & editing",
+  "faq": [
+    {"q": "Can Click & Record blur parts of a video?", "a": "No. Click & Record does not have a blur or redaction tool. You can crop, trim, split and delete sections, hide the webcam, and change the URL shown in the mock browser frame, but blurring a region requires a separate video editor."},
+    {"q": "What is the safest way to avoid leaking data in a screen recording?", "a": "Prevent it from appearing in the first place. Use a demo account with fake data, record a single tab, close unrelated tabs and turn on Do Not Disturb before you start."},
+    {"q": "Is blurring enough to hide passwords or API keys?", "a": "Treat a leaked secret as compromised. Light blur or pixelation on short text can sometimes be reversed, so use a solid box if you must mask, and rotate any key or password that appeared on screen."},
+    {"q": "Does recording a single tab protect other windows?", "a": "Yes. A tab recording captures only that tab's content, so other tabs, desktop apps and system notifications stay out of the video. Notifications rendered inside the page itself are still captured."}
+  ],
+  "related": ["private-screen-recorder-no-upload", "how-to-record-a-chrome-tab", "add-background-and-browser-frame-to-screen-recording"]
+}
+-->
+<p>The most reliable way to hide sensitive information in screen recordings is to keep it off screen in the first place: use a demo account, record a single tab, and silence notifications. After recording, crop out sensitive areas, cut sections where something leaked, and replace the visible URL. Blurring a specific region is a last resort and usually needs a dedicated video editor.</p>
+<p>This guide goes through each layer of protection in order, from preparation to final review, and is honest about what each one can and cannot do.</p>
+
+<h2>What typically leaks in a screen recording</h2>
+<p>Most leaks are not dramatic. They are small things in the corner of the frame that nobody notices until the video is public:</p>
+<ul>
+<li>Customer names, emails and order numbers in tables</li>
+<li>API keys, tokens or session IDs in URLs, terminals or DevTools</li>
+<li>Notification previews from chat or email apps</li>
+<li>Other tabs, bookmarks and browser profile names</li>
+<li>Internal hostnames such as staging or admin subdomains</li>
+<li>Autofill suggestions that reveal your email or address</li>
+<li>Revenue figures, roadmap items or calendar entries</li>
+</ul>
+
+<h2>Prepare first: the best way to hide sensitive information in screen recordings</h2>
+<p>Preparation beats editing every time. Nothing can leak if it was never captured, and you avoid trusting a blur to hold up.</p>
+<h3>Use a demo environment</h3>
+<p>Record in a demo or sandbox account seeded with realistic fake data. Names like "Acme Corp" and "jane@example.com" make the video look real without exposing anyone. If you must use production, filter tables to records you created for the purpose.</p>
+<h3>Clean up the browser</h3>
+<ul>
+<li>Close every tab you do not need.</li>
+<li>Hide the bookmarks bar, or use a separate browser profile just for recording.</li>
+<li>Clear or disable autofill suggestions for the fields you will type into.</li>
+<li>Sign out of personal accounts in that profile.</li>
+</ul>
+<h3>Silence the system</h3>
+<p>Turn on Do Not Disturb or Focus mode in your operating system, and quit chat apps. A single message preview can reveal more than the whole demo.</p>
+<h3>Handle secrets deliberately</h3>
+<p>Never paste a real API key or password on camera. Use a throwaway key that you revoke right after recording, or a placeholder value.</p>
+
+<h2>Record only what you need</h2>
+<p>What you choose to capture matters as much as what is on screen.</p>
+<table>
+<thead><tr><th>Source</th><th>What it captures</th><th>Leak risk</th></tr></thead>
+<tbody>
+<tr><td>Single browser tab</td><td>Only the page content of that tab</td><td>Lowest: no other tabs, apps or OS notifications</td></tr>
+<tr><td>Application window</td><td>One app's window</td><td>Medium: anything inside that app, including its sidebars</td></tr>
+<tr><td>Entire display</td><td>Everything on the screen</td><td>Highest: notifications, taskbar, other windows</td></tr>
+</tbody>
+</table>
+<p>For browser demos, recording one tab is the strongest default. Our guide to <a href="/blog/how-to-record-a-chrome-tab">recording a Chrome tab</a> walks through it. If you use a webcam, remember the camera can show your room too; in <a href="/">Click &amp; Record</a> the webcam is a separate track, so you can hide it after recording if something in the background should not be there.</p>
+<p>Use pause as you go. If you need to open something sensitive mid-demo, pause the recording, do it, navigate back to a safe screen, and resume.</p>
+
+<h2>Remove sensitive information after recording</h2>
+<p>If something did slip into the take, these edits handle most cases. Click &amp; Record's editor, also available as <a href="/editor/editor.html">the free browser editor</a> for any video file, supports all of them locally without uploading the footage.</p>
+<h3>Crop the frame</h3>
+<p>If the sensitive content sits in a fixed area, like a sidebar with account names or a status bar at the bottom, crop it out for the whole video. Cropping removes those pixels from the export entirely.</p>
+<h3>Cut the section</h3>
+<p>If a notification popped up or you briefly opened the wrong record, split the timeline before and after that moment and delete the clip. A short jump cut is far better than a leak. See <a href="/blog/trim-and-split-video-in-browser">how to trim and split video in the browser</a>.</p>
+<h3>Replace the visible URL</h3>
+<p>URLs often contain internal hostnames, IDs or tokens. Add the mock browser frame and edit its URL bar to show a clean public address instead. This only covers the address bar, so pair it with a tab recording or a crop that removes your real browser toolbar. More on frames in <a href="/blog/add-background-and-browser-frame-to-screen-recording">adding a background and browser frame</a>.</p>
+<h3>Check subtitles and audio too</h3>
+<p>If you generated captions, read them. A name you said out loud ends up in the subtitle file as text. Edit or delete the cue, and cut the audio section if needed.</p>
+
+<h2>When you need to blur: use another tool</h2>
+<p>To be clear: Click &amp; Record does not include a blur, pixelate or redaction tool. If sensitive content appears in the middle of the frame and moves around, and you cannot crop or cut it, you will need a video editor that supports masking or blur, applied after you export.</p>
+<p>If you go that route:</p>
+<ul>
+<li><strong>Prefer solid boxes over blur</strong> for text such as keys, emails and account numbers. Weak blur on short text can be easier to reverse than people expect.</li>
+<li><strong>Track the content.</strong> If the page scrolls, the mask must follow it in every frame.</li>
+<li><strong>Rotate exposed secrets anyway.</strong> Treat any credential that appeared on screen as compromised.</li>
+</ul>
+<p>Honestly, most of the time it is quicker to re-record with a demo account than to mask a moving region.</p>
+
+<h2>A final review checklist</h2>
+<ol>
+<li>Watch the full export at normal speed, then scrub through frame by frame around any risky moments.</li>
+<li>Pause on every table, form and URL and read it.</li>
+<li>Check the corners: status bars, avatars, tab titles.</li>
+<li>Read the subtitle file if you are publishing one.</li>
+<li>Have a colleague watch it with fresh eyes before it goes public.</li>
+</ol>
+<p>Keeping the workflow local also helps: a recorder that never uploads means rough takes with mistakes in them do not sit on someone else's server. Read more in <a href="/blog/private-screen-recorder-no-upload">private screen recording with no upload</a>. Click &amp; Record gives you tab recording, cropping, cutting and an editable URL bar in one free tool; for blur, pair it with an editor that has masking.</p>

@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<title>Zoom-on-Click Screen Recorder for Chrome: Setup Guide</title>
+<meta name="description" content="Set up a free zoom on click screen recorder in Chrome, record a take that zooms well, and fine-tune each zoom afterwards. Step-by-step, no account needed." />
+<link rel="canonical" href="https://clickandrecord.tech/blog/zoom-on-click-screen-recorder-chrome" />
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+<meta name="theme-color" content="#ffffff" />
+<meta name="color-scheme" content="light dark" />
+
+<meta property="og:type" content="article" />
+<meta property="og:site_name" content="Click &amp; Record" />
+<meta property="og:url" content="https://clickandrecord.tech/blog/zoom-on-click-screen-recorder-chrome" />
+<meta property="og:title" content="Zoom-on-Click Screen Recorder for Chrome: Setup Guide" />
+<meta property="og:description" content="Set up a free zoom on click screen recorder in Chrome, record a take that zooms well, and fine-tune each zoom afterwards. Step-by-step, no account needed." />
+<meta property="og:image" content="https://clickandrecord.tech/og-image.png" />
+<meta property="og:image:alt" content="Click &amp; Record" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Zoom-on-Click Screen Recorder for Chrome: Setup Guide" />
+<meta name="twitter:description" content="Set up a free zoom on click screen recorder in Chrome, record a take that zooms well, and fine-tune each zoom afterwards. Step-by-step, no account needed." />
+<meta name="twitter:image" content="https://clickandrecord.tech/og-image.png" />
+
+<link rel="icon" href="/favicon.png" type="image/png" sizes="128x128" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<link rel="preload" href="/fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="stylesheet" href="/blog/blog.css" />
+<script src="/analytics.js" defer></script>
+
+<script>
+(function(){try{var t=localStorage.getItem('cr-theme');
+if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "BlogPosting",
+      "@id": "https://clickandrecord.tech/blog/zoom-on-click-screen-recorder-chrome#article",
+      "headline": "How to use a zoom-on-click screen recorder in Chrome",
+      "name": "Zoom-on-Click Screen Recorder for Chrome: Setup Guide",
+      "description": "Set up a free zoom on click screen recorder in Chrome, record a take that zooms well, and fine-tune each zoom afterwards. Step-by-step, no account needed.",
+      "url": "https://clickandrecord.tech/blog/zoom-on-click-screen-recorder-chrome",
+      "mainEntityOfPage": "https://clickandrecord.tech/blog/zoom-on-click-screen-recorder-chrome",
+      "datePublished": "2026-10-10",
+      "dateModified": "2026-10-10",
+      "inLanguage": "en",
+      "articleSection": "Recording techniques",
+      "keywords": "zoom on click screen recorder",
+      "wordCount": 977,
+      "image": "https://clickandrecord.tech/og-image.png",
+      "author": {
+        "@type": "Organization",
+        "name": "Click & Record",
+        "url": "https://clickandrecord.tech/"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "Click & Record",
+        "url": "https://clickandrecord.tech/",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://clickandrecord.tech/apple-touch-icon.png"
+        }
+      },
+      "about": {
+        "@type": "SoftwareApplication",
+        "name": "Click & Record",
+        "url": "https://clickandrecord.tech/"
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://clickandrecord.tech/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Blog",
+          "item": "https://clickandrecord.tech/blog"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "How to use a zoom-on-click screen recorder in Chrome",
+          "item": "https://clickandrecord.tech/blog/zoom-on-click-screen-recorder-chrome"
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Does zoom on click work when I record my whole screen?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes, for clicks inside web pages in Chrome. An extension cannot see clicks in other desktop apps, so those moments need a manual zoom added in the editor."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Will the zoom capture what I type?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. Click & Record only records the timing of typing bursts so it can hold the zoom while you type. The actual keys are never recorded."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I record without any zoom?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Zooms are added after recording, so you can delete all of them and export the plain, full-frame video."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Which browsers does it work in?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Click & Record runs in Chrome, Edge and Brave on Chromium 116 or newer. It does not run in Firefox or Safari."
+          }
+        }
+      ]
+    }
+  ]
+}
+</script>
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+<header class="mast">
+  <div class="shell">
+    <a class="wordmark" href="/"><span class="dotrec" aria-hidden="true"></span> Click&nbsp;&amp;&nbsp;Record</a>
+    <nav aria-label="Primary">
+      <a href="/#zoom">Zoom</a>
+      <a href="/#subtitles">Subtitles</a>
+      <a href="/#evidence">Evidence</a>
+      <a href="/blog">Blog</a>
+      <a href="/editor/editor.html">Editor</a>
+      <button class="themer" id="themer" type="button" aria-pressed="false"
+              aria-label="Switch to dark theme" title="Switch theme">
+        <svg class="ico-sun" viewBox="0 0 20 20" width="16" height="16" fill="none" aria-hidden="true">
+          <circle cx="10" cy="10" r="3.6" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M10 1.8v2.1M10 16.1v2.1M18.2 10h-2.1M3.9 10H1.8M15.8 4.2l-1.5 1.5M5.7 14.3l-1.5 1.5M15.8 15.8l-1.5-1.5M5.7 5.7L4.2 4.2"
+                stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <svg class="ico-moon" viewBox="0 0 20 20" width="16" height="16" fill="none" aria-hidden="true">
+          <path d="M16.5 12.4A7 7 0 017.6 3.5a7 7 0 108.9 8.9z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <a class="btn btn-solid" href="https://chromewebstore.google.com/detail/lfpnagkdegnjjghefcbpeoblgoaklnnn" target="_blank" rel="noopener" data-cta="chrome-store">Add to Chrome</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <div class="shell post-head">
+    <nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a> <span aria-hidden="true">/</span> <a href="/blog">Blog</a> <span aria-hidden="true">/</span> <span>Recording techniques</span></nav>
+    <p class="tc" data-mark="rec">Recording techniques · 4 min read</p>
+    <h1>How to use a zoom-on-click screen recorder in Chrome</h1>
+    <p class="updated">Published <time datetime="2026-10-10">October 10, 2026</time> · Click &amp; Record team</p>
+    <nav class="toc" aria-label="On this page">
+      <a href="#s1-before-you-start-requirements">Before you start: requirements</a>
+      <a href="#s2-set-up-a-zoom-on-click-screen-recorder-in-chrome">Set up a zoom on click screen recorder in Chrome</a>
+      <a href="#s3-how-the-click-zoom-behaves">How the click zoom behaves</a>
+      <a href="#s4-recording-technique-for-clean-zooms">Recording technique for clean zooms</a>
+      <a href="#s5-fine-tune-zooms-in-the-editor">Fine-tune zooms in the editor</a>
+      <a href="#s6-export-settings-that-suit-zoomed-video">Export settings that suit zoomed video</a>
+      <a href="#s7-where-zoom-on-click-fits-best">Where zoom on click fits best</a>
+    </nav>
+  </div>
+
+  <div class="shell">
+    <article class="post">
+<p>A zoom on click screen recorder for Chrome is a browser extension that records your screen and automatically zooms the video toward each click. With <a href="/">Click &amp; Record</a>, you install the extension, pick a tab, window or screen, record normally, and the editor opens with a zoom already placed on every click, each one adjustable or removable. It is free, needs no account, and adds no watermark.</p>
+<p>This is the hands-on guide: setup, how to perform a take so the zooms land well, and how to tune them afterwards.</p>
+
+<h2 id="s1-before-you-start-requirements">Before you start: requirements</h2>
+<ul>
+<li><strong>Browser:</strong> Chrome, Edge or Brave, version 116 or newer (check at <code>chrome://settings/help</code>).</li>
+<li><strong>What gets zoomed:</strong> clicks inside web pages. You can record any window or your whole display, but clicks in non-browser apps produce no automatic zoom.</li>
+<li><strong>Optional:</strong> a microphone for narration and a webcam for a face bubble.</li>
+</ul>
+
+<h2 id="s2-set-up-a-zoom-on-click-screen-recorder-in-chrome">Set up a zoom on click screen recorder in Chrome</h2>
+<ol>
+<li><strong>Install the extension</strong> from the <a href="https://chromewebstore.google.com/detail/lfpnagkdegnjjghefcbpeoblgoaklnnn" target="_blank" rel="noopener">Chrome Web Store</a> and pin it to the toolbar so the icon is always one click away.</li>
+<li><strong>Open the page you want to demo.</strong> Log in, close stray tabs and dismiss cookie banners now, not mid-take.</li>
+<li><strong>Click the toolbar icon</strong> and choose the source: this tab, a window or a whole screen. For browser-only demos, a tab gives the cleanest result; see <a href="/blog/how-to-record-a-chrome-tab">how to record a Chrome tab</a>.</li>
+<li><strong>Turn on mic or webcam</strong> if you want them. The webcam is stored as its own track, so you can restyle or hide it later.</li>
+<li><strong>Start recording.</strong> A 3-2-1 count-in runs first and is not included in the file.</li>
+<li><strong>Stop</strong> from the toolbar icon or with <code>Alt+Shift+S</code>. The editor opens with zooms already generated.</li>
+</ol>
+
+<h2 id="s3-how-the-click-zoom-behaves">How the click zoom behaves</h2>
+<p>Knowing the rules helps you record a take that needs little cleanup.</p>
+<table>
+<thead><tr><th>What you do</th><th>What the zoom does</th></tr></thead>
+<tbody>
+<tr><td>Single click</td><td>Eases in toward the click point, holds, eases out.</td></tr>
+<tr><td>Several clicks in quick succession</td><td>Clicks inside an in-flight zoom are skipped, so bursts do not stack into a jittery mess.</td></tr>
+<tr><td>Two clicks close together in time</td><td>The zooms link, and the camera pans from one point to the next while staying zoomed in.</td></tr>
+<tr><td>Click a field, then type</td><td>The zoom holds for the whole typing burst. Only timing is recorded, never the characters.</td></tr>
+<tr><td>Click in a desktop app (not a web page)</td><td>No automatic zoom. Add a manual zoom in the editor if needed.</td></tr>
+</tbody>
+</table>
+<p>Because the zooms are generated after you stop, recording itself is unaffected: the raw file is a normal full-frame capture, and the zooms are keyframes on top. For the concept in more depth, read <a href="/blog/what-is-an-auto-zoom-screen-recorder">what an auto-zoom screen recorder is</a>.</p>
+
+<h2 id="s4-recording-technique-for-clean-zooms">Recording technique for clean zooms</h2>
+<p>Zoom on click rewards a calm, intentional take. A few habits make a big difference.</p>
+<h3>Click with purpose</h3>
+<p>Every click is a candidate zoom. Avoid clicking empty space to "focus" a window or out of habit while you talk. If you need to focus a page, do it before you start recording.</p>
+<h3>Let each zoom land</h3>
+<p>After an important click, pause about a second before the next action. That gives the zoom time to ease in and the viewer time to see what changed.</p>
+<h3>Move the mouse less</h3>
+<p>Big sweeping cursor movements between clicks look busy when the frame is zoomed. Move directly to the next target.</p>
+<h3>Size the window sensibly</h3>
+<p>A 1280 to 1600 pixel wide browser window keeps UI elements large enough to stay sharp when zoomed, while still looking like a real desktop. Very large windows make text small; very small ones look cramped.</p>
+<h3>Use pause instead of retakes</h3>
+<p>If you need to look something up or wait for a slow process, pause the recording and resume when ready. If the browser crashes mid-take, the recording is written to disk continuously and the popup offers to recover it.</p>
+
+<h2 id="s5-fine-tune-zooms-in-the-editor">Fine-tune zooms in the editor</h2>
+<p>The generated zooms are a first draft. Spend a few minutes on one review pass:</p>
+<ul>
+<li><strong>Delete</strong> zooms on incidental clicks such as closing a tooltip or clicking into the address bar.</li>
+<li><strong>Retime</strong> a zoom that arrives late or leaves while the viewer is still reading.</li>
+<li><strong>Re-aim</strong> a zoom so it centers on the result, not the button, when the result is what matters.</li>
+<li><strong>Strengthen or weaken</strong> individual zooms: stronger for tiny icons, weaker for wide panels.</li>
+<li><strong>Add manual zooms</strong> for moments with no click, like a value updating or a notification appearing.</li>
+</ul>
+<p>Then trim the start and end, speed up slow sections (0.5x to 4x per clip), and optionally add a background, rounded corners and a browser frame. The mock frame has an editable URL bar, which is handy for hiding a staging URL.</p>
+
+<h2 id="s6-export-settings-that-suit-zoomed-video">Export settings that suit zoomed video</h2>
+<ul>
+<li><strong>Format:</strong> MP4 (H.264 + AAC) for maximum compatibility, or WebM (VP9 + Opus) for web embeds. See <a href="/blog/mp4-vs-webm-screen-recording">MP4 vs WebM for screen recordings</a>.</li>
+<li><strong>Aspect ratio:</strong> 16:9 for YouTube and docs, 9:16 for Shorts and Reels, 1:1 or 4:5 for feeds. Zooms matter even more in narrow frames.</li>
+<li><strong>Quality:</strong> the export dialog shows resolution, bitrate and estimated file size before you commit, so you can pick a preset that fits your upload limit.</li>
+</ul>
+<p>Everything, including export, runs locally in your browser. Nothing is uploaded unless you choose Save to Google Drive.</p>
+
+<h2 id="s7-where-zoom-on-click-fits-best">Where zoom on click fits best</h2>
+<p>Zoom on click shines for product demos, feature announcements, onboarding videos and tutorials, where each click is a step the viewer should follow. If you are planning a full demo, <a href="/blog/how-to-make-a-product-demo-video">how to make a product demo video</a> covers scripting and structure. For quick bug reports, you might delete the zooms and keep the full frame so developers see everything.</p>
+<p>Install the extension, record one short take of a real workflow, and review the zooms it produces. Most people find the first draft is close, and a two-minute cleanup gets it the rest of the way.</p>
+
+    <section class="post-faq" id="faq">
+      <h2>Frequently asked questions</h2>
+      <div class="faq">
+        <details open>
+          <summary>Does zoom on click work when I record my whole screen?</summary>
+          <div><p>Yes, for clicks inside web pages in Chrome. An extension cannot see clicks in other desktop apps, so those moments need a manual zoom added in the editor.</p></div>
+        </details>
+        <details>
+          <summary>Will the zoom capture what I type?</summary>
+          <div><p>No. Click &amp; Record only records the timing of typing bursts so it can hold the zoom while you type. The actual keys are never recorded.</p></div>
+        </details>
+        <details>
+          <summary>Can I record without any zoom?</summary>
+          <div><p>Yes. Zooms are added after recording, so you can delete all of them and export the plain, full-frame video.</p></div>
+        </details>
+        <details>
+          <summary>Which browsers does it work in?</summary>
+          <div><p>Click &amp; Record runs in Chrome, Edge and Brave on Chromium 116 or newer. It does not run in Firefox or Safari.</p></div>
+        </details>
+      </div>
+    </section>
+    </article>
+    <aside class="cta" aria-label="Try Click &amp; Record">
+  <p class="tc" data-mark="rec">Free · No account · Nothing uploaded</p>
+  <h2>Record it once. Get the zooms for free.</h2>
+  <p>Click &amp; Record is a free Chrome extension that turns every click into a smooth zoom, transcribes subtitles on your own machine, and can capture network and console logs alongside the video.</p>
+  <div class="actions">
+    <a class="btn btn-solid" href="https://chromewebstore.google.com/detail/lfpnagkdegnjjghefcbpeoblgoaklnnn" target="_blank" rel="noopener" data-cta="chrome-store"><span class="dotrec" aria-hidden="true"></span> Add to Chrome</a>
+    <a class="btn btn-line" href="/editor/editor.html" data-cta="open-editor">Try the editor in your browser</a>
+  </div>
+</aside>
+  </div>
+
+  <section class="related shell" aria-labelledby="related-h">
+    <h2 id="related-h">Keep reading</h2>
+    <div class="cards">
+      <a class="card" href="/blog/what-is-an-auto-zoom-screen-recorder">
+        <span class="tc" data-mark="rec">Recording techniques</span>
+        <h3>What is an auto-zoom screen recorder, and how does it work?</h3>
+        <p>An auto zoom screen recorder follows your clicks and zooms in on them for you. Learn how it works, when it helps, when it hurts, and what to look for.</p>
+        <span class="more">5 min read →</span>
+      </a>
+      <a class="card" href="/blog/how-to-record-a-chrome-tab">
+        <span class="tc" data-mark="rec">Recording techniques</span>
+        <h3>How to record a Chrome tab, step by step</h3>
+        <p>How to record a Chrome tab for free: pick the tab, handle audio, keep notifications and other windows out of the shot, and export a clean MP4 in minutes.</p>
+        <span class="more">4 min read →</span>
+      </a>
+      <a class="card" href="/blog/how-to-make-a-product-demo-video">
+        <span class="tc" data-mark="zoom">Product demos</span>
+        <h3>How to make a product demo video that people actually finish</h3>
+        <p>Learn how to make a product demo video step by step: pick one outcome, script it, prep a clean demo account, record in one take, then zoom, trim and export.</p>
+        <span class="more">5 min read →</span>
+      </a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="shell">
+    <div class="fcols">
+      <div>
+        <a class="wordmark" href="/"><span class="dotrec" aria-hidden="true"></span> Click&nbsp;&amp;&nbsp;Record</a>
+        <p style="margin-top:14px;max-width:32ch;color:var(--faint)">
+          The screen recorder that pushes in on every click — and can prove what the app was doing.
+        </p>
+      </div>
+      <div><h3>Product</h3><ul>
+        <li><a href="/#zoom">Automatic zoom</a></li>
+        <li><a href="/#subtitles">Subtitles</a></li>
+        <li><a href="/#evidence">Network &amp; console</a></li>
+        <li><a href="/editor/editor.html">Open the editor</a></li>
+      </ul></div>
+      <div><h3>Guides</h3><ul>
+        <li><a href="/blog/async-sales-demo-video">Async Sales Demo Video: Record Demos Prospects Watch</a></li>
+        <li><a href="/blog/changelog-release-notes-video">Release Notes Video: Turn Your Changelog Into Clips</a></li>
+        <li><a href="/blog/feature-announcement-video">Feature Announcement Video: A Simple 30-Second Formula</a></li>
+        <li><a href="/blog/how-to-make-a-product-demo-video">How to Make a Product Demo Video</a></li>
+      </ul></div>
+      <div><h3>More</h3><ul>
+        <li><a href="/blog">All articles</a></li>
+        <li><a href="/#faq">FAQ</a></li>
+        <li><a href="/privacy">Privacy</a></li>
+        <li><a href="/terms">Terms</a></li>
+      </ul></div>
+    </div>
+    <div class="rule">
+      <span>© 2026 Click &amp; Record</span>
+      <span>Built for people who make demos.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var root = document.documentElement;
+  var btn = document.getElementById('themer');
+  if (!btn) return;
+  function sync() {
+    var dark = root.getAttribute('data-theme') === 'dark';
+    btn.setAttribute('aria-pressed', String(dark));
+    btn.setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme');
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', dark ? '#0c0e13' : '#ffffff');
+  }
+  btn.addEventListener('click', function () {
+    var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('cr-theme', next); } catch (e) {}
+    sync();
+  });
+  sync();
+})();
+</script>
+
+</body>
+</html>

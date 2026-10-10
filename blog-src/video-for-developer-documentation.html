@@ -1,0 +1,106 @@
+<!--meta
+{
+  "slug": "video-for-developer-documentation",
+  "title": "Video for Developer Documentation: When and How",
+  "h1": "Video for developer documentation: when it helps and how to make it",
+  "description": "When to use video for developer documentation, how to record short clips that stay accurate, and how to embed them with captions and small file sizes.",
+  "keyword": "video for developer documentation",
+  "category": "Comparisons & use cases",
+  "faq": [
+    {"q": "Should developer docs use video or GIFs?", "a": "Short MP4 or WebM clips are usually a better choice than GIFs: they are typically much smaller for the same length, support captions and can be paused. Use a GIF only where your docs platform cannot embed video."},
+    {"q": "How long should a documentation video be?", "a": "Keep each clip focused on a single task, often well under a minute. Short clips are easier to re-record when the UI changes and do not force readers to scrub."},
+    {"q": "How do I add captions to a docs video?", "a": "Export a WebVTT file and reference it with a track element inside your video tag. Click & Record generates VTT captions locally in the browser, with no upload."},
+    {"q": "Can I hide localhost or staging URLs in docs recordings?", "a": "Yes. Click & Record's mock browser frame has an editable URL bar, so you can replace a local or staging address with your production domain or hide it."}
+  ],
+  "related": ["mp4-vs-webm-screen-recording", "reduce-screen-recording-file-size", "screen-recorder-that-captures-network-requests"]
+}
+-->
+<p>Video for developer documentation works best as short, silent-friendly clips that show one UI task or flow, embedded next to the written steps rather than replacing them. Text stays the source of truth for commands, code and reference; video earns its place when the reader needs to see where something is or what a sequence of screens looks like.</p>
+
+<p>This guide covers when to use video in docs, how to record clips that do not go stale, and how to embed them with captions and small file sizes.</p>
+
+<h2>When video helps in developer docs, and when it does not</h2>
+
+<p>Developers skim, search and copy. Video cannot be searched or copied, so use it deliberately.</p>
+
+<table>
+<thead>
+<tr><th>Good fit for video</th><th>Better as text</th></tr>
+</thead>
+<tbody>
+<tr><td>Finding a setting buried in a dashboard</td><td>CLI commands and code snippets</td></tr>
+<tr><td>Multi-screen flows like OAuth app setup</td><td>API reference and parameters</td></tr>
+<tr><td>Showing what "success" looks like</td><td>Configuration values and environment variables</td></tr>
+<tr><td>Drag-and-drop or visual editors</td><td>Error messages people will search for</td></tr>
+<tr><td>Quickstart overviews</td><td>Anything that changes every release</td></tr>
+</tbody>
+</table>
+
+<p>A useful rule: if a reader would need a screenshot for each of several steps, a 20-second clip is often clearer than five screenshots. If they need to copy something, it must also be in text.</p>
+
+<h2>Recording clips that stay accurate</h2>
+
+<p>The biggest cost of docs video is maintenance. A UI change can make a clip wrong overnight. Reduce that cost up front:</p>
+
+<ul>
+<li><strong>One task per clip.</strong> When the settings page changes, you re-record 15 seconds, not a 6-minute tour.</li>
+<li><strong>No narration by default.</strong> Silent clips with captions or nearby text are faster to redo and work for readers in open offices. Add voice for longer conceptual walkthroughs.</li>
+<li><strong>Consistent window size.</strong> Record every clip at the same browser size so they look like a set.</li>
+<li><strong>Clean test data.</strong> Use a sandbox account with obviously fake names and keys.</li>
+<li><strong>Record the tab, not the screen.</strong> Tab recordings keep notifications, other windows and your desktop out of shot. See <a href="/blog/how-to-record-a-chrome-tab">how to record a Chrome tab</a>.</li>
+</ul>
+
+<h2>Making video for developer documentation readable</h2>
+
+<p>Docs clips are usually embedded at a fraction of the page width, so small UI text becomes unreadable fast. Two fixes:</p>
+
+<ol>
+<li><strong>Zoom on the action.</strong> Click &amp; Record logs each click during recording and turns it into an editable zoom afterward, so the clip moves in on the button or field you used. Remove any zoom that distracts, and add manual ones where needed.</li>
+<li><strong>Crop to the relevant area.</strong> If the task only involves a sidebar, crop to it.</li>
+</ol>
+
+<p>Then frame it. A mock browser frame signals "this is the web dashboard," and its URL bar is editable, so <code>localhost:3000</code> or a staging host can become your real domain. Cut loading spinners, and speed up waits to 2x or more.</p>
+
+<h2>File size and format</h2>
+
+<p>Docs pages should stay fast. Some practical guidance:</p>
+
+<ul>
+<li><strong>Prefer video over GIF.</strong> An MP4 or WebM is usually far smaller than an equivalent GIF and supports pausing and captions.</li>
+<li><strong>Pick the format your platform handles.</strong> MP4 (H.264) plays almost everywhere. WebM (VP9) is well supported in modern browsers. The trade-offs are in <a href="/blog/mp4-vs-webm-screen-recording">MP4 vs WebM for screen recordings</a>.</li>
+<li><strong>Use a lower quality preset for short UI clips.</strong> Click &amp; Record's export dialog shows resolution, bitrate and estimated file size before you export, so you can check the cost first.</li>
+<li><strong>Trim hard.</strong> Every second you cut is bytes saved. More in <a href="/blog/reduce-screen-recording-file-size">reducing screen recording file size</a>.</li>
+</ul>
+
+<h2>Embedding video with captions</h2>
+
+<p>On a docs site you control, the HTML <code>video</code> element is the simplest embed. Add <code>controls</code> so readers can pause, <code>muted</code> and <code>playsinline</code> for silent clips, and <code>preload="metadata"</code> to avoid downloading the whole file up front. MDN's <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/video" rel="noopener">video element reference</a> lists every attribute.</p>
+
+<p>For captions, add a <code>track</code> element pointing to a WebVTT file; see MDN's <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/track" rel="noopener">track element reference</a>. Click &amp; Record transcribes speech locally with a built-in Whisper model, lets you edit cues or write your own for silent clips, and exports VTT or SRT.</p>
+
+<p>Some accessibility basics:</p>
+
+<ul>
+<li>Avoid autoplaying clips with sound.</li>
+<li>Keep the written steps next to the video, so the video is a supplement, not the only path.</li>
+<li>Describe what the clip shows in the surrounding text for readers who cannot watch.</li>
+</ul>
+
+<p>On GitHub, you can attach video to issues, pull requests and discussions; see GitHub Docs on <a href="https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/attaching-files" rel="noopener">attaching files</a> for current size limits.</p>
+
+<h2>Bonus: debugging docs from the same recording</h2>
+
+<p>If you write API or integration docs, the clip you record can also capture what happened under the hood. For tab recordings, Click &amp; Record can optionally log network requests and console output against the video timeline, export a HAR file and copy any request as cURL. That is useful for checking the exact request a UI step makes before you document it, or for filing a bug when a docs flow breaks. The guide to <a href="/blog/screen-recorder-that-captures-network-requests">screen recording with network requests</a> shows how.</p>
+
+<h2>A docs video checklist</h2>
+
+<ol>
+<li>The clip covers one task and the written steps sit next to it.</li>
+<li>Window size and frame match your other clips.</li>
+<li>No real keys, emails or internal URLs are visible.</li>
+<li>UI text is readable at the embedded width.</li>
+<li>Captions or a text description are present.</li>
+<li>File size is reasonable for a docs page.</li>
+</ol>
+
+<p><a href="/">Click &amp; Record</a> is free, needs no account and keeps everything on your machine, which suits docs teams recording internal tools. Already have clips from another recorder? <a href="/editor/editor.html">The free browser editor</a> can crop, trim, add zooms and captions, and re-export them without installing anything.</p>

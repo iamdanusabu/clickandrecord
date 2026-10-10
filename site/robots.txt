@@ -13,6 +13,8 @@ Allow: /
 # *into* the tool, not un-blocking this.
 Disallow: /editor/
 Disallow: /vendor/
+# Same-origin analytics relay (PostHog ingestion), not content.
+Disallow: /relay/
 
 # ── Answer engines and AI assistants ─────────────────────────────────────────
 # Named explicitly and allowed on purpose. These crawlers decide whether Click &

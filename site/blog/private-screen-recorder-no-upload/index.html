@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<title>Private Screen Recorder With No Upload: What to Look For</title>
+<meta name="description" content="A private screen recorder with no upload keeps video, audio and transcripts on your computer. Here is what to check before you trust one with your screen." />
+<link rel="canonical" href="https://clickandrecord.tech/blog/private-screen-recorder-no-upload" />
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+<meta name="theme-color" content="#ffffff" />
+<meta name="color-scheme" content="light dark" />
+
+<meta property="og:type" content="article" />
+<meta property="og:site_name" content="Click &amp; Record" />
+<meta property="og:url" content="https://clickandrecord.tech/blog/private-screen-recorder-no-upload" />
+<meta property="og:title" content="Private Screen Recorder With No Upload: What to Look For" />
+<meta property="og:description" content="A private screen recorder with no upload keeps video, audio and transcripts on your computer. Here is what to check before you trust one with your screen." />
+<meta property="og:image" content="https://clickandrecord.tech/og-image.png" />
+<meta property="og:image:alt" content="Click &amp; Record" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Private Screen Recorder With No Upload: What to Look For" />
+<meta name="twitter:description" content="A private screen recorder with no upload keeps video, audio and transcripts on your computer. Here is what to check before you trust one with your screen." />
+<meta name="twitter:image" content="https://clickandrecord.tech/og-image.png" />
+
+<link rel="icon" href="/favicon.png" type="image/png" sizes="128x128" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<link rel="preload" href="/fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="stylesheet" href="/blog/blog.css" />
+<script src="/analytics.js" defer></script>
+
+<script>
+(function(){try{var t=localStorage.getItem('cr-theme');
+if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "BlogPosting",
+      "@id": "https://clickandrecord.tech/blog/private-screen-recorder-no-upload#article",
+      "headline": "Private screen recorder with no upload: how to keep recordings on your machine",
+      "name": "Private Screen Recorder With No Upload: What to Look For",
+      "description": "A private screen recorder with no upload keeps video, audio and transcripts on your computer. Here is what to check before you trust one with your screen.",
+      "url": "https://clickandrecord.tech/blog/private-screen-recorder-no-upload",
+      "mainEntityOfPage": "https://clickandrecord.tech/blog/private-screen-recorder-no-upload",
+      "datePublished": "2026-10-10",
+      "dateModified": "2026-10-10",
+      "inLanguage": "en",
+      "articleSection": "Subtitles & editing",
+      "keywords": "private screen recorder",
+      "wordCount": 938,
+      "image": "https://clickandrecord.tech/og-image.png",
+      "author": {
+        "@type": "Organization",
+        "name": "Click & Record",
+        "url": "https://clickandrecord.tech/"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "Click & Record",
+        "url": "https://clickandrecord.tech/",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://clickandrecord.tech/apple-touch-icon.png"
+        }
+      },
+      "about": {
+        "@type": "SoftwareApplication",
+        "name": "Click & Record",
+        "url": "https://clickandrecord.tech/"
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://clickandrecord.tech/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Blog",
+          "item": "https://clickandrecord.tech/blog"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Private screen recorder with no upload: how to keep recordings on your machine",
+          "item": "https://clickandrecord.tech/blog/private-screen-recorder-no-upload"
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Do free screen recorders upload my videos?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Many do, because their business is hosting and sharing links. Others save locally. Check whether the tool requires an account, where the file goes when you stop, and what its privacy policy says about processing."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How can I tell if a Chrome extension uploads my recordings?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Read the privacy policy and permissions, then test: record with your network disconnected and see whether everything still works, or watch the Network panel of DevTools while recording and exporting."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Are automatic subtitles private?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Only if transcription runs on your device. Many caption tools send audio to a cloud API. Click & Record runs its Whisper model locally in the browser, so the audio never leaves your computer."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I still share a video recorded locally?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. You get a normal MP4 or WebM file, so you decide where it goes: email, your company drive, a ticket, or a video host. Click & Record also has an optional Save to Google Drive button that only runs when you click it."
+          }
+        }
+      ]
+    }
+  ]
+}
+</script>
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+<header class="mast">
+  <div class="shell">
+    <a class="wordmark" href="/"><span class="dotrec" aria-hidden="true"></span> Click&nbsp;&amp;&nbsp;Record</a>
+    <nav aria-label="Primary">
+      <a href="/#zoom">Zoom</a>
+      <a href="/#subtitles">Subtitles</a>
+      <a href="/#evidence">Evidence</a>
+      <a href="/blog">Blog</a>
+      <a href="/editor/editor.html">Editor</a>
+      <button class="themer" id="themer" type="button" aria-pressed="false"
+              aria-label="Switch to dark theme" title="Switch theme">
+        <svg class="ico-sun" viewBox="0 0 20 20" width="16" height="16" fill="none" aria-hidden="true">
+          <circle cx="10" cy="10" r="3.6" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M10 1.8v2.1M10 16.1v2.1M18.2 10h-2.1M3.9 10H1.8M15.8 4.2l-1.5 1.5M5.7 14.3l-1.5 1.5M15.8 15.8l-1.5-1.5M5.7 5.7L4.2 4.2"
+                stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <svg class="ico-moon" viewBox="0 0 20 20" width="16" height="16" fill="none" aria-hidden="true">
+          <path d="M16.5 12.4A7 7 0 017.6 3.5a7 7 0 108.9 8.9z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <a class="btn btn-solid" href="https://chromewebstore.google.com/detail/lfpnagkdegnjjghefcbpeoblgoaklnnn" target="_blank" rel="noopener" data-cta="chrome-store">Add to Chrome</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <div class="shell post-head">
+    <nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a> <span aria-hidden="true">/</span> <a href="/blog">Blog</a> <span aria-hidden="true">/</span> <span>Subtitles &amp; editing</span></nav>
+    <p class="tc" data-mark="cue">Subtitles &amp; editing · 4 min read</p>
+    <h1>Private screen recorder with no upload: how to keep recordings on your machine</h1>
+    <p class="updated">Published <time datetime="2026-10-10">October 10, 2026</time> · Click &amp; Record team</p>
+    <nav class="toc" aria-label="On this page">
+      <a href="#s1-why-upload-first-recorders-are-a-privacy-risk">Why upload-first recorders are a privacy risk</a>
+      <a href="#s2-what-makes-a-private-screen-recorder">What makes a private screen recorder</a>
+      <a href="#s3-how-to-verify-a-recorder-does-not-upload">How to verify a recorder does not upload</a>
+      <a href="#s4-a-private-screen-recording-workflow-with-click-r">A private screen recording workflow with Click &amp; Record</a>
+      <a href="#s5-privacy-starts-before-you-hit-record">Privacy starts before you hit record</a>
+      <a href="#s6-when-sharing-is-the-goal">When sharing is the goal</a>
+    </nav>
+  </div>
+
+  <div class="shell">
+    <article class="post">
+<p>A private screen recorder captures, edits and exports video entirely on your own computer, so nothing is uploaded unless you choose to share the file yourself. The things to check are where the recording is stored, whether editing and subtitles run locally, and whether the tool needs an account or tracks you.</p>
+<p>This guide explains why that matters, how to verify a recorder's claims, and how to set up a workflow where your recordings never touch someone else's server by default.</p>
+
+<h2 id="s1-why-upload-first-recorders-are-a-privacy-risk">Why upload-first recorders are a privacy risk</h2>
+<p>Many popular screen recorders are built around instant sharing: you stop recording and the video is already in the cloud, with a link on your clipboard. That is convenient, but it means every take, including the ones you would never share, ends up on a third-party server.</p>
+<p>Screen recordings are unusually sensitive because they capture whatever happened to be visible:</p>
+<ul>
+<li>Customer names, emails and order details in an admin panel</li>
+<li>Internal dashboards, revenue numbers and roadmaps</li>
+<li>Browser tabs, bookmarks and notification previews</li>
+<li>Tokens or keys in a URL, a terminal or a DevTools panel</li>
+<li>Your voice, and potentially your webcam</li>
+</ul>
+<p>Even when a vendor is trustworthy, uploading creates questions you then have to answer: who can access the file, how long it is retained, whether it is processed by sub-processors such as transcription APIs, and whether your company policy allows it at all.</p>
+
+<h2 id="s2-what-makes-a-private-screen-recorder">What makes a private screen recorder</h2>
+<p>"Private" gets used loosely. Use this checklist to judge a tool on what it actually does:</p>
+<table>
+<thead><tr><th>Check</th><th>Private behavior</th><th>Red flag</th></tr></thead>
+<tbody>
+<tr><td>Storage</td><td>Recording saved to local disk</td><td>Recording streamed to a server as you record</td></tr>
+<tr><td>Account</td><td>None needed</td><td>Sign-in required before you can record</td></tr>
+<tr><td>Editing</td><td>Editor runs on your device</td><td>Edits only possible in a web app after upload</td></tr>
+<tr><td>Subtitles</td><td>Speech model runs locally</td><td>Audio sent to a cloud transcription API</td></tr>
+<tr><td>Export</td><td>File rendered and saved locally</td><td>Download only from the vendor's site</td></tr>
+<tr><td>Tracking</td><td>No analytics, no cookies</td><td>Third-party analytics in the recorder UI</td></tr>
+<tr><td>Sharing</td><td>Opt-in, per file</td><td>Automatic public or team link</td></tr>
+</tbody>
+</table>
+<p>Subtitles deserve special attention. A recorder can save video locally and still upload your audio for captions. If transcription matters to you, read <a href="/blog/offline-video-transcription-in-browser">how offline video transcription works in the browser</a>.</p>
+
+<h2 id="s3-how-to-verify-a-recorder-does-not-upload">How to verify a recorder does not upload</h2>
+<p>Do not rely on marketing copy, including ours. You can check for yourself in a few minutes:</p>
+<ol>
+<li><strong>Read the privacy policy.</strong> Look for what is collected, where processing happens and which sub-processors are listed.</li>
+<li><strong>Review the extension's permissions</strong> on the Chrome Web Store listing and in <code>chrome://extensions</code>.</li>
+<li><strong>Go offline.</strong> Disconnect from the network, then record, edit, transcribe and export. A truly local tool keeps working.</li>
+<li><strong>Watch the network.</strong> Open DevTools on the recorder's editor page and watch the Network panel while you export. Chrome's <a href="https://developer.chrome.com/docs/devtools/network" target="_blank" rel="noopener">Network panel documentation</a> explains how.</li>
+<li><strong>Check where the file lands.</strong> You should end up with a normal video file in a folder you chose.</li>
+</ol>
+
+<h2 id="s4-a-private-screen-recording-workflow-with-click-r">A private screen recording workflow with Click &amp; Record</h2>
+<p><a href="/">Click &amp; Record</a> is a free Chrome extension designed to work this way. Recording, editing, transcription and export all run locally in the browser. Nothing is uploaded unless you click Save to Google Drive, which uses the limited <code>drive.file</code> scope. There is no account, no analytics and no cookies.</p>
+<p>A typical private workflow looks like this:</p>
+<ol>
+<li><strong>Record</strong> a tab, a window or your whole screen, with optional mic and webcam. The take is written to local disk continuously, which also means a browser crash does not lose it; the popup offers to recover it.</li>
+<li><strong>Edit</strong> in the built-in editor: trim, split, adjust automatic zooms, add a background or browser frame.</li>
+<li><strong>Caption</strong> with the bundled Whisper model, which runs in the browser via WebAssembly. No API key and no upload.</li>
+<li><strong>Export</strong> MP4 or WebM to your disk, and share it through whatever channel your team already trusts.</li>
+</ol>
+<p>If you already have a video file, <a href="/editor/editor.html">the free browser editor</a> gives you the same local editing and subtitles without installing anything.</p>
+
+<h3>Local does not mean fragile</h3>
+<p>A common worry about local-only tools is losing work. Because the recording is saved to disk as it happens rather than held only in memory, a crashed tab or browser does not take the take with it. Keep your exports in a folder that your normal backup already covers, and you have the same safety net as a cloud tool without the exposure.</p>
+
+<h2 id="s5-privacy-starts-before-you-hit-record">Privacy starts before you hit record</h2>
+<p>A local recorder protects the file. It cannot protect you from recording the wrong thing. Before sensitive takes:</p>
+<ul>
+<li>Use a demo account with fake data instead of real customer records.</li>
+<li>Record a single tab rather than your whole screen, so other windows stay out of frame.</li>
+<li>Turn on Do Not Disturb so message previews do not pop up.</li>
+<li>Close unrelated tabs and hide your bookmarks bar.</li>
+</ul>
+<p>Our guide to <a href="/blog/hide-sensitive-information-in-screen-recordings">hiding sensitive information in screen recordings</a> goes deeper, including what to do when something slips into a take.</p>
+
+<h2 id="s6-when-sharing-is-the-goal">When sharing is the goal</h2>
+<p>Local-first does not mean hard to share. You end up with a standard file, so you can attach it to a ticket, drop it in your company drive, or upload it to a host you have vetted. The difference is that sharing becomes a deliberate choice per video rather than the default for every take. If you also want to skip sign-ups entirely, see our guide to <a href="/blog/screen-recorder-no-account">screen recorders that need no account</a>.</p>
+<p>A private screen recorder gives you the convenience of modern tools, like auto-zoom, editing and subtitles, without handing your screen to anyone. Click &amp; Record keeps all of it on your machine.</p>
+
+    <section class="post-faq" id="faq">
+      <h2>Frequently asked questions</h2>
+      <div class="faq">
+        <details open>
+          <summary>Do free screen recorders upload my videos?</summary>
+          <div><p>Many do, because their business is hosting and sharing links. Others save locally. Check whether the tool requires an account, where the file goes when you stop, and what its privacy policy says about processing.</p></div>
+        </details>
+        <details>
+          <summary>How can I tell if a Chrome extension uploads my recordings?</summary>
+          <div><p>Read the privacy policy and permissions, then test: record with your network disconnected and see whether everything still works, or watch the Network panel of DevTools while recording and exporting.</p></div>
+        </details>
+        <details>
+          <summary>Are automatic subtitles private?</summary>
+          <div><p>Only if transcription runs on your device. Many caption tools send audio to a cloud API. Click &amp; Record runs its Whisper model locally in the browser, so the audio never leaves your computer.</p></div>
+        </details>
+        <details>
+          <summary>Can I still share a video recorded locally?</summary>
+          <div><p>Yes. You get a normal MP4 or WebM file, so you decide where it goes: email, your company drive, a ticket, or a video host. Click &amp; Record also has an optional Save to Google Drive button that only runs when you click it.</p></div>
+        </details>
+      </div>
+    </section>
+    </article>
+    <aside class="cta" aria-label="Try Click &amp; Record">
+  <p class="tc" data-mark="rec">Free · No account · Nothing uploaded</p>
+  <h2>Record it once. Get the zooms for free.</h2>
+  <p>Click &amp; Record is a free Chrome extension that turns every click into a smooth zoom, transcribes subtitles on your own machine, and can capture network and console logs alongside the video.</p>
+  <div class="actions">
+    <a class="btn btn-solid" href="https://chromewebstore.google.com/detail/lfpnagkdegnjjghefcbpeoblgoaklnnn" target="_blank" rel="noopener" data-cta="chrome-store"><span class="dotrec" aria-hidden="true"></span> Add to Chrome</a>
+    <a class="btn btn-line" href="/editor/editor.html" data-cta="open-editor">Try the editor in your browser</a>
+  </div>
+</aside>
+  </div>
+
+  <section class="related shell" aria-labelledby="related-h">
+    <h2 id="related-h">Keep reading</h2>
+    <div class="cards">
+      <a class="card" href="/blog/offline-video-transcription-in-browser">
+        <span class="tc" data-mark="cue">Subtitles &amp; editing</span>
+        <h3>Offline video transcription in the browser: how it works and when to use it</h3>
+        <p>Offline video transcription in the browser lets you turn speech into timed text with a local Whisper model. No upload, no API key, no per-minute fees.</p>
+        <span class="more">4 min read →</span>
+      </a>
+      <a class="card" href="/blog/hide-sensitive-information-in-screen-recordings">
+        <span class="tc" data-mark="cue">Subtitles &amp; editing</span>
+        <h3>How to hide sensitive information in screen recordings</h3>
+        <p>Hide sensitive information in screen recordings by preparing a clean setup, recording one tab, then cropping, cutting and masking the URL before you share.</p>
+        <span class="more">4 min read →</span>
+      </a>
+      <a class="card" href="/blog/screen-recorder-no-account">
+        <span class="tc" data-mark="rec">Recording techniques</span>
+        <h3>Screen recorder with no account: record, edit and share without signing up</h3>
+        <p>Want a screen recorder with no account or sign-up? Why many tools require login, what you give up without one, and how to share recordings without a cloud.</p>
+        <span class="more">4 min read →</span>
+      </a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="shell">
+    <div class="fcols">
+      <div>
+        <a class="wordmark" href="/"><span class="dotrec" aria-hidden="true"></span> Click&nbsp;&amp;&nbsp;Record</a>
+        <p style="margin-top:14px;max-width:32ch;color:var(--faint)">
+          The screen recorder that pushes in on every click — and can prove what the app was doing.
+        </p>
+      </div>
+      <div><h3>Product</h3><ul>
+        <li><a href="/#zoom">Automatic zoom</a></li>
+        <li><a href="/#subtitles">Subtitles</a></li>
+        <li><a href="/#evidence">Network &amp; console</a></li>
+        <li><a href="/editor/editor.html">Open the editor</a></li>
+      </ul></div>
+      <div><h3>Guides</h3><ul>
+        <li><a href="/blog/async-sales-demo-video">Async Sales Demo Video: Record Demos Prospects Watch</a></li>
+        <li><a href="/blog/changelog-release-notes-video">Release Notes Video: Turn Your Changelog Into Clips</a></li>
+        <li><a href="/blog/feature-announcement-video">Feature Announcement Video: A Simple 30-Second Formula</a></li>
+        <li><a href="/blog/how-to-make-a-product-demo-video">How to Make a Product Demo Video</a></li>
+      </ul></div>
+      <div><h3>More</h3><ul>
+        <li><a href="/blog">All articles</a></li>
+        <li><a href="/#faq">FAQ</a></li>
+        <li><a href="/privacy">Privacy</a></li>
+        <li><a href="/terms">Terms</a></li>
+      </ul></div>
+    </div>
+    <div class="rule">
+      <span>© 2026 Click &amp; Record</span>
+      <span>Built for people who make demos.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var root = document.documentElement;
+  var btn = document.getElementById('themer');
+  if (!btn) return;
+  function sync() {
+    var dark = root.getAttribute('data-theme') === 'dark';
+    btn.setAttribute('aria-pressed', String(dark));
+    btn.setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme');
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', dark ? '#0c0e13' : '#ffffff');
+  }
+  btn.addEventListener('click', function () {
+    var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('cr-theme', next); } catch (e) {}
+    sync();
+  });
+  sync();
+})();
+</script>
+
+</body>
+</html>

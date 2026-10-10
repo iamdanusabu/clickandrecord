@@ -1,0 +1,84 @@
+<!--meta
+{
+  "slug": "how-to-record-a-software-demo",
+  "title": "How to Record a Software Demo: Setup and Capture Guide",
+  "h1": "How to record a software demo: capture setup for web, desktop and dev tools",
+  "description": "How to record a software demo that looks sharp: pick tab, window or full screen, set resolution and fonts, handle multiple apps, and back up live demos.",
+  "keyword": "record a software demo",
+  "category": "Product demos",
+  "faq": [
+    {"q": "Should I record a software demo in a tab, a window or the full screen?", "a": "Record a tab when everything happens in one web page, a window when you demo a desktop app or a terminal, and the full screen only when you need to move between several apps."},
+    {"q": "What resolution should I record a software demo at?", "a": "Record at the resolution you plan to export, commonly 1920 by 1080 for 16:9. A smaller browser window with larger text often reads better than a huge 4K desktop."},
+    {"q": "How do I make code and terminal text readable in a demo?", "a": "Increase the editor or terminal font size well beyond what you normally use, choose a high-contrast theme, and add zooms on the lines that matter."},
+    {"q": "Should I pre-record a demo for a live presentation?", "a": "It is a good safety net. Keep a recorded version ready so that a network failure or a broken build does not end your talk or sales call."}
+  ],
+  "related": ["record-a-window-or-full-screen-in-chrome", "screen-recording-tips-for-crisp-video", "product-walkthrough-video"]
+}
+-->
+<p>To record a software demo well, pick the smallest capture area that shows everything (a tab, a single window, or the full screen), set the screen to the resolution you'll export at, enlarge fonts so text survives compression, and rehearse with the exact data you'll show. That technical setup matters more than which recorder you use. This guide focuses on capture: getting web apps, desktop apps, terminals and multi-app flows onto video cleanly.</p>
+
+<h2>Choose what to capture</h2>
+<p>The capture source decides how much clutter makes it into your video and how readable the result is. Here's how to choose:</p>
+<table>
+<thead><tr><th>Source</th><th>Best for</th><th>Watch out for</th></tr></thead>
+<tbody>
+<tr><td>Browser tab</td><td>Web apps and SaaS where the whole demo lives in one tab</td><td>Pop-ups that open in new tabs or windows won't be captured</td></tr>
+<tr><td>Application window</td><td>Desktop apps, IDEs, terminals, design tools</td><td>Dialogs that open as separate windows may be missed</td></tr>
+<tr><td>Full screen (display)</td><td>Demos that jump between a browser, a terminal and a desktop app</td><td>Notifications, dock, taskbar and other windows are all visible</td></tr>
+</tbody>
+</table>
+<p>A good default: use the narrowest option that still contains the whole story. For more on window and display capture in Chrome, see <a href="/blog/record-a-window-or-full-screen-in-chrome">how to record a window or full screen in Chrome</a>, and for tabs, <a href="/blog/how-to-record-a-chrome-tab">how to record a Chrome tab</a>.</p>
+
+<h2>Set resolution and scale before you record a software demo</h2>
+<p>Most demos are watched in a 16:9 player at 1080p or smaller, often on a laptop. If you record a 4K monitor at native size, the UI is tiny and the video gets scaled down until labels blur.</p>
+<ul>
+<li><strong>Match the export size.</strong> Resize the browser or app window to about 1920 by 1080 (or 1280 by 720 for a tighter look) before recording.</li>
+<li><strong>Zoom the UI.</strong> Browser zoom at 110 to 125 percent makes web apps much more readable without changing their layout much.</li>
+<li><strong>Enlarge code and terminal fonts.</strong> If you normally use 13px, try 18 to 22px for the demo. High-contrast themes survive video compression better than subtle ones.</li>
+<li><strong>Plan for vertical if you need it.</strong> If the same demo will be cut for phones, keep the important action near the center so a 9:16 crop still works.</li>
+</ul>
+
+<h2>Prepare the machine</h2>
+<p>Every demo setup checklist overlaps, but software demos have a few extra traps:</p>
+<ol>
+<li><strong>Turn on Do Not Disturb</strong> so chat and calendar notifications don't appear, especially for full-screen captures.</li>
+<li><strong>Use a demo profile.</strong> A separate browser profile with no bookmarks, extensions or autofill avoids leaking personal data.</li>
+<li><strong>Pre-warm everything.</strong> Start dev servers, run the build once, open files in the IDE, and load the pages so caches are warm and nothing compiles on camera.</li>
+<li><strong>Clear your terminal history</strong> or start a fresh shell so old commands and paths don't show.</li>
+<li><strong>Stage the data.</strong> Have sample files, test accounts and inputs ready to paste. Typing long values live is where demos stall.</li>
+<li><strong>Check your microphone level</strong> with a ten-second test recording.</li>
+</ol>
+
+<h2>Handle multi-app and developer-tool demos</h2>
+<p>Developer tools, integrations and APIs rarely live in one window. Common patterns:</p>
+<h3>Browser plus terminal</h3>
+<p>Arrange the two side by side on one display and record the full screen, or record two separate clips (one window each) and join them in the editor. Separate clips usually look cleaner and let you zoom into each one.</p>
+<h3>Code editor walkthroughs</h3>
+<p>Record the editor window only. Collapse sidebars you don't need, and scroll slowly. Pause on each important block for a beat so viewers can read it.</p>
+<h3>Integrations between two web apps</h3>
+<p>If the flow moves between tabs, record the window rather than a single tab so tab switches are captured.</p>
+
+<h3>General recording technique</h3>
+<ul>
+<li><strong>Move the cursor deliberately</strong> and pause briefly before each click.</li>
+<li><strong>Narrate intent, not mechanics.</strong> "Now we connect the repo" beats "I'm clicking the blue button in the top right."</li>
+<li><strong>Record in chapters.</strong> Shorter clips are easier to retake. A recorder that lets you append clips makes assembling them simple.</li>
+<li><strong>Let results land.</strong> After a command finishes or a page loads, hold for two seconds.</li>
+</ul>
+<p><a href="/">Click &amp; Record</a> handles all three sources (tab, any app window, or the whole display) with optional mic and webcam, and has a 3-2-1 count-in that isn't recorded. It logs clicks inside web pages and turns them into zooms after recording, which helps with small UI. Be aware of one honest limit: an extension can only see clicks inside web pages, so clicks in a terminal or desktop app don't generate automatic zooms. You can add manual zooms on those moments in the editor, which is usually what you want for code anyway.</p>
+
+<h2>Edit, then export</h2>
+<p>Keep the edit simple:</p>
+<ul>
+<li>Trim the start and end, and delete fumbles.</li>
+<li>Speed up installs, builds and long-running commands instead of cutting them, so viewers see they're real.</li>
+<li>Add captions; technical terms read better than they sound. Click &amp; Record generates subtitles on your device, and you can correct cues for product names.</li>
+<li>Use the browser frame's editable URL bar to swap a <code>localhost</code> address for your real domain.</li>
+<li>Check the export dialog's resolution, bitrate and estimated file size before rendering. MP4 is the most compatible choice; see <a href="/blog/mp4-vs-webm-screen-recording">MP4 vs WebM</a>.</li>
+</ul>
+
+<h2>Keep a recorded backup for live demos</h2>
+<p>If you're giving the demo live, on a sales call, at a meetup or in a conference talk, record it the day before. Live demos fail for boring reasons: hotel Wi-Fi, an expired token, a dependency that updated overnight. Having a clean recording ready means you can switch to it in seconds and keep talking over it. Many presenters play the recording by default and keep the live version for Q&amp;A.</p>
+
+<h2>Summary</h2>
+<p>To record a software demo that people can actually read: choose the narrowest capture source, record at your export resolution with enlarged fonts, prepare the machine so nothing surprising appears, and record in chapters. For a longer guided tour built from those chapters, see <a href="/blog/product-walkthrough-video">product walkthrough videos</a>. <a href="/">Click &amp; Record</a> does capture, zooms, subtitles and export in the browser, for free and without an account.</p>

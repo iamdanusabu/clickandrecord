@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<title>Record a Window or Full Screen in Chrome (Step-by-Step)</title>
+<meta name="description" content="Record a window or full screen in Chrome with a free extension: when to pick each, macOS permissions, multiple monitors, notifications, and audio caveats." />
+<link rel="canonical" href="https://clickandrecord.tech/blog/record-a-window-or-full-screen-in-chrome" />
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+<meta name="theme-color" content="#ffffff" />
+<meta name="color-scheme" content="light dark" />
+
+<meta property="og:type" content="article" />
+<meta property="og:site_name" content="Click &amp; Record" />
+<meta property="og:url" content="https://clickandrecord.tech/blog/record-a-window-or-full-screen-in-chrome" />
+<meta property="og:title" content="Record a Window or Full Screen in Chrome (Step-by-Step)" />
+<meta property="og:description" content="Record a window or full screen in Chrome with a free extension: when to pick each, macOS permissions, multiple monitors, notifications, and audio caveats." />
+<meta property="og:image" content="https://clickandrecord.tech/og-image.png" />
+<meta property="og:image:alt" content="Click &amp; Record" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Record a Window or Full Screen in Chrome (Step-by-Step)" />
+<meta name="twitter:description" content="Record a window or full screen in Chrome with a free extension: when to pick each, macOS permissions, multiple monitors, notifications, and audio caveats." />
+<meta name="twitter:image" content="https://clickandrecord.tech/og-image.png" />
+
+<link rel="icon" href="/favicon.png" type="image/png" sizes="128x128" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<link rel="preload" href="/fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="stylesheet" href="/blog/blog.css" />
+<script src="/analytics.js" defer></script>
+
+<script>
+(function(){try{var t=localStorage.getItem('cr-theme');
+if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "BlogPosting",
+      "@id": "https://clickandrecord.tech/blog/record-a-window-or-full-screen-in-chrome#article",
+      "headline": "How to record a window or your full screen from Chrome",
+      "name": "Record a Window or Full Screen in Chrome (Step-by-Step)",
+      "description": "Record a window or full screen in Chrome with a free extension: when to pick each, macOS permissions, multiple monitors, notifications, and audio caveats.",
+      "url": "https://clickandrecord.tech/blog/record-a-window-or-full-screen-in-chrome",
+      "mainEntityOfPage": "https://clickandrecord.tech/blog/record-a-window-or-full-screen-in-chrome",
+      "datePublished": "2026-10-10",
+      "dateModified": "2026-10-10",
+      "inLanguage": "en",
+      "articleSection": "Recording techniques",
+      "keywords": "record full screen in chrome",
+      "wordCount": 923,
+      "image": "https://clickandrecord.tech/og-image.png",
+      "author": {
+        "@type": "Organization",
+        "name": "Click & Record",
+        "url": "https://clickandrecord.tech/"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "Click & Record",
+        "url": "https://clickandrecord.tech/",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://clickandrecord.tech/apple-touch-icon.png"
+        }
+      },
+      "about": {
+        "@type": "SoftwareApplication",
+        "name": "Click & Record",
+        "url": "https://clickandrecord.tech/"
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://clickandrecord.tech/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Blog",
+          "item": "https://clickandrecord.tech/blog"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "How to record a window or your full screen from Chrome",
+          "item": "https://clickandrecord.tech/blog/record-a-window-or-full-screen-in-chrome"
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Can a Chrome extension record apps outside the browser?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. When you choose a window or an entire screen, the recording captures whatever is shown, including desktop apps like a code editor or design tool."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Why is my screen recording black on a Mac?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "macOS requires you to grant Chrome Screen Recording permission in System Settings under Privacy and Security. After enabling it, quit and reopen Chrome and try again."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does click zoom work when recording the full screen?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "In Click & Record, automatic zooms are created for clicks inside web pages. Clicks in other desktop apps are not visible to an extension, but you can add manual zooms for those moments in the editor."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Window or full screen, which should I choose?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Choose a window when everything happens in one app and you want other apps kept out. Choose the full screen when you move between apps or need to show the desktop itself."
+          }
+        }
+      ]
+    }
+  ]
+}
+</script>
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+<header class="mast">
+  <div class="shell">
+    <a class="wordmark" href="/"><span class="dotrec" aria-hidden="true"></span> Click&nbsp;&amp;&nbsp;Record</a>
+    <nav aria-label="Primary">
+      <a href="/#zoom">Zoom</a>
+      <a href="/#subtitles">Subtitles</a>
+      <a href="/#evidence">Evidence</a>
+      <a href="/blog">Blog</a>
+      <a href="/editor/editor.html">Editor</a>
+      <button class="themer" id="themer" type="button" aria-pressed="false"
+              aria-label="Switch to dark theme" title="Switch theme">
+        <svg class="ico-sun" viewBox="0 0 20 20" width="16" height="16" fill="none" aria-hidden="true">
+          <circle cx="10" cy="10" r="3.6" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M10 1.8v2.1M10 16.1v2.1M18.2 10h-2.1M3.9 10H1.8M15.8 4.2l-1.5 1.5M5.7 14.3l-1.5 1.5M15.8 15.8l-1.5-1.5M5.7 5.7L4.2 4.2"
+                stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <svg class="ico-moon" viewBox="0 0 20 20" width="16" height="16" fill="none" aria-hidden="true">
+          <path d="M16.5 12.4A7 7 0 017.6 3.5a7 7 0 108.9 8.9z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <a class="btn btn-solid" href="https://chromewebstore.google.com/detail/lfpnagkdegnjjghefcbpeoblgoaklnnn" target="_blank" rel="noopener" data-cta="chrome-store">Add to Chrome</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <div class="shell post-head">
+    <nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a> <span aria-hidden="true">/</span> <a href="/blog">Blog</a> <span aria-hidden="true">/</span> <span>Recording techniques</span></nav>
+    <p class="tc" data-mark="rec">Recording techniques · 4 min read</p>
+    <h1>How to record a window or your full screen from Chrome</h1>
+    <p class="updated">Published <time datetime="2026-10-10">October 10, 2026</time> · Click &amp; Record team</p>
+    <nav class="toc" aria-label="On this page">
+      <a href="#s1-tab-window-or-full-screen-which-to-choose">Tab, window or full screen: which to choose</a>
+      <a href="#s2-how-to-record-full-screen-in-chrome-or-a-single-">How to record full screen in Chrome (or a single window)</a>
+      <a href="#s3-platform-setup-and-common-snags">Platform setup and common snags</a>
+      <a href="#s4-clean-desk-checklist-for-full-screen-recordings">Clean-desk checklist for full-screen recordings</a>
+      <a href="#s5-click-zoom-with-window-and-full-screen-recording">Click zoom with window and full-screen recordings</a>
+      <a href="#s6-editing-and-exporting-a-full-screen-recording">Editing and exporting a full-screen recording</a>
+    </nav>
+  </div>
+
+  <div class="shell">
+    <article class="post">
+<p>To record full screen in Chrome, or just a single window, use a screen recorder extension, choose "window" or "entire screen" in Chrome's share picker, select the window or display, and start recording. Unlike tab recording, this captures apps outside the browser too, so you can show a desktop tool, move between programs, or record a multi-app workflow in one take.</p>
+<p>This guide explains when to choose window versus full screen, the setup steps, and the platform quirks that trip people up, such as macOS permissions and system audio.</p>
+
+<h2 id="s1-tab-window-or-full-screen-which-to-choose">Tab, window or full screen: which to choose</h2>
+<p>Chrome-based recorders typically offer three sources. Picking the right one saves editing later.</p>
+<table>
+<thead><tr><th>Source</th><th>Captures</th><th>Best for</th><th>Watch out for</th></tr></thead>
+<tbody>
+<tr><td>Tab</td><td>One browser tab's page content</td><td>Web app demos, website walkthroughs</td><td>Cannot show other tabs or apps</td></tr>
+<tr><td>Window</td><td>One application window, browser or not</td><td>A single desktop app, or one browser window with several tabs</td><td>Pop-ups that open as separate windows may not appear</td></tr>
+<tr><td>Full screen</td><td>An entire display</td><td>Multi-app workflows, OS-level settings, drag and drop between apps</td><td>Notifications, desktop clutter and other private content</td></tr>
+</tbody>
+</table>
+<p>If everything happens in one page, tab recording is cleaner; see <a href="/blog/how-to-record-a-chrome-tab">how to record a Chrome tab</a>. Otherwise, read on.</p>
+
+<h2 id="s2-how-to-record-full-screen-in-chrome-or-a-single-">How to record full screen in Chrome (or a single window)</h2>
+<p>These steps use <a href="/">Click &amp; Record</a>, a free extension for Chrome, Edge and Brave (Chromium 116+), with no account and no watermark.</p>
+<ol>
+<li><strong>Install the extension</strong> and pin it to the toolbar.</li>
+<li><strong>Arrange your desktop.</strong> Open the apps you need, close the ones you do not, and size the main window.</li>
+<li><strong>Click the extension icon</strong> and choose window or screen as the source.</li>
+<li><strong>Pick the target</strong> in Chrome's share dialog: a specific window, or the display you want if you have several.</li>
+<li><strong>Enable mic and webcam</strong> if needed. The webcam is a separate track you can reposition or hide later.</li>
+<li><strong>Record.</strong> A 3-2-1 count-in runs first and is not part of the file. Pause and resume freely.</li>
+<li><strong>Stop</strong> with the toolbar icon or <code>Alt+Shift+S</code>, then edit and export.</li>
+</ol>
+
+<h2 id="s3-platform-setup-and-common-snags">Platform setup and common snags</h2>
+<h3>macOS: grant Screen Recording permission</h3>
+<p>The first time you share a window or screen on a Mac, macOS asks for permission. If you see a black video or an empty list of windows, open System Settings, go to Privacy and Security, then Screen Recording, enable your browser, and restart it. This is an operating system requirement for any app that captures the screen.</p>
+<h3>Multiple monitors</h3>
+<p>Record the display where the action happens, and move everything you need onto it before starting. Recording a large ultrawide or 4K display produces small text when viewed on a laptop or phone, so consider recording a window instead, or plan to zoom.</p>
+<h3>System audio</h3>
+<p>Whether sound from other apps can be captured depends on your operating system and browser version. Chrome's share dialog shows an audio checkbox only where it is supported, for example when sharing an entire screen on Windows. If you need app audio, do a short test first. Narration via your microphone works everywhere.</p>
+<h3>Windows that do not appear</h3>
+<p>Minimized windows and some system dialogs may not show in the window list or may record as blank. Restore the window before starting, or switch to full screen.</p>
+
+<h2 id="s4-clean-desk-checklist-for-full-screen-recordings">Clean-desk checklist for full-screen recordings</h2>
+<p>Full-screen recordings show everything, so prepare like you would for a screen share with a client.</p>
+<ul>
+<li><strong>Turn on Do Not Disturb</strong> (Focus on macOS, Do not disturb on Windows) so notifications do not pop in.</li>
+<li><strong>Quit chat and email apps</strong> or at least hide their previews.</li>
+<li><strong>Tidy the desktop</strong> or use a plain wallpaper.</li>
+<li><strong>Hide the bookmarks bar</strong> and close personal tabs in the browser.</li>
+<li><strong>Use demo data</strong> rather than real customer records.</li>
+<li><strong>Increase text size</strong> in the apps you are showing, especially code editors and terminals.</li>
+</ul>
+<p>If something sensitive slips through, see <a href="/blog/hide-sensitive-information-in-screen-recordings">how to hide sensitive information in screen recordings</a> for options.</p>
+
+<h2 id="s5-click-zoom-with-window-and-full-screen-recording">Click zoom with window and full-screen recordings</h2>
+<p>Click &amp; Record logs click positions and turns them into zoom keyframes after you stop, and this works for all three sources. The limitation is what an extension can see: it only detects clicks inside web pages. If your full-screen take moves between Chrome and, say, a desktop design tool, the browser clicks get automatic zooms and the desktop-app clicks do not. Add manual zooms for those in the editor, where every zoom can be retimed, re-aimed or deleted.</p>
+<p>If you record desktop apps all day and want automatic zoom there too, a native desktop recorder may suit you better. The trade-offs are covered in <a href="/blog/chrome-extension-screen-recorder-vs-desktop-app">Chrome extension vs desktop screen recorder</a>.</p>
+
+<h2 id="s6-editing-and-exporting-a-full-screen-recording">Editing and exporting a full-screen recording</h2>
+<p>Full-screen footage often benefits from more editing than a tab capture.</p>
+<ul>
+<li><strong>Crop</strong> to the area that matters, such as one app on a wide monitor.</li>
+<li><strong>Trim and split</strong> out app-switching fumbles.</li>
+<li><strong>Speed up</strong> installs, builds and loading screens (0.5x to 4x per clip).</li>
+<li><strong>Add a background and padding</strong> to make a cropped window look intentional.</li>
+<li><strong>Pick the aspect ratio:</strong> 16:9, 9:16, 1:1, 4:5 or source. The export dialog shows resolution, bitrate and estimated size before you export to MP4 or WebM.</li>
+</ul>
+<p>If the recording is for a YouTube tutorial, <a href="/blog/record-software-tutorial-for-youtube">how to record a software tutorial for YouTube</a> walks through structure and pacing.</p>
+<p>Recording a window or the full screen from Chrome gives you a free, install-light way to capture any app. Grant the permissions once, clean your desktop, choose the narrowest source that still shows everything, and the rest is the same as any other recording.</p>
+
+    <section class="post-faq" id="faq">
+      <h2>Frequently asked questions</h2>
+      <div class="faq">
+        <details open>
+          <summary>Can a Chrome extension record apps outside the browser?</summary>
+          <div><p>Yes. When you choose a window or an entire screen, the recording captures whatever is shown, including desktop apps like a code editor or design tool.</p></div>
+        </details>
+        <details>
+          <summary>Why is my screen recording black on a Mac?</summary>
+          <div><p>macOS requires you to grant Chrome Screen Recording permission in System Settings under Privacy and Security. After enabling it, quit and reopen Chrome and try again.</p></div>
+        </details>
+        <details>
+          <summary>Does click zoom work when recording the full screen?</summary>
+          <div><p>In Click &amp; Record, automatic zooms are created for clicks inside web pages. Clicks in other desktop apps are not visible to an extension, but you can add manual zooms for those moments in the editor.</p></div>
+        </details>
+        <details>
+          <summary>Window or full screen, which should I choose?</summary>
+          <div><p>Choose a window when everything happens in one app and you want other apps kept out. Choose the full screen when you move between apps or need to show the desktop itself.</p></div>
+        </details>
+      </div>
+    </section>
+    </article>
+    <aside class="cta" aria-label="Try Click &amp; Record">
+  <p class="tc" data-mark="rec">Free · No account · Nothing uploaded</p>
+  <h2>Record it once. Get the zooms for free.</h2>
+  <p>Click &amp; Record is a free Chrome extension that turns every click into a smooth zoom, transcribes subtitles on your own machine, and can capture network and console logs alongside the video.</p>
+  <div class="actions">
+    <a class="btn btn-solid" href="https://chromewebstore.google.com/detail/lfpnagkdegnjjghefcbpeoblgoaklnnn" target="_blank" rel="noopener" data-cta="chrome-store"><span class="dotrec" aria-hidden="true"></span> Add to Chrome</a>
+    <a class="btn btn-line" href="/editor/editor.html" data-cta="open-editor">Try the editor in your browser</a>
+  </div>
+</aside>
+  </div>
+
+  <section class="related shell" aria-labelledby="related-h">
+    <h2 id="related-h">Keep reading</h2>
+    <div class="cards">
+      <a class="card" href="/blog/how-to-record-a-chrome-tab">
+        <span class="tc" data-mark="rec">Recording techniques</span>
+        <h3>How to record a Chrome tab, step by step</h3>
+        <p>How to record a Chrome tab for free: pick the tab, handle audio, keep notifications and other windows out of the shot, and export a clean MP4 in minutes.</p>
+        <span class="more">4 min read →</span>
+      </a>
+      <a class="card" href="/blog/chrome-extension-screen-recorder-vs-desktop-app">
+        <span class="tc" data-mark="zoom">Comparisons &amp; use cases</span>
+        <h3>Chrome extension screen recorder vs desktop app: which should you use?</h3>
+        <p>Chrome extension screen recorder vs desktop app: compare setup, permissions, what each can capture, click zoom and privacy to pick the right recorder.</p>
+        <span class="more">4 min read →</span>
+      </a>
+      <a class="card" href="/blog/record-software-tutorial-for-youtube">
+        <span class="tc" data-mark="zoom">Comparisons &amp; use cases</span>
+        <h3>How to record a software tutorial for YouTube that viewers finish</h3>
+        <p>Learn how to record a software tutorial for YouTube: outline, window setup, zooms, captions, chapters and the right export settings for full videos and Shorts.</p>
+        <span class="more">4 min read →</span>
+      </a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="shell">
+    <div class="fcols">
+      <div>
+        <a class="wordmark" href="/"><span class="dotrec" aria-hidden="true"></span> Click&nbsp;&amp;&nbsp;Record</a>
+        <p style="margin-top:14px;max-width:32ch;color:var(--faint)">
+          The screen recorder that pushes in on every click — and can prove what the app was doing.
+        </p>
+      </div>
+      <div><h3>Product</h3><ul>
+        <li><a href="/#zoom">Automatic zoom</a></li>
+        <li><a href="/#subtitles">Subtitles</a></li>
+        <li><a href="/#evidence">Network &amp; console</a></li>
+        <li><a href="/editor/editor.html">Open the editor</a></li>
+      </ul></div>
+      <div><h3>Guides</h3><ul>
+        <li><a href="/blog/async-sales-demo-video">Async Sales Demo Video: Record Demos Prospects Watch</a></li>
+        <li><a href="/blog/changelog-release-notes-video">Release Notes Video: Turn Your Changelog Into Clips</a></li>
+        <li><a href="/blog/feature-announcement-video">Feature Announcement Video: A Simple 30-Second Formula</a></li>
+        <li><a href="/blog/how-to-make-a-product-demo-video">How to Make a Product Demo Video</a></li>
+      </ul></div>
+      <div><h3>More</h3><ul>
+        <li><a href="/blog">All articles</a></li>
+        <li><a href="/#faq">FAQ</a></li>
+        <li><a href="/privacy">Privacy</a></li>
+        <li><a href="/terms">Terms</a></li>
+      </ul></div>
+    </div>
+    <div class="rule">
+      <span>© 2026 Click &amp; Record</span>
+      <span>Built for people who make demos.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var root = document.documentElement;
+  var btn = document.getElementById('themer');
+  if (!btn) return;
+  function sync() {
+    var dark = root.getAttribute('data-theme') === 'dark';
+    btn.setAttribute('aria-pressed', String(dark));
+    btn.setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme');
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', dark ? '#0c0e13' : '#ffffff');
+  }
+  btn.addEventListener('click', function () {
+    var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('cr-theme', next); } catch (e) {}
+    sync();
+  });
+  sync();
+})();
+</script>
+
+</body>
+</html>

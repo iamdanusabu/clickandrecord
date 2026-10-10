@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<title>How to Write a Bug Report With Video (Template)</title>
+<meta name="description" content="Learn how to write a bug report with video: a copy-ready template, what to record, what to write, and how to attach logs so developers can fix it fast." />
+<link rel="canonical" href="https://clickandrecord.tech/blog/how-to-write-a-bug-report-with-video" />
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+<meta name="theme-color" content="#ffffff" />
+<meta name="color-scheme" content="light dark" />
+
+<meta property="og:type" content="article" />
+<meta property="og:site_name" content="Click &amp; Record" />
+<meta property="og:url" content="https://clickandrecord.tech/blog/how-to-write-a-bug-report-with-video" />
+<meta property="og:title" content="How to Write a Bug Report With Video (Template)" />
+<meta property="og:description" content="Learn how to write a bug report with video: a copy-ready template, what to record, what to write, and how to attach logs so developers can fix it fast." />
+<meta property="og:image" content="https://clickandrecord.tech/og-image.png" />
+<meta property="og:image:alt" content="Click &amp; Record" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="How to Write a Bug Report With Video (Template)" />
+<meta name="twitter:description" content="Learn how to write a bug report with video: a copy-ready template, what to record, what to write, and how to attach logs so developers can fix it fast." />
+<meta name="twitter:image" content="https://clickandrecord.tech/og-image.png" />
+
+<link rel="icon" href="/favicon.png" type="image/png" sizes="128x128" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<link rel="preload" href="/fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="stylesheet" href="/blog/blog.css" />
+<script src="/analytics.js" defer></script>
+
+<script>
+(function(){try{var t=localStorage.getItem('cr-theme');
+if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "BlogPosting",
+      "@id": "https://clickandrecord.tech/blog/how-to-write-a-bug-report-with-video#article",
+      "headline": "How to write a bug report with video that gets fixed fast",
+      "name": "How to Write a Bug Report With Video (Template)",
+      "description": "Learn how to write a bug report with video: a copy-ready template, what to record, what to write, and how to attach logs so developers can fix it fast.",
+      "url": "https://clickandrecord.tech/blog/how-to-write-a-bug-report-with-video",
+      "mainEntityOfPage": "https://clickandrecord.tech/blog/how-to-write-a-bug-report-with-video",
+      "datePublished": "2026-10-10",
+      "dateModified": "2026-10-10",
+      "inLanguage": "en",
+      "articleSection": "Bug reports & QA",
+      "keywords": "bug report with video",
+      "wordCount": 1169,
+      "image": "https://clickandrecord.tech/og-image.png",
+      "author": {
+        "@type": "Organization",
+        "name": "Click & Record",
+        "url": "https://clickandrecord.tech/"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "Click & Record",
+        "url": "https://clickandrecord.tech/",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://clickandrecord.tech/apple-touch-icon.png"
+        }
+      },
+      "about": {
+        "@type": "SoftwareApplication",
+        "name": "Click & Record",
+        "url": "https://clickandrecord.tech/"
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://clickandrecord.tech/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Blog",
+          "item": "https://clickandrecord.tech/blog"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "How to write a bug report with video that gets fixed fast",
+          "item": "https://clickandrecord.tech/blog/how-to-write-a-bug-report-with-video"
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Should a bug report have a video or a screenshot?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Use a screenshot when the problem is a static visual defect, like a misaligned button. Use a video when the bug depends on a sequence of actions, timing, or something that changes on screen."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How long should a bug report video be?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "As a rule of thumb, aim for under a minute. Start a few seconds before the first relevant action and stop right after the bug appears, then trim anything in between that does not matter."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does a video replace written steps to reproduce?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. The video shows what happened once, while written steps let someone repeat it and let people search the tracker later. Include both."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What should I do if the bug only happens sometimes?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Record every attempt until it happens, note how many tries it took, and capture network and console logs during the recording so the failing attempt carries technical evidence."
+          }
+        }
+      ]
+    }
+  ]
+}
+</script>
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+<header class="mast">
+  <div class="shell">
+    <a class="wordmark" href="/"><span class="dotrec" aria-hidden="true"></span> Click&nbsp;&amp;&nbsp;Record</a>
+    <nav aria-label="Primary">
+      <a href="/#zoom">Zoom</a>
+      <a href="/#subtitles">Subtitles</a>
+      <a href="/#evidence">Evidence</a>
+      <a href="/blog">Blog</a>
+      <a href="/editor/editor.html">Editor</a>
+      <button class="themer" id="themer" type="button" aria-pressed="false"
+              aria-label="Switch to dark theme" title="Switch theme">
+        <svg class="ico-sun" viewBox="0 0 20 20" width="16" height="16" fill="none" aria-hidden="true">
+          <circle cx="10" cy="10" r="3.6" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M10 1.8v2.1M10 16.1v2.1M18.2 10h-2.1M3.9 10H1.8M15.8 4.2l-1.5 1.5M5.7 14.3l-1.5 1.5M15.8 15.8l-1.5-1.5M5.7 5.7L4.2 4.2"
+                stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <svg class="ico-moon" viewBox="0 0 20 20" width="16" height="16" fill="none" aria-hidden="true">
+          <path d="M16.5 12.4A7 7 0 017.6 3.5a7 7 0 108.9 8.9z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <a class="btn btn-solid" href="https://chromewebstore.google.com/detail/lfpnagkdegnjjghefcbpeoblgoaklnnn" target="_blank" rel="noopener" data-cta="chrome-store">Add to Chrome</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <div class="shell post-head">
+    <nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a> <span aria-hidden="true">/</span> <a href="/blog">Blog</a> <span aria-hidden="true">/</span> <span>Bug reports &amp; QA</span></nav>
+    <p class="tc" data-mark="link">Bug reports &amp; QA · 5 min read</p>
+    <h1>How to write a bug report with video that gets fixed fast</h1>
+    <p class="updated">Published <time datetime="2026-10-10">October 10, 2026</time> · Click &amp; Record team</p>
+    <nav class="toc" aria-label="On this page">
+      <a href="#s1-why-a-bug-report-with-video-gets-fixed-faster">Why a bug report with video gets fixed faster</a>
+      <a href="#s2-the-bug-report-template">The bug report template</a>
+      <a href="#s3-what-to-record-and-what-to-leave-out">What to record (and what to leave out)</a>
+      <a href="#s4-add-logs-so-the-video-explains-itself">Add logs so the video explains itself</a>
+      <a href="#s5-recording-a-bug-report-with-click-record">Recording a bug report with Click &amp; Record</a>
+      <a href="#s6-bug-report-checklist">Bug report checklist</a>
+      <a href="#s7-putting-it-together">Putting it together</a>
+    </nav>
+  </div>
+
+  <div class="shell">
+    <article class="post">
+<p>A good bug report with video combines a short recording of the bug happening with a written summary, steps to reproduce, expected versus actual result, and environment details. The video proves the bug and shows timing; the text makes it searchable and repeatable. Below is a template you can paste into any tracker, plus guidance on what to record so the developer does not have to ask follow-up questions.</p>
+
+<h2 id="s1-why-a-bug-report-with-video-gets-fixed-faster">Why a bug report with video gets fixed faster</h2>
+<p>Most back-and-forth on a bug ticket comes from missing context: "Which page?", "What did you click first?", "What browser?", "Can you show me?" A recording answers several of those at once. The developer sees the exact path you took, how long things took, what was on screen right before the failure, and whether there was an error message that flashed and disappeared.</p>
+<p>Video also catches details the reporter did not think were important. A double click instead of a single click, a filter left on from an earlier session, or a slow-loading spinner that you clicked through all show up in a recording, even when you would never think to write them down.</p>
+<p>What video does not do on its own is explain <em>why</em> the bug happened. That is where written context and, ideally, network and console logs come in.</p>
+
+<h2 id="s2-the-bug-report-template">The bug report template</h2>
+<p>Copy this structure into Jira, Linear, GitHub Issues or whatever tracker your team uses. Each field has a job.</p>
+<ol>
+<li><strong>Title:</strong> what broke, where, and under what condition. "Checkout total ignores discount code when cart has 2+ items" beats "Checkout broken".</li>
+<li><strong>Summary:</strong> one or two sentences in plain language. What you were trying to do and what went wrong.</li>
+<li><strong>Steps to reproduce:</strong> numbered, one action per step, starting from a known state (logged out, fresh page, specific account).</li>
+<li><strong>Expected result:</strong> what should have happened.</li>
+<li><strong>Actual result:</strong> what did happen, including any exact error text.</li>
+<li><strong>Video:</strong> the recording, with a timestamp for the moment the bug occurs (for example "bug at 0:23").</li>
+<li><strong>Logs:</strong> console errors and network requests from the same session, if you have them.</li>
+<li><strong>Environment:</strong> browser and version, OS, device, account or role, app version or URL, feature flags.</li>
+<li><strong>Frequency:</strong> always, sometimes (for example 3 out of 10 tries), or once.</li>
+<li><strong>Severity or impact:</strong> who is affected and whether there is a workaround.</li>
+</ol>
+<p>For steps to reproduce, write one action per line and include the boring parts: which account, which page you started on, and what you typed. If you can only reproduce the bug some of the time, say so and say how many attempts it took.</p>
+
+<h2 id="s3-what-to-record-and-what-to-leave-out">What to record (and what to leave out)</h2>
+<p>The best bug videos are short and boring in a good way: they show the minimum path to the failure and nothing else.</p>
+<h3>Before you hit record</h3>
+<ul>
+<li>Reset to a clean starting point: reload the page, log in as the test account, close unrelated tabs.</li>
+<li>Close anything sensitive. Personal email, customer data and API dashboards should not be visible. See <a href="/blog/hide-sensitive-information-in-screen-recordings">how to hide sensitive information in screen recordings</a>.</li>
+<li>Decide what to capture: a single browser tab is usually enough for web app bugs and keeps the recording focused. See <a href="/blog/how-to-record-a-chrome-tab">how to record a Chrome tab</a>.</li>
+</ul>
+<h3>While recording</h3>
+<ul>
+<li>Move deliberately. Pause briefly before each click so viewers can see where the cursor is going.</li>
+<li>If you use a microphone, narrate what you expect: "I'm applying the code, the total should drop to 40."</li>
+<li>Let the failure sit on screen for two or three seconds before stopping so error messages are readable.</li>
+<li>If the bug is intermittent, keep recording through multiple attempts rather than starting and stopping.</li>
+</ul>
+<h3>After recording</h3>
+<ul>
+<li>Trim dead time at the start and end.</li>
+<li>Note the timestamp where the bug happens and put it in the report.</li>
+<li>Export at a size your tracker accepts. MP4 is the safest choice for playback everywhere.</li>
+</ul>
+
+<h2 id="s4-add-logs-so-the-video-explains-itself">Add logs so the video explains itself</h2>
+<p>A video shows the symptom. Logs show the cause. If a button does nothing, the recording tells you the click happened, but only the network panel tells you the request returned a 500, and only the console tells you a JavaScript error was thrown.</p>
+<p>You can collect these manually with Chrome DevTools: open the Network and Console panels before you reproduce, then export a HAR file and save the console output. The catch is that you need to remember to open DevTools first, and the logs end up in separate files with no link to the video timeline. A <a href="/blog/screen-recorder-that-captures-network-requests">screen recorder that captures network requests</a> solves both problems by logging everything during the take.</p>
+<p>One caution: HAR files and copied requests can contain cookies, auth headers and tokens. Review them before attaching to a ticket that many people can read.</p>
+
+<h2 id="s5-recording-a-bug-report-with-click-record">Recording a bug report with Click &amp; Record</h2>
+<p><a href="/">Click &amp; Record</a> is a free Chrome extension that was built partly for this job. When you record a tab, you can turn on network and console capture. Every request and console line is timestamped against the video, and clicking a row in the editor seeks the video to that moment, so a developer can jump straight from "POST /api/cart 500" to what was on screen when it fired.</p>
+<p>From the same take you can export a standard HAR 1.2 file that opens in Chrome DevTools, or use "Copy as cURL" on a single request so the developer can replay it in a terminal. Capture does not use the Chrome debugger API, so there is no "is debugging this browser" banner and DevTools stays available if you want it.</p>
+<p>Clicks are also logged and turned into automatic zooms after recording, which helps on high-resolution screens where a small dropdown would otherwise be unreadable. Each zoom can be adjusted or deleted in the editor. Everything runs locally; nothing is uploaded unless you choose Save to Google Drive.</p>
+
+<h2 id="s6-bug-report-checklist">Bug report checklist</h2>
+<table>
+<thead><tr><th>Check</th><th>Why it matters</th></tr></thead>
+<tbody>
+<tr><td>Title names the feature and the condition</td><td>Makes duplicates easy to spot</td></tr>
+<tr><td>Steps start from a known state</td><td>Someone else can follow them cold</td></tr>
+<tr><td>Expected and actual are both stated</td><td>Avoids "works as designed" confusion</td></tr>
+<tr><td>Video is under about a minute, with a timestamp</td><td>Reviewers watch it immediately</td></tr>
+<tr><td>Console and network logs attached and reviewed</td><td>Points to the cause, not just the symptom</td></tr>
+<tr><td>Environment listed</td><td>Rules out browser or account differences</td></tr>
+<tr><td>Frequency noted</td><td>Sets expectations for reproducing</td></tr>
+</tbody>
+</table>
+<p>If the report comes from a customer rather than a teammate, the same principles apply with less jargon; see <a href="/blog/customer-support-screen-recordings">screen recordings for customer support</a>.</p>
+
+<h2 id="s7-putting-it-together">Putting it together</h2>
+<p>A bug report with video works best when the recording and the text do different jobs: the video shows exactly what happened once, the written steps let anyone repeat it, and the logs explain why. Whatever tool you use, keep the recording short, start from a clean state, and timestamp the failure. If you want the video, the network requests and the console output to come from one take and line up automatically, <a href="/">Click &amp; Record</a> does that for free, with no account.</p>
+
+    <section class="post-faq" id="faq">
+      <h2>Frequently asked questions</h2>
+      <div class="faq">
+        <details open>
+          <summary>Should a bug report have a video or a screenshot?</summary>
+          <div><p>Use a screenshot when the problem is a static visual defect, like a misaligned button. Use a video when the bug depends on a sequence of actions, timing, or something that changes on screen.</p></div>
+        </details>
+        <details>
+          <summary>How long should a bug report video be?</summary>
+          <div><p>As a rule of thumb, aim for under a minute. Start a few seconds before the first relevant action and stop right after the bug appears, then trim anything in between that does not matter.</p></div>
+        </details>
+        <details>
+          <summary>Does a video replace written steps to reproduce?</summary>
+          <div><p>No. The video shows what happened once, while written steps let someone repeat it and let people search the tracker later. Include both.</p></div>
+        </details>
+        <details>
+          <summary>What should I do if the bug only happens sometimes?</summary>
+          <div><p>Record every attempt until it happens, note how many tries it took, and capture network and console logs during the recording so the failing attempt carries technical evidence.</p></div>
+        </details>
+      </div>
+    </section>
+    </article>
+    <aside class="cta" aria-label="Try Click &amp; Record">
+  <p class="tc" data-mark="rec">Free · No account · Nothing uploaded</p>
+  <h2>Record it once. Get the zooms for free.</h2>
+  <p>Click &amp; Record is a free Chrome extension that turns every click into a smooth zoom, transcribes subtitles on your own machine, and can capture network and console logs alongside the video.</p>
+  <div class="actions">
+    <a class="btn btn-solid" href="https://chromewebstore.google.com/detail/lfpnagkdegnjjghefcbpeoblgoaklnnn" target="_blank" rel="noopener" data-cta="chrome-store"><span class="dotrec" aria-hidden="true"></span> Add to Chrome</a>
+    <a class="btn btn-line" href="/editor/editor.html" data-cta="open-editor">Try the editor in your browser</a>
+  </div>
+</aside>
+  </div>
+
+  <section class="related shell" aria-labelledby="related-h">
+    <h2 id="related-h">Keep reading</h2>
+    <div class="cards">
+      <a class="card" href="/blog/screen-recorder-that-captures-network-requests">
+        <span class="tc" data-mark="link">Bug reports &amp; QA</span>
+        <h3>Choosing a screen recorder that captures network requests</h3>
+        <p>What to look for in a screen recorder that captures network requests: timeline sync, HAR export, cURL, debugger banners, privacy, and how the options compare.</p>
+        <span class="more">5 min read →</span>
+      </a>
+      <a class="card" href="/blog/customer-support-screen-recordings">
+        <span class="tc" data-mark="link">Bug reports &amp; QA</span>
+        <h3>Customer support screen recordings: how to ask for them and how to send them</h3>
+        <p>How to use customer support screen recordings: get customers to record the problem, reply with short video answers, and escalate clear tickets to engineering.</p>
+        <span class="more">4 min read →</span>
+      </a>
+      <a class="card" href="/blog/how-to-record-a-chrome-tab">
+        <span class="tc" data-mark="rec">Recording techniques</span>
+        <h3>How to record a Chrome tab, step by step</h3>
+        <p>How to record a Chrome tab for free: pick the tab, handle audio, keep notifications and other windows out of the shot, and export a clean MP4 in minutes.</p>
+        <span class="more">4 min read →</span>
+      </a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="shell">
+    <div class="fcols">
+      <div>
+        <a class="wordmark" href="/"><span class="dotrec" aria-hidden="true"></span> Click&nbsp;&amp;&nbsp;Record</a>
+        <p style="margin-top:14px;max-width:32ch;color:var(--faint)">
+          The screen recorder that pushes in on every click — and can prove what the app was doing.
+        </p>
+      </div>
+      <div><h3>Product</h3><ul>
+        <li><a href="/#zoom">Automatic zoom</a></li>
+        <li><a href="/#subtitles">Subtitles</a></li>
+        <li><a href="/#evidence">Network &amp; console</a></li>
+        <li><a href="/editor/editor.html">Open the editor</a></li>
+      </ul></div>
+      <div><h3>Guides</h3><ul>
+        <li><a href="/blog/async-sales-demo-video">Async Sales Demo Video: Record Demos Prospects Watch</a></li>
+        <li><a href="/blog/changelog-release-notes-video">Release Notes Video: Turn Your Changelog Into Clips</a></li>
+        <li><a href="/blog/feature-announcement-video">Feature Announcement Video: A Simple 30-Second Formula</a></li>
+        <li><a href="/blog/how-to-make-a-product-demo-video">How to Make a Product Demo Video</a></li>
+      </ul></div>
+      <div><h3>More</h3><ul>
+        <li><a href="/blog">All articles</a></li>
+        <li><a href="/#faq">FAQ</a></li>
+        <li><a href="/privacy">Privacy</a></li>
+        <li><a href="/terms">Terms</a></li>
+      </ul></div>
+    </div>
+    <div class="rule">
+      <span>© 2026 Click &amp; Record</span>
+      <span>Built for people who make demos.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var root = document.documentElement;
+  var btn = document.getElementById('themer');
+  if (!btn) return;
+  function sync() {
+    var dark = root.getAttribute('data-theme') === 'dark';
+    btn.setAttribute('aria-pressed', String(dark));
+    btn.setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme');
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', dark ? '#0c0e13' : '#ffffff');
+  }
+  btn.addEventListener('click', function () {
+    var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('cr-theme', next); } catch (e) {}
+    sync();
+  });
+  sync();
+})();
+</script>
+
+</body>
+</html>

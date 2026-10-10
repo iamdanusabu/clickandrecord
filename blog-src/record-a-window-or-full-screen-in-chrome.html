@@ -1,0 +1,81 @@
+<!--meta
+{
+  "slug": "record-a-window-or-full-screen-in-chrome",
+  "title": "Record a Window or Full Screen in Chrome (Step-by-Step)",
+  "h1": "How to record a window or your full screen from Chrome",
+  "description": "Record a window or full screen in Chrome with a free extension: when to pick each, macOS permissions, multiple monitors, notifications, and audio caveats.",
+  "keyword": "record full screen in chrome",
+  "category": "Recording techniques",
+  "faq": [
+    {"q": "Can a Chrome extension record apps outside the browser?", "a": "Yes. When you choose a window or an entire screen, the recording captures whatever is shown, including desktop apps like a code editor or design tool."},
+    {"q": "Why is my screen recording black on a Mac?", "a": "macOS requires you to grant Chrome Screen Recording permission in System Settings under Privacy and Security. After enabling it, quit and reopen Chrome and try again."},
+    {"q": "Does click zoom work when recording the full screen?", "a": "In Click & Record, automatic zooms are created for clicks inside web pages. Clicks in other desktop apps are not visible to an extension, but you can add manual zooms for those moments in the editor."},
+    {"q": "Window or full screen, which should I choose?", "a": "Choose a window when everything happens in one app and you want other apps kept out. Choose the full screen when you move between apps or need to show the desktop itself."}
+  ],
+  "related": ["how-to-record-a-chrome-tab", "chrome-extension-screen-recorder-vs-desktop-app", "record-software-tutorial-for-youtube"]
+}
+-->
+<p>To record full screen in Chrome, or just a single window, use a screen recorder extension, choose "window" or "entire screen" in Chrome's share picker, select the window or display, and start recording. Unlike tab recording, this captures apps outside the browser too, so you can show a desktop tool, move between programs, or record a multi-app workflow in one take.</p>
+<p>This guide explains when to choose window versus full screen, the setup steps, and the platform quirks that trip people up, such as macOS permissions and system audio.</p>
+
+<h2>Tab, window or full screen: which to choose</h2>
+<p>Chrome-based recorders typically offer three sources. Picking the right one saves editing later.</p>
+<table>
+<thead><tr><th>Source</th><th>Captures</th><th>Best for</th><th>Watch out for</th></tr></thead>
+<tbody>
+<tr><td>Tab</td><td>One browser tab's page content</td><td>Web app demos, website walkthroughs</td><td>Cannot show other tabs or apps</td></tr>
+<tr><td>Window</td><td>One application window, browser or not</td><td>A single desktop app, or one browser window with several tabs</td><td>Pop-ups that open as separate windows may not appear</td></tr>
+<tr><td>Full screen</td><td>An entire display</td><td>Multi-app workflows, OS-level settings, drag and drop between apps</td><td>Notifications, desktop clutter and other private content</td></tr>
+</tbody>
+</table>
+<p>If everything happens in one page, tab recording is cleaner; see <a href="/blog/how-to-record-a-chrome-tab">how to record a Chrome tab</a>. Otherwise, read on.</p>
+
+<h2>How to record full screen in Chrome (or a single window)</h2>
+<p>These steps use <a href="/">Click &amp; Record</a>, a free extension for Chrome, Edge and Brave (Chromium 116+), with no account and no watermark.</p>
+<ol>
+<li><strong>Install the extension</strong> and pin it to the toolbar.</li>
+<li><strong>Arrange your desktop.</strong> Open the apps you need, close the ones you do not, and size the main window.</li>
+<li><strong>Click the extension icon</strong> and choose window or screen as the source.</li>
+<li><strong>Pick the target</strong> in Chrome's share dialog: a specific window, or the display you want if you have several.</li>
+<li><strong>Enable mic and webcam</strong> if needed. The webcam is a separate track you can reposition or hide later.</li>
+<li><strong>Record.</strong> A 3-2-1 count-in runs first and is not part of the file. Pause and resume freely.</li>
+<li><strong>Stop</strong> with the toolbar icon or <code>Alt+Shift+S</code>, then edit and export.</li>
+</ol>
+
+<h2>Platform setup and common snags</h2>
+<h3>macOS: grant Screen Recording permission</h3>
+<p>The first time you share a window or screen on a Mac, macOS asks for permission. If you see a black video or an empty list of windows, open System Settings, go to Privacy and Security, then Screen Recording, enable your browser, and restart it. This is an operating system requirement for any app that captures the screen.</p>
+<h3>Multiple monitors</h3>
+<p>Record the display where the action happens, and move everything you need onto it before starting. Recording a large ultrawide or 4K display produces small text when viewed on a laptop or phone, so consider recording a window instead, or plan to zoom.</p>
+<h3>System audio</h3>
+<p>Whether sound from other apps can be captured depends on your operating system and browser version. Chrome's share dialog shows an audio checkbox only where it is supported, for example when sharing an entire screen on Windows. If you need app audio, do a short test first. Narration via your microphone works everywhere.</p>
+<h3>Windows that do not appear</h3>
+<p>Minimized windows and some system dialogs may not show in the window list or may record as blank. Restore the window before starting, or switch to full screen.</p>
+
+<h2>Clean-desk checklist for full-screen recordings</h2>
+<p>Full-screen recordings show everything, so prepare like you would for a screen share with a client.</p>
+<ul>
+<li><strong>Turn on Do Not Disturb</strong> (Focus on macOS, Do not disturb on Windows) so notifications do not pop in.</li>
+<li><strong>Quit chat and email apps</strong> or at least hide their previews.</li>
+<li><strong>Tidy the desktop</strong> or use a plain wallpaper.</li>
+<li><strong>Hide the bookmarks bar</strong> and close personal tabs in the browser.</li>
+<li><strong>Use demo data</strong> rather than real customer records.</li>
+<li><strong>Increase text size</strong> in the apps you are showing, especially code editors and terminals.</li>
+</ul>
+<p>If something sensitive slips through, see <a href="/blog/hide-sensitive-information-in-screen-recordings">how to hide sensitive information in screen recordings</a> for options.</p>
+
+<h2>Click zoom with window and full-screen recordings</h2>
+<p>Click &amp; Record logs click positions and turns them into zoom keyframes after you stop, and this works for all three sources. The limitation is what an extension can see: it only detects clicks inside web pages. If your full-screen take moves between Chrome and, say, a desktop design tool, the browser clicks get automatic zooms and the desktop-app clicks do not. Add manual zooms for those in the editor, where every zoom can be retimed, re-aimed or deleted.</p>
+<p>If you record desktop apps all day and want automatic zoom there too, a native desktop recorder may suit you better. The trade-offs are covered in <a href="/blog/chrome-extension-screen-recorder-vs-desktop-app">Chrome extension vs desktop screen recorder</a>.</p>
+
+<h2>Editing and exporting a full-screen recording</h2>
+<p>Full-screen footage often benefits from more editing than a tab capture.</p>
+<ul>
+<li><strong>Crop</strong> to the area that matters, such as one app on a wide monitor.</li>
+<li><strong>Trim and split</strong> out app-switching fumbles.</li>
+<li><strong>Speed up</strong> installs, builds and loading screens (0.5x to 4x per clip).</li>
+<li><strong>Add a background and padding</strong> to make a cropped window look intentional.</li>
+<li><strong>Pick the aspect ratio:</strong> 16:9, 9:16, 1:1, 4:5 or source. The export dialog shows resolution, bitrate and estimated size before you export to MP4 or WebM.</li>
+</ul>
+<p>If the recording is for a YouTube tutorial, <a href="/blog/record-software-tutorial-for-youtube">how to record a software tutorial for YouTube</a> walks through structure and pacing.</p>
+<p>Recording a window or the full screen from Chrome gives you a free, install-light way to capture any app. Grant the permissions once, clean your desktop, choose the narrowest source that still shows everything, and the rest is the same as any other recording.</p>

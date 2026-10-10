@@ -1,0 +1,79 @@
+<!--meta
+{
+  "slug": "vertical-screen-recording-reels-shorts-tiktok",
+  "title": "Vertical Screen Recording for Reels, Shorts and TikTok",
+  "h1": "Vertical screen recording: turn a widescreen demo into Reels, Shorts and TikTok",
+  "description": "How to make a vertical screen recording for Reels, Shorts and TikTok: record a narrow window, zoom on clicks, keep UI out of the safe zones, and export 9:16.",
+  "keyword": "vertical screen recording",
+  "category": "Product demos",
+  "faq": [
+    {"q": "What resolution is a vertical video for Reels, Shorts and TikTok?", "a": "All three use a 9:16 vertical frame, and 1080 by 1920 pixels is the common target. Check each platform's help pages for current length and file limits."},
+    {"q": "How do I turn a horizontal screen recording into a vertical video?", "a": "Export it at 9:16 and use zoom and crop so the area you are working in fills the frame. Without zooms, a widescreen UI becomes a thin strip in the middle of the phone."},
+    {"q": "Can I record my screen in portrait mode on a desktop?", "a": "You can narrow your browser window so the page reflows into a taller, mobile-like layout, then record that window or tab. Combined with a 9:16 export, this gives the most readable result."},
+    {"q": "Where should I put captions in a vertical video?", "a": "Keep captions and key UI in the middle of the frame. The bottom and right edges are usually covered by the platform's captions, buttons and account name."}
+  ],
+  "related": ["linkedin-product-demo-video", "how-to-zoom-in-on-a-screen-recording", "feature-announcement-video"]
+}
+-->
+<p>To make a vertical screen recording for Reels, Shorts or TikTok, record a narrow browser window or tab so the page reflows into a taller layout, let zooms follow your clicks so small UI fills the phone, keep text and captions in the middle of the frame away from the platform's buttons, and export at 9:16, usually 1080 by 1920. Simply squeezing a 16:9 recording into a vertical frame leaves a tiny strip nobody can read. Here is the full workflow.</p>
+
+<h2>Why widescreen demos fail as a vertical screen recording</h2>
+<p>A desktop UI is built for a wide screen. Put a 16:9 recording into a 9:16 frame and it fills less than a third of the height, surrounded by empty bars. On a phone, buttons become a few pixels wide and body text becomes unreadable. Viewers scroll past in a second.</p>
+<p>There are three ways to fix this, and the best results come from combining them:</p>
+<ol>
+<li><strong>Change what you record</strong> so the content is taller to begin with.</li>
+<li><strong>Zoom in</strong> on the part of the screen that matters at each moment.</li>
+<li><strong>Frame it for 9:16</strong> with a background, so the remaining space looks intentional.</li>
+</ol>
+
+<h2>Step 1: Record a taller layout</h2>
+<p>Most web apps are responsive. If you make the browser window narrow, around 400 to 600 pixels wide, the page reflows into its tablet or mobile layout: one column, larger tap targets, stacked cards. That layout is naturally suited to a vertical frame.</p>
+<ul>
+<li>Resize the window to a narrow, tall shape before you start recording.</li>
+<li>Alternatively, use Chrome DevTools device mode to emulate a phone viewport and record the tab.</li>
+<li>Check that your key feature still works and looks good in that layout. Some dashboards hide important panels on small screens.</li>
+<li>If the product only makes sense on desktop, record the normal wide layout and rely on zooms in step 2.</li>
+</ul>
+<p>Recording only the tab or a single window keeps your desktop and other tabs out of the shot. See <a href="/blog/record-a-window-or-full-screen-in-chrome">how to record a window or full screen in Chrome</a> for the options.</p>
+
+<h2>Step 2: Zoom so the UI fills the vertical frame</h2>
+<p>Zooms do most of the work in a vertical screen recording. When the view pushes in on the button you just clicked, a cropped region of a wide UI fills the tall frame and becomes readable on a phone.</p>
+<p><a href="/">Click &amp; Record</a> does this automatically. It logs every click (position and time) during recording and turns each into a zoom keyframe afterwards. Nearby clicks are linked so the camera pans across the interface while staying zoomed in, instead of pulsing in and out, and typing holds the zoom steady. Because zooms are a post-process, you can make them stronger for vertical exports, re-aim one that is slightly off, delete distractions and add manual zooms anywhere. For the general technique, see <a href="/blog/how-to-zoom-in-on-a-screen-recording">how to zoom in on a screen recording</a>.</p>
+<h3>Tips for vertical zooms</h3>
+<ul>
+<li><strong>Zoom harder than you would for 16:9.</strong> A vertical frame shows a narrow slice, so a deeper zoom keeps text large.</li>
+<li><strong>Keep clicks in one area</strong> when possible, so the camera does not have to travel far.</li>
+<li><strong>Hold each zoom longer.</strong> Short-form viewers glance, so give each moment a second or two to land.</li>
+</ul>
+
+<h2>Step 3: Frame it for 9:16 and mind the safe zones</h2>
+<p>Each platform overlays its own interface on your video: the caption, account name and audio label along the bottom, and like, comment and share buttons down the right side. Anything important placed there gets covered.</p>
+<table>
+<thead><tr><th>Area of the 9:16 frame</th><th>What usually covers it</th><th>What to put there</th></tr></thead>
+<tbody>
+<tr><td>Top strip</td><td>Platform tabs, search, progress bar</td><td>Background only, or a short title</td></tr>
+<tr><td>Center</td><td>Mostly clear</td><td>The UI and your subtitles</td></tr>
+<tr><td>Right edge</td><td>Like, comment, share buttons</td><td>Padding, no key UI</td></tr>
+<tr><td>Bottom strip</td><td>Caption text, account name, audio</td><td>Background only</td></tr>
+</tbody>
+</table>
+<p>Exact overlay positions vary by platform and change over time, so preview your export on a phone before posting. In the Click &amp; Record editor you can choose the 9:16 aspect ratio, set a gradient or image background, add inset padding and rounded corners, and crop the recording, so the UI sits in the clear center with the rest of the frame filled deliberately.</p>
+
+<h2>Step 4: Captions for sound-off viewing</h2>
+<p>A lot of short-form viewing happens with sound off, so treat captions as part of the video, not an extra. Keep them short (a few words per line), high contrast, and in the center third of the frame.</p>
+<p>Click &amp; Record generates subtitles on your computer with a built-in Whisper speech model, with word-level timings and editable cues, and you can write cues by hand for a silent video. Export SRT or VTT if you want to upload captions to the platform separately. See <a href="/blog/add-subtitles-to-screen-recording-free">how to add subtitles to a screen recording for free</a>.</p>
+
+<h2>Step 5: Export at 9:16</h2>
+<p>Export MP4 (H.264 + AAC) at 1080 by 1920 for broad compatibility. Click &amp; Record's export dialog shows the resolution, bitrate and estimated file size before you render. Before uploading, check each platform's current limits on length and file size in its help center, since they change.</p>
+
+<h3>Structure for a 20 to 45 second vertical demo</h3>
+<ol>
+<li><strong>0 to 2 seconds:</strong> the result or a bold claim on screen ("Turn any form into a chart in 3 clicks").</li>
+<li><strong>2 to 30 seconds:</strong> the three clicks, each zoomed, with captions.</li>
+<li><strong>Last 3 to 5 seconds:</strong> the finished result and one line on where to find you.</li>
+</ol>
+<p>Short-form loops replay automatically, so ending on the result and cutting straight back to the hook can work well.</p>
+
+<h2>One recording, every format</h2>
+<p>You do not need to record separately for each platform. Record once, then export 9:16 for Reels, Shorts and TikTok, 1:1 or 4:5 for LinkedIn (see <a href="/blog/linkedin-product-demo-video">LinkedIn product demo video</a>), and 16:9 for your website or YouTube. Adjust zoom strength per export where needed.</p>
+<p>Click &amp; Record is a free Chrome extension with no account and no watermark, and everything runs locally on your machine. Already have a widescreen recording from another tool? Open it in <a href="/editor/editor.html">the free browser editor</a>, add manual zooms and captions, and export at 9:16 without installing anything. For short release clips, the <a href="/blog/feature-announcement-video">feature announcement video</a> format pairs well with vertical exports.</p>

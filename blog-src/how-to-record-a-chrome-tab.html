@@ -1,0 +1,88 @@
+<!--meta
+{
+  "slug": "how-to-record-a-chrome-tab",
+  "title": "How to Record a Chrome Tab (Free, With Audio Tips)",
+  "h1": "How to record a Chrome tab, step by step",
+  "description": "How to record a Chrome tab for free: pick the tab, handle audio, keep notifications and other windows out of the shot, and export a clean MP4 in minutes.",
+  "keyword": "record a chrome tab",
+  "category": "Recording techniques",
+  "faq": [
+    {"q": "Does Chrome have a built-in tab recorder?", "a": "Not on Windows or macOS. Chrome can share a tab during calls, but to save a recording of a tab you need an extension or a separate screen recording tool."},
+    {"q": "Will notifications show up when I record a tab?", "a": "System notifications and other windows are not part of the tab, so they do not appear in a tab recording. Only the page content inside that tab is captured."},
+    {"q": "What happens if I switch to another tab while recording?", "a": "A tab recording follows the tab you selected, not whatever is in front of you. If you need to move between several tabs, record the window or the whole screen instead."},
+    {"q": "Can I record a tab without installing anything?", "a": "Most free options need an extension. If you already have a video file, the Click & Record browser editor can trim and polish it without installing, but recording itself needs the extension."}
+  ],
+  "related": ["record-a-window-or-full-screen-in-chrome", "zoom-on-click-screen-recorder-chrome", "how-to-record-a-website-walkthrough"]
+}
+-->
+<p>To record a Chrome tab, install a screen recording extension, open the tab you want, choose "this tab" as the source, and press record. Only the page content is captured, so notifications, your dock or taskbar, and other windows stay out of the video. When you stop, you can trim the result and export it as an MP4 or WebM file.</p>
+<p>Below is the full walkthrough, plus the audio, window size and privacy details that decide whether the recording looks clean or amateur.</p>
+
+<h2>Why record a tab instead of the whole screen</h2>
+<p>If everything you want to show lives in the browser, tab recording is usually the best choice.</p>
+<ul>
+<li><strong>Nothing else leaks in.</strong> Chat pop-ups, email previews, desktop icons and other apps are outside the tab, so they never appear.</li>
+<li><strong>Cleaner framing.</strong> The video contains just the page, without browser chrome, bookmarks bar or extension icons.</li>
+<li><strong>Predictable size.</strong> The output matches the tab's viewport, so you control the resolution by sizing the window.</li>
+<li><strong>Tab-only extras.</strong> Some tools can capture what the page was doing, such as network requests and console logs, which is only possible when recording a tab.</li>
+</ul>
+<p>When should you not record a tab? If you need to switch between several tabs, show a desktop app, or demonstrate something in the browser's own UI. In those cases, read <a href="/blog/record-a-window-or-full-screen-in-chrome">how to record a window or full screen in Chrome</a>.</p>
+
+<h2>How to record a Chrome tab in 6 steps</h2>
+<p>These steps use <a href="/">Click &amp; Record</a>, a free extension for Chrome, Edge and Brave, but the flow is similar in most tab recorders.</p>
+<ol>
+<li><strong>Install and pin the extension</strong> from the Chrome Web Store so its icon sits in the toolbar.</li>
+<li><strong>Prepare the tab.</strong> Load the page, log in, close banners and set the zoom level (<code>Ctrl</code> or <code>Cmd</code> plus <code>0</code> resets it to 100%).</li>
+<li><strong>Click the extension icon</strong> while that tab is in front and choose the current tab as the source.</li>
+<li><strong>Choose inputs.</strong> Turn on your microphone if you will narrate and your webcam if you want a face bubble.</li>
+<li><strong>Record.</strong> A 3-2-1 count-in runs before capture starts and is not in the file. Pause and resume as needed.</li>
+<li><strong>Stop</strong> from the toolbar icon or with <code>Alt+Shift+S</code>, then edit and export.</li>
+</ol>
+<p>Click &amp; Record also turns each click in the tab into a zoom keyframe after you stop, which you can adjust or delete. The setup is covered in <a href="/blog/zoom-on-click-screen-recorder-chrome">the zoom-on-click guide for Chrome</a>.</p>
+
+<h2>Getting the size and sharpness right</h2>
+<p>The tab recording's resolution follows the tab's visible area, multiplied by your display scaling. A few practical targets:</p>
+<table>
+<thead><tr><th>Goal</th><th>Window setup</th><th>Why</th></tr></thead>
+<tbody>
+<tr><td>YouTube or docs (16:9)</td><td>Browser window roughly 1280 to 1600 px wide, maximized height</td><td>Readable text, standard aspect after export.</td></tr>
+<tr><td>Vertical video (9:16)</td><td>Narrower window, or use the 9:16 export with zoom</td><td>Keeps UI large when cropped for phones.</td></tr>
+<tr><td>Maximum sharpness</td><td>Retina or high-DPI display at 100% page zoom</td><td>More pixels per UI element, so zooms stay crisp.</td></tr>
+</tbody>
+</table>
+<p>Hide the bookmarks bar and close unrelated tabs anyway. Even though they are not captured, a tidy browser reduces the chance of clicking the wrong thing mid-take. More detail is in our <a href="/blog/screen-recording-tips-for-crisp-video">tips for crisp screen recordings</a>.</p>
+
+<h2>Audio when you record a Chrome tab</h2>
+<p>There are two kinds of audio to think about.</p>
+<h3>Your voice</h3>
+<p>Enable the microphone in your recorder. Use a headset or a USB mic if you have one, and record in a quiet room. Do a 10-second test and play it back before the real take.</p>
+<h3>The page's own sound</h3>
+<p>If the page plays audio, such as a video or a notification sound, whether it ends up in the file depends on the tool. Chrome's own tab-sharing picker offers a "share tab audio" option when a site requests screen capture (see the <a href="https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getDisplayMedia" rel="noopener">getDisplayMedia documentation on MDN</a>). Do a quick test recording to confirm before relying on page audio.</p>
+
+<h2>Privacy checklist before you hit record</h2>
+<ul>
+<li>Close or move tabs with personal data so you do not switch to them by accident.</li>
+<li>Use a test account or demo data where possible.</li>
+<li>Check the URL bar: if you plan to show a browser frame, the editor's mock frame lets you change or hide the real URL.</li>
+<li>Turn off autofill suggestions that might reveal saved emails or addresses.</li>
+<li>Prefer tools that keep the recording on your machine. Click &amp; Record records, edits and exports locally, and uploads nothing unless you click Save to Google Drive.</li>
+</ul>
+<p>For more on keeping secrets off screen, see <a href="/blog/hide-sensitive-information-in-screen-recordings">how to hide sensitive information in screen recordings</a>.</p>
+
+<h2>Troubleshooting a Chrome tab recording</h2>
+<ul>
+<li><strong>The video is blurry.</strong> Check the page zoom is 100% and the window is not tiny. A larger viewport on a high-DPI display gives more pixels to work with.</li>
+<li><strong>Black or frozen frames.</strong> Some pages using protected video playback appear black in any capture. That is the site's choice, not a recorder fault.</li>
+<li><strong>A pop-up is missing.</strong> If the site opens a separate window, such as a login or payment pop-up, it is not part of the tab. Record the window or screen instead.</li>
+<li><strong>The browser crashed mid-take.</strong> Click &amp; Record writes the recording to disk as it goes, and the popup offers to recover it when you reopen the extension.</li>
+</ul>
+
+<h2>After recording: quick edits worth making</h2>
+<ol>
+<li><strong>Trim</strong> the first and last second where you reach for the mouse.</li>
+<li><strong>Cut or speed up</strong> page loads and waits; per-clip speed goes from 0.5x to 4x.</li>
+<li><strong>Review zooms</strong> and delete any on incidental clicks.</li>
+<li><strong>Add subtitles</strong> if you narrated. Click &amp; Record transcribes on-device and exports SRT or VTT.</li>
+<li><strong>Export</strong> as MP4 for the widest compatibility, choosing an aspect ratio that suits where it will be posted.</li>
+</ol>
+<p>Recording a Chrome tab is the simplest way to get a clean, focused browser video. Prepare the tab, keep the window at a sensible size, test your audio, and you will rarely need a retake. If you are recording a full site tour, <a href="/blog/how-to-record-a-website-walkthrough">how to record a website walkthrough</a> covers planning the route through the pages.</p>

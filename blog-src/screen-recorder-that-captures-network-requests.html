@@ -1,0 +1,75 @@
+<!--meta
+{
+  "slug": "screen-recorder-that-captures-network-requests",
+  "title": "Screen Recorder That Captures Network Requests",
+  "h1": "Choosing a screen recorder that captures network requests",
+  "description": "What to look for in a screen recorder that captures network requests: timeline sync, HAR export, cURL, debugger banners, privacy, and how the options compare.",
+  "keyword": "screen recorder that captures network requests",
+  "category": "Bug reports & QA",
+  "faq": [
+    {"q": "Can a normal screen recorder capture network requests?", "a": "No. A normal screen recorder only captures pixels and audio. Capturing network requests requires access to the browser itself, which is why these tools are usually browser extensions."},
+    {"q": "Why do some extensions show an is debugging this browser banner?", "a": "Extensions that use the chrome.debugger API trigger that banner for as long as they are attached. Tools that capture requests another way do not show it, and they leave DevTools free to use."},
+    {"q": "Can I capture network requests from a desktop app or full-screen recording?", "a": "Browser-based tools can only see requests made by web pages in the browser. In Click and Record, network and console capture is available for tab recordings only."},
+    {"q": "Are captured network logs safe to share?", "a": "Not automatically. Request and response headers can include cookies, authorization headers and tokens, so review or strip them before sharing outside your team."}
+  ],
+  "related": ["how-to-write-a-bug-report-with-video", "customer-support-screen-recordings", "how-to-record-a-chrome-tab"]
+}
+-->
+<p>A screen recorder that captures network requests records your browser tab as video and, at the same time, logs every HTTP request the page makes, with timestamps that line up with the video. That lets a developer see the click and the failing API call together instead of guessing. This guide covers what separates a useful one from a gimmick, and how to pick.</p>
+
+<h2>Why pair video with network requests at all</h2>
+<p>Many web bugs look identical on screen and completely different underneath. A button that "does nothing" could be a JavaScript error, a request that never fired, a request that returned 401 because the session expired, or a 200 response with an empty body. Video alone can't distinguish these. A network log can, but on its own it lacks context: which of the 140 requests on the page matters, and what was the user doing at the time?</p>
+<p>Capturing both in one session, on one clock, removes the guesswork. The developer scrubs the video to the moment things went wrong and sees the exact request, status code, headers and timing.</p>
+
+<h2>What to look for in a screen recorder that captures network requests</h2>
+<p>Several tools advertise network capture. These are the details that decide whether it actually helps.</p>
+<h3>1. Timeline sync</h3>
+<p>Requests should be timestamped against the video, not just listed. The best implementations let you click a request and jump the video to that moment, or scrub the video and see which requests were in flight.</p>
+<h3>2. A standard export format</h3>
+<p>Look for HAR export. HAR (HTTP Archive) is a JSON format that Chrome DevTools, Firefox, Charles, Fiddler and many other tools can import, so the log isn't locked into one vendor's viewer. Each entry records the URL, method, status, headers, timings and often the response body. Because it captures headers, a HAR file can also contain cookies, authorization headers and tokens, so it should be reviewed before it is shared.</p>
+<h3>3. Copy as cURL</h3>
+<p>Being able to copy a single request as a cURL command means a backend developer can replay it from a terminal in seconds, tweak a parameter and see if the server behaves. Like HAR files, copied commands usually include cookie and authorization headers, so replace those with placeholders before pasting one into a ticket.</p>
+<h3>4. No debugger banner</h3>
+<p>Some extensions capture traffic through the <code>chrome.debugger</code> API. It works, but Chrome shows a persistent "is debugging this browser" bar while it's attached, and it can interfere with opening DevTools yourself. That matters when the person recording is a developer who wants DevTools open, or a customer who finds the banner alarming.</p>
+<h3>5. Console capture too</h3>
+<p>Network failures and JavaScript errors often come together. A recorder that logs console output on the same timeline saves a second tool. An uncaught exception with a stack trace next to the failing request is often the whole diagnosis.</p>
+<h3>6. Where the data goes</h3>
+<p>Network logs can contain cookies, bearer tokens and personal data in request bodies. Know whether the tool uploads recordings and logs to its own servers by default, or keeps them local until you decide to share.</p>
+<h3>7. Video quality</h3>
+<p>Bug recorders often produce plain, unedited video. That's fine for a ticket, but if you also want the same take to be readable on a large monitor or reusable in docs, zoom and editing features matter.</p>
+
+<h2>How the main approaches compare</h2>
+<table>
+<thead><tr><th>Approach</th><th>Network capture</th><th>Synced to video</th><th>Trade-offs</th></tr></thead>
+<tbody>
+<tr><td>OS screen recorder + DevTools HAR export</td><td>Yes, manually</td><td>No</td><td>Two files, must open DevTools first, easy to forget</td></tr>
+<tr><td>Bug-report extensions (e.g. Jam, Bird Eats Bug, PlayLog)</td><td>Yes</td><td>Yes</td><td>Focus on bug capture; video is typically plain. Check each tool's site for how and where data is stored</td></tr>
+<tr><td>Auto-zoom recorders (e.g. Cursorful, Screen Studio)</td><td>Not their focus</td><td>n/a</td><td>Polished video, but nothing about what the page was doing</td></tr>
+<tr><td>Click &amp; Record</td><td>Yes (tab recordings)</td><td>Yes, click a row to seek</td><td>Chromium browsers only; capture limited to tab recordings</td></tr>
+</tbody>
+</table>
+<p>Feature sets change, so check each vendor's current documentation before deciding.</p>
+
+<h2>How Click &amp; Record handles network capture</h2>
+<p><a href="/">Click &amp; Record</a> is a free Chrome extension (it also runs in Edge and Brave) with no account and no watermark. When you record a tab, you can switch on network and console capture. Each request and console line is timestamped against the video. In the editor, clicking a row seeks the video to that moment.</p>
+<p>From there you can:</p>
+<ul>
+<li>Export a standard HAR 1.2 file that opens in Chrome DevTools, Charles and similar tools.</li>
+<li>Copy any request as cURL.</li>
+<li>Keep DevTools usable, since capture doesn't rely on <code>chrome.debugger</code> and there's no debugging banner.</li>
+</ul>
+<p>The same take also gets automatic click zooms, which you can retime, re-aim or delete afterwards, so the video is easy to follow even on a 4K screen. Recording, editing and export all happen locally in your browser; nothing is uploaded unless you click Save to Google Drive.</p>
+<p>Two honest limits: network capture is for tab recordings only (window and full-screen recordings get video, not requests), and the extension can only see what happens inside the browser.</p>
+
+<h2>A quick workflow</h2>
+<ol>
+<li>Open the page where the bug happens and start a tab recording with network capture on (new to tab recording? see <a href="/blog/how-to-record-a-chrome-tab">how to record a Chrome tab</a>).</li>
+<li>Reproduce the bug at a steady pace.</li>
+<li>Stop the recording and look for red status codes or console errors near the moment it broke.</li>
+<li>Export the video plus a HAR file, or copy the failing request as cURL.</li>
+<li>Review headers and bodies for secrets before sharing. Search the HAR for <code>cookie</code>, <code>authorization</code>, <code>token</code> and <code>password</code>, and share it through a private channel. Then attach it to a ticket using the template in <a href="/blog/how-to-write-a-bug-report-with-video">how to write a bug report with video</a>.</li>
+</ol>
+
+<h2>The bottom line</h2>
+<p>Support teams benefit too: asking a customer for a recording with logs attached is covered in <a href="/blog/customer-support-screen-recordings">customer support screen recordings</a>.</p>
+<p>If your recordings regularly end up in bug tickets, a screen recorder that captures network requests pays for itself the first time it saves a round of "can you open DevTools and try again?" Prioritize real timeline sync, HAR export and a clear answer to where your data lives. If you'd like that without an account or uploads, and with video that's pleasant to watch, try <a href="/">Click &amp; Record</a>.</p>

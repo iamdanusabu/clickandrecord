@@ -1,0 +1,112 @@
+<!--meta
+{
+  "slug": "srt-vs-vtt-subtitles",
+  "title": "SRT vs VTT Subtitles: Differences and Which to Use",
+  "h1": "SRT vs VTT: which subtitle format should you use?",
+  "description": "SRT vs VTT subtitles compared: syntax, styling, browser support and platform compatibility, plus a simple rule for picking the right caption file format.",
+  "keyword": "srt vs vtt",
+  "category": "Subtitles & editing",
+  "faq": [
+    {"q": "Is VTT better than SRT?", "a": "Neither is better overall. VTT is the native format for HTML5 video and supports positioning and styling, while SRT is simpler and accepted almost everywhere. Choose based on where the video will play."},
+    {"q": "Can I convert SRT to VTT?", "a": "Yes. Add a WEBVTT header line and change the comma before the milliseconds in each timestamp to a period. Cue numbers can stay. Many tools also export both formats directly."},
+    {"q": "Which subtitle format does YouTube accept?", "a": "YouTube accepts both SRT and VTT, along with several other formats. Check YouTube's help pages for the current list."},
+    {"q": "Why do my VTT captions not show in the browser?", "a": "The most common causes are a missing WEBVTT header, commas instead of periods in timestamps, or the file being served from another origin without the right CORS headers. Also make sure the track element has a srclang and the track is enabled."}
+  ],
+  "related": ["add-subtitles-to-screen-recording-free", "accessible-tutorial-videos-captions", "mp4-vs-webm-screen-recording"]
+}
+-->
+<p>In the SRT vs VTT choice, the short answer is: use VTT (WebVTT) for video embedded on web pages with the HTML5 player, and SRT for uploads to platforms, video editors and desktop players. Both are plain-text files of timed captions; VTT adds a header, a few syntax differences and optional styling and positioning.</p>
+<p>Below you will find the exact differences, side-by-side examples, and how to convert between them.</p>
+
+<h2>What SRT and VTT files are</h2>
+<p>Both formats are <em>sidecar</em> subtitle files: a separate text file that sits next to your video and tells the player which text to show and when. Because captions are not burned into the pixels, viewers can turn them on or off, and you can fix a typo without re-exporting the video.</p>
+<ul>
+<li><strong>SRT (SubRip Subtitle)</strong> dates back to a DVD-ripping tool and became a de facto standard because it is so simple. It has no formal specification body, which is part of why minor variations exist.</li>
+<li><strong>VTT (WebVTT)</strong> is a W3C format designed for the web. It is the format the HTML <code>&lt;track&gt;</code> element expects. The <a href="https://www.w3.org/TR/webvtt1/" rel="noopener">WebVTT specification</a> defines it formally.</li>
+</ul>
+
+<h2>SRT vs VTT syntax, side by side</h2>
+<p>Here is the same caption in each format. An SRT cue:</p>
+<blockquote>
+<p><code>1</code></p>
+<p><code>00:00:04,200 --&gt; 00:00:07,800</code></p>
+<p><code>Click Settings, then open Billing.</code></p>
+</blockquote>
+<p>The same cue in VTT:</p>
+<blockquote>
+<p><code>WEBVTT</code></p>
+<p><code>00:00:04.200 --&gt; 00:00:07.800</code></p>
+<p><code>Click Settings, then open Billing.</code></p>
+</blockquote>
+<p>In a real file, a blank line separates the header from the first cue and each cue from the next.</p>
+<p>The differences are small but they matter, because a player that expects one format may reject the other:</p>
+<table>
+<thead><tr><th>Feature</th><th>SRT</th><th>VTT</th></tr></thead>
+<tbody>
+<tr><td>File header</td><td>None</td><td>Must start with <code>WEBVTT</code></td></tr>
+<tr><td>Millisecond separator</td><td>Comma (<code>00:00:04,200</code>)</td><td>Period (<code>00:00:04.200</code>)</td></tr>
+<tr><td>Cue numbers</td><td>Expected</td><td>Optional cue identifiers</td></tr>
+<tr><td>Hours in timestamp</td><td>Always included</td><td>Optional for short videos</td></tr>
+<tr><td>Positioning</td><td>Not standardized</td><td>Cue settings for line, position, alignment</td></tr>
+<tr><td>Styling</td><td>Basic tags in some players</td><td>Bold, italic, classes, voice tags, CSS via <code>::cue</code></td></tr>
+<tr><td>Comments and metadata</td><td>No</td><td><code>NOTE</code> blocks, chapters and metadata tracks</td></tr>
+<tr><td>Native HTML5 support</td><td>No</td><td>Yes</td></tr>
+</tbody>
+</table>
+
+<h2>Where each format works</h2>
+<p>Compatibility is the deciding factor for most people, so here is a practical summary. Platform support changes, so treat this as a guide and check each platform's help pages.</p>
+<h3>Use VTT for</h3>
+<ul>
+<li>Videos on your own website using the native <code>&lt;video&gt;</code> element and <code>&lt;track&gt;</code>. MDN has a clear <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebVTT_API" rel="noopener">WebVTT API guide</a>.</li>
+<li>Web players and many video hosts that are built on HTML5 video.</li>
+<li>Cases where you need captions positioned somewhere other than the bottom, for example to avoid covering a toolbar in a screen recording.</li>
+</ul>
+<h3>Use SRT for</h3>
+<ul>
+<li>Uploading to video platforms and course hosts, which very commonly accept SRT.</li>
+<li>Desktop video editors and players such as VLC, which load an SRT with the same base name as the video.</li>
+<li>Handing captions to someone else to edit or translate, since SRT is the most widely understood format.</li>
+</ul>
+<p>Many platforms, including YouTube, accept both. If you are not sure, export both files; they are tiny.</p>
+
+<h2>How to convert SRT to VTT (and back)</h2>
+<p>Because the formats are so close, conversion is straightforward for basic captions.</p>
+<h3>SRT to VTT</h3>
+<ol>
+<li>Add <code>WEBVTT</code> as the first line, followed by a blank line.</li>
+<li>Replace the comma before the milliseconds in every timestamp with a period.</li>
+<li>Keep or remove the cue numbers; VTT treats them as identifiers.</li>
+<li>Save with a <code>.vtt</code> extension and UTF-8 encoding.</li>
+</ol>
+<h3>VTT to SRT</h3>
+<ol>
+<li>Delete the <code>WEBVTT</code> header and any <code>NOTE</code>, <code>STYLE</code> or <code>REGION</code> blocks.</li>
+<li>Number each cue sequentially, starting at 1.</li>
+<li>Make sure every timestamp includes hours and uses a comma before the milliseconds.</li>
+<li>Remove cue settings after the timestamps (like <code>line:10%</code>) and any VTT-only tags.</li>
+</ol>
+<p>Styling and positioning do not survive the trip to SRT, so keep the VTT as your master copy if you rely on them.</p>
+
+<h2>Generating SRT and VTT files without manual typing</h2>
+<p>Writing timestamps by hand is tedious. A transcription tool can generate the cues for you, and you only fix the text. <a href="/">Click &amp; Record</a> includes an on-device Whisper model that transcribes your narration with word-level timings, lets you edit or add cues, and exports either SRT or VTT. It runs in the browser, so nothing is uploaded, and <a href="/editor/editor.html">the free browser editor</a> does this for any video file without installing the extension. Our walkthrough on <a href="/blog/add-subtitles-to-screen-recording-free">adding subtitles to a screen recording for free</a> covers the full process.</p>
+
+<h2>A simple rule for choosing</h2>
+<p>If you only remember one thing from this SRT vs VTT comparison, make it this decision order:</p>
+<ol>
+<li><strong>Is the video going on a web page you control, using the native player?</strong> Use VTT.</li>
+<li><strong>Do you need captions positioned or styled?</strong> Use VTT, and confirm the destination player respects cue settings.</li>
+<li><strong>Is it going to a platform, editor or someone else for translation?</strong> Use SRT unless the destination asks for VTT.</li>
+<li><strong>Still unsure?</strong> Export both and keep them next to the video with the same base name.</li>
+</ol>
+<p>For screen recordings in particular, positioning can be worth the switch to VTT: captions at the bottom of the frame can cover a status bar, a chat widget or the exact button you are clicking.</p>
+
+<h2>Common mistakes with either format</h2>
+<ul>
+<li><strong>Wrong encoding.</strong> Save as UTF-8, or accented characters and non-Latin scripts turn into garbage.</li>
+<li><strong>Mismatched separators.</strong> A single comma in a VTT timestamp can make a browser skip the cue or the whole file.</li>
+<li><strong>Overlapping cues.</strong> Some players handle overlaps poorly. Make each cue end before the next starts unless overlap is intentional.</li>
+<li><strong>Captions out of sync after editing.</strong> If you trim the video after exporting captions, timings shift. Re-export subtitles after your final cut.</li>
+<li><strong>Missing language info.</strong> On the web, set <code>srclang</code> and <code>label</code> on the track so players and assistive tech present it correctly.</li>
+</ul>
+<p>Pick VTT for the open web and SRT for everywhere else, and you will rarely go wrong. If captions are part of an accessibility commitment, read <a href="/blog/accessible-tutorial-videos-captions">how to make tutorial videos accessible with captions</a> next. And if you are also deciding on a video container, see <a href="/blog/mp4-vs-webm-screen-recording">MP4 vs WebM for screen recordings</a>.</p>

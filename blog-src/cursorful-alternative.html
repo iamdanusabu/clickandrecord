@@ -1,0 +1,112 @@
+<!--meta
+{
+  "slug": "cursorful-alternative",
+  "title": "Cursorful Alternative: Free Auto-Zoom Recorder for Chrome",
+  "h1": "Looking for a Cursorful alternative? What to compare before you switch",
+  "description": "Comparing a Cursorful alternative? See how Click & Record handles auto zoom, editing, subtitles and network logs, and when Cursorful is still the better fit.",
+  "keyword": "cursorful alternative",
+  "category": "Comparisons & use cases",
+  "faq": [
+    {"q": "Is Click & Record a free Cursorful alternative?", "a": "Yes. Click & Record is a free Chrome extension with no account, no sign-up and no watermark. It records with automatic click zoom and includes an editor, on-device subtitles and optional network and console capture."},
+    {"q": "Does Click & Record zoom on clicks the same way Cursorful does?", "a": "Both tools zoom toward your clicks, but the details differ. In Click & Record every click becomes an editable zoom keyframe after recording, so you can retime, re-aim, weaken or delete each zoom and add manual ones."},
+    {"q": "Can I use Click & Record outside Chrome?", "a": "It works in Chromium browsers version 116 and later, including Chrome, Edge and Brave. It can record a tab, any application window or a whole display, though automatic click zoom only sees clicks inside web pages."},
+    {"q": "When should I stay with Cursorful?", "a": "If you already have a workflow, presets or a plan you are happy with in Cursorful, and you do not need subtitles or network logs, switching may not be worth the effort. Check their site for current features and pricing."}
+  ],
+  "related": ["auto-zoom-screen-recorders-compared", "what-is-an-auto-zoom-screen-recorder", "zoom-on-click-screen-recorder-chrome"]
+}
+-->
+<p>If you want a Cursorful alternative, the closest match is another Chrome extension that zooms toward your clicks automatically and lets you polish the result in the browser. Click &amp; Record does that for free, with no account, and adds two things auto-zoom recorders usually skip: on-device subtitles and a timestamped log of network requests and console output.</p>
+
+<p>This guide is a fair comparison, not a takedown. Cursorful is a well-made tool, and for some people it will stay the right choice. The goal is to help you figure out which features actually matter for the videos you make.</p>
+
+<h2>Why people look for a Cursorful alternative</h2>
+
+<p>Cursorful is a Chrome extension built around one idea: record your screen and have the video zoom in on what you click, so a demo looks edited without hours on a timeline. That idea is good, and it is why the auto-zoom category exists. People who search for alternatives usually have one of these reasons:</p>
+
+<ul>
+<li><strong>Budget.</strong> They want the auto-zoom look without a subscription. Pricing changes, so check Cursorful's pricing page for what is free and what is paid at the time you read this.</li>
+<li><strong>No account.</strong> Some teams cannot sign up for new tools without a security review, or simply do not want another login.</li>
+<li><strong>Privacy.</strong> They record internal dashboards or customer data and want everything to stay on their machine.</li>
+<li><strong>Extra output.</strong> They need captions for accessibility, or the same recording to double as a bug report with network logs.</li>
+<li><strong>More control over zooms.</strong> They want to fix a single bad zoom instead of re-recording.</li>
+</ul>
+
+<p>If none of these apply to you, there may be no reason to switch. If one or two do, read on.</p>
+
+<h2>Cursorful vs Click &amp; Record at a glance</h2>
+
+<p>The table below sticks to what is stable and verifiable. For Cursorful's current feature list and limits, check their website, since product details change faster than blog posts.</p>
+
+<table>
+<thead>
+<tr><th>Question</th><th>Cursorful</th><th>Click &amp; Record</th></tr>
+</thead>
+<tbody>
+<tr><td>Where it runs</td><td>Chrome extension</td><td>Chrome extension (also Edge and Brave, Chromium 116+)</td></tr>
+<tr><td>Automatic zoom on clicks</td><td>Yes, its core feature</td><td>Yes, generated as editable keyframes after recording</td></tr>
+<tr><td>Account required</td><td>Check their site</td><td>No account, no sign-up</td></tr>
+<tr><td>Watermark</td><td>Check their pricing page</td><td>None</td></tr>
+<tr><td>Subtitles</td><td>Check their site</td><td>On-device Whisper model, SRT or VTT export</td></tr>
+<tr><td>Network and console capture</td><td>Not its focus</td><td>Optional, tab recordings, HAR 1.2 export</td></tr>
+<tr><td>Price</td><td>See their pricing page</td><td>Free</td></tr>
+</tbody>
+</table>
+
+<h2>How the auto zoom actually differs</h2>
+
+<p>Every auto-zoom recorder promises "zooms where you click." The useful question is what happens when a zoom is wrong, because some will be.</p>
+
+<p>In Click &amp; Record, the zoom is a post-process. During recording, the extension only logs each click's position and timestamp. When you stop, those clicks become zoom keyframes in the editor. Nothing is baked into the pixels, so you can:</p>
+
+<ul>
+<li>Retime a zoom that starts too early or lingers too long.</li>
+<li>Make a zoom stronger or weaker.</li>
+<li>Re-aim it at a different part of the screen.</li>
+<li>Delete it entirely, or add a manual zoom where you did not click.</li>
+</ul>
+
+<p>A few rules keep the camera calm. Clicks that land during a zoom that is already in progress are skipped, so a burst of clicks does not stack into a jittery mess. Nearby zooms link together, so the view pans across the screen while zoomed instead of pulsing in and out. When you type, the zoom holds until you finish; only the timing of the typing is recorded, never what you typed.</p>
+
+<p>If you want the background on why this matters, the explainer on <a href="/blog/what-is-an-auto-zoom-screen-recorder">what an auto-zoom screen recorder is</a> covers the trade-offs, and <a href="/blog/auto-zoom-screen-recorders-compared">our comparison of auto-zoom recorders</a> looks at the wider category.</p>
+
+<h2>Features beyond the zoom</h2>
+
+<h3>Subtitles that never leave your machine</h3>
+
+<p>Click &amp; Record ships a Whisper speech model inside the extension. It runs locally in the browser through WebAssembly, so there is no API key, no per-minute cost and no upload, and it works offline. You pick a faster or a more accurate model, edit the cues, and export SRT or VTT. The guide to <a href="/blog/add-subtitles-to-screen-recording-free">adding subtitles to a screen recording for free</a> walks through it.</p>
+
+<h3>One take, two jobs</h3>
+
+<p>For tab recordings you can turn on network and console capture. Requests and console lines are timestamped against the video, clicking a row jumps to that moment, and you can export a standard HAR file or copy any request as cURL. That means the same recording can be a polished demo for marketing and a debuggable bug report for engineering. It does not use the browser's debugger API, so there is no "is debugging this browser" banner.</p>
+
+<h3>Editing and export</h3>
+
+<p>The editor covers trim, split, per-clip speed from 0.5x to 4x, backgrounds, padding, rounded corners, shadows and a mock browser frame with an editable URL bar. Export is MP4 or WebM in 16:9, 9:16, 1:1, 4:5 or the source ratio, and the dialog shows resolution, bitrate and estimated file size before you commit. The webcam is a separate track, so the bubble can be moved, resized or hidden after recording.</p>
+
+<h2>When Cursorful is the better fit</h2>
+
+<p>Be honest with yourself about switching costs. Cursorful may be the better choice if:</p>
+
+<ul>
+<li>You already pay for it and have presets, styles or templates you rely on.</li>
+<li>Your team has standardized on it and shares a consistent look across videos.</li>
+<li>It has a specific feature you use that Click &amp; Record does not offer. Check their current feature list against what you need.</li>
+</ul>
+
+<p>A tool you know well usually beats a slightly better tool you have to learn under deadline.</p>
+
+<h2>How to test an alternative in 15 minutes</h2>
+
+<ol>
+<li>Pick a real flow you have recorded before, around 60 to 90 seconds long.</li>
+<li>Record it in both tools with the same window size and the same script.</li>
+<li>Count the zooms you would want to change. Then try changing one in each tool.</li>
+<li>Export at 1080p and compare file size, sharpness of small text, and export time.</li>
+<li>If you need captions, generate them and check how many words you have to fix.</li>
+</ol>
+
+<p>This tells you more than any feature table, including this one.</p>
+
+<h2>The bottom line</h2>
+
+<p>If you want auto-zoom demos without an account or a watermark, and you value subtitles or network logs from the same take, <a href="/">Click &amp; Record</a> is a strong Cursorful alternative. If you only have existing footage, you can try the zoom, subtitle and frame tools in <a href="/editor/editor.html">the free browser editor</a> without installing anything. And if Cursorful already fits your workflow, keep using it; the best recorder is the one that gets your video shipped.</p>

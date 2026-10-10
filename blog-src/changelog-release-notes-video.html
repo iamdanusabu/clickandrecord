@@ -1,0 +1,80 @@
+<!--meta
+{
+  "slug": "changelog-release-notes-video",
+  "title": "Release Notes Video: Turn Your Changelog Into Clips",
+  "h1": "How to make a release notes video for every changelog update",
+  "description": "How to make a release notes video for your changelog: a repeatable format, short clips per change, a recording routine, and where to publish each update.",
+  "keyword": "release notes video",
+  "category": "Product demos",
+  "faq": [
+    {"q": "How is a release notes video different from a feature announcement video?", "a": "A feature announcement is a one-off, polished video for a big launch. A release notes video is a recurring, lighter format that covers several smaller changes from a sprint or month."},
+    {"q": "How long should a release notes video be?", "a": "Short. A clip of 15 to 30 seconds per change works well as a guideline, and a combined roundup of a few minutes is plenty for a monthly update."},
+    {"q": "Should every changelog entry get a video?", "a": "No. Video helps when a change is visual or behavioral, such as a new view, a faster flow or a moved setting. Bug fixes and backend changes are fine as text."},
+    {"q": "How can a small team keep up with video release notes?", "a": "Record each clip as soon as a feature ships, use a fixed template for framing and captions, and assemble the roundup from clips you already have."}
+  ],
+  "related": ["feature-announcement-video", "async-video-updates-for-remote-teams", "speed-up-screen-recording"]
+}
+-->
+<p>A release notes video turns your changelog into short clips that show what changed: one 15 to 30 second screen recording per notable update, optionally stitched into a monthly roundup. Users understand a new feature much faster when they see it, and a fixed, lightweight format means even a small team can keep it up every release. Here's a repeatable process for planning, recording and publishing changelog videos without turning each one into a production.</p>
+
+<h2>Why add video to release notes</h2>
+<p>Text changelogs are great for completeness and search, but they're easy to skim past. "Added bulk edit to the tasks table" means little until you see someone select twenty rows and change their status in one move. A short clip:</p>
+<ul>
+<li><strong>Shows where the feature lives</strong>, which removes a whole category of support questions.</li>
+<li><strong>Makes small improvements visible.</strong> A faster flow or a smarter default is hard to describe and easy to show.</li>
+<li><strong>Signals momentum.</strong> A regular stream of clips shows customers and prospects that the product is actively developed.</li>
+<li><strong>Gives marketing reusable content</strong> for social posts and newsletters.</li>
+</ul>
+<p>This is different from a big <a href="/blog/feature-announcement-video">feature announcement video</a>. Announcements are one-off, polished, launch-day assets. Release notes videos are recurring and deliberately lightweight. If you treat every changelog clip like a launch, you'll stop making them.</p>
+
+<h2>Decide what deserves a clip</h2>
+<table>
+<thead><tr><th>Change type</th><th>Video?</th><th>Why</th></tr></thead>
+<tbody>
+<tr><td>New screen, view or feature</td><td>Yes</td><td>Users need to see where it is and what it does</td></tr>
+<tr><td>Redesigned or moved UI</td><td>Yes</td><td>Prevents "where did X go?" tickets</td></tr>
+<tr><td>Faster or simpler workflow</td><td>Yes, often before and after</td><td>The improvement is only obvious when shown</td></tr>
+<tr><td>New integration</td><td>Sometimes</td><td>Show the setup if it's more than one click</td></tr>
+<tr><td>Bug fix, performance or backend change</td><td>Usually no</td><td>A line of text is enough</td></tr>
+</tbody>
+</table>
+
+<h2>A repeatable release notes video format</h2>
+<p>Consistency is what makes this sustainable. Pick a template and reuse it every time:</p>
+<ol>
+<li><strong>Title card or opening line (2 to 3 seconds):</strong> the name of the change, as text on screen or a single spoken sentence.</li>
+<li><strong>Context (3 to 5 seconds):</strong> where you are in the product.</li>
+<li><strong>The change (10 to 20 seconds):</strong> do the thing, once, at a steady pace.</li>
+<li><strong>Result (2 to 3 seconds):</strong> hold on the outcome.</li>
+</ol>
+<p>Keep the same background, frame, aspect ratio and caption style for every clip, so they feel like a series. Many teams skip narration entirely for clips this short and rely on captions written by hand.</p>
+<h3>Before and after clips</h3>
+<p>For improvements to an existing flow, a before and after clip is the clearest format. Record the old flow on a build or environment that still has it, record the new flow with the same data, and join them with a short caption such as "Before: 6 clicks" and "After: 2 clicks." Only use numbers you actually counted. If the old version is gone, a single clip of the new flow with a caption naming what changed works fine.</p>
+
+<h2>Recording routine for each release</h2>
+<p>The trick is to record while the feature is fresh, not in a batch at the end of the month.</p>
+<ol>
+<li><strong>When a feature ships</strong>, whoever built or tested it records a clip in a demo or staging environment with realistic data.</li>
+<li><strong>Record one take per change.</strong> Short clips are easy to retake.</li>
+<li><strong>Apply the template</strong> in the editor: background, frame, aspect ratio, captions.</li>
+<li><strong>Save the export</strong> in a shared folder named by release or date.</li>
+<li><strong>At release time</strong>, attach each clip to its changelog entry and assemble the roundup.</li>
+</ol>
+<p><a href="/">Click &amp; Record</a> keeps this routine quick. It's a free Chrome extension, no account, no watermark. Clicks are logged during recording and turned into zooms afterwards, so the exact button or menu item the change affects is enlarged without manual keyframing. You can tweak or delete any zoom, and if a staging URL is visible, the editor's browser frame has an editable URL bar to show your real domain instead.</p>
+<p>For captions, Click &amp; Record runs a Whisper speech model on your device, or you can write cues by hand, which is often faster for a 20-second silent clip. Optional Save to Google Drive puts exports straight into a shared folder.</p>
+
+<h2>Building the monthly roundup</h2>
+<p>A roundup collects the month's clips into one video for your newsletter or YouTube. In Click &amp; Record's editor, open the first clip, append the others as extra clips, trim the joins, and export once. Speed up any slow sections with per-clip speed from 0.5x to 4x; see <a href="/blog/speed-up-screen-recording">how to speed up a screen recording</a>.</p>
+<p>A good roundup is a few minutes at most. Open with a ten-second list of what's included so viewers know whether to keep watching, and close with a link to the full text changelog.</p>
+
+<h2>Where to publish release notes videos</h2>
+<ul>
+<li><strong>Your changelog page:</strong> embed each clip next to its entry. MP4 is the safest format for web playback.</li>
+<li><strong>In-app "What's new" panel:</strong> a muted, looping clip works well here. Captions are essential.</li>
+<li><strong>Email newsletter:</strong> link a thumbnail to the roundup.</li>
+<li><strong>Social channels:</strong> export 1:1 or 9:16 versions; the same clip can serve several platforms. See <a href="/blog/screen-recording-for-social-media-marketing">screen recording for social media marketing</a>.</li>
+<li><strong>Internal updates:</strong> sales and support appreciate seeing changes before customers ask. This pairs well with <a href="/blog/async-video-updates-for-remote-teams">async video updates for remote teams</a>.</li>
+</ul>
+
+<h2>Summary</h2>
+<p>A release notes video doesn't need to be a production. Pick which changes deserve a clip, use one fixed template, record as features ship, and assemble a roundup from clips you already have. The habit matters more than the polish. To record, auto-zoom and caption those clips for free in your browser, try <a href="/">Click &amp; Record</a>.</p>

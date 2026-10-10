@@ -1,0 +1,82 @@
+<!--meta
+{
+  "slug": "speed-up-screen-recording",
+  "title": "How to Speed Up a Screen Recording (Only the Slow Parts)",
+  "h1": "How to speed up a screen recording without making it unwatchable",
+  "description": "How to speed up a screen recording the smart way: split out slow sections, set per-clip speed from 0.5x to 4x, and keep key steps at normal pace.",
+  "keyword": "speed up screen recording",
+  "category": "Subtitles & editing",
+  "faq": [
+    {"q": "Should I speed up the whole screen recording?", "a": "Usually not. Speeding up everything makes narration hard to follow. Speed up only the slow, low-information parts such as loading, typing or waiting, and leave key steps at normal speed."},
+    {"q": "How fast can I speed up a clip?", "a": "In the Click & Record editor each clip can be set between 0.5x and 4x. Around 2x works well for routine actions; 4x suits long waits where nothing needs to be read."},
+    {"q": "What happens to my voice when I speed up a section?", "a": "The audio plays faster along with the video, so sped-up narration sounds rushed. Try to stay quiet during sections you plan to speed up, or keep narrated steps at 1x."},
+    {"q": "Can I slow down part of a screen recording?", "a": "Yes. Setting a clip below 1x, down to 0.5x, helps viewers catch a fast interaction like a drag, a hover menu or a quick keyboard shortcut."}
+  ],
+  "related": ["trim-and-split-video-in-browser", "screen-recording-tips-for-crisp-video", "saas-demo-video-best-practices"]
+}
+-->
+<p>The best way to speed up screen recording footage is to split the timeline around the slow parts, such as page loads, form filling or waiting for a build, and set only those clips to 2x to 4x while the important steps stay at normal speed. Speeding up the whole video is quicker to do, but it usually makes narration rushed and clicks hard to follow.</p>
+<p>Here is how to decide what to speed up, how fast to go, and how to do it in a free browser editor.</p>
+
+<h2>Why you should speed up screen recordings selectively</h2>
+<p>Every screen recording has dead time: the spinner after you hit Save, the seconds you spend typing a long email address, the pause while you find the right menu. Viewers do not need to sit through it at real speed. But they do need to see and hear the steps that matter.</p>
+<p>Selective speed changes give you the best of both:</p>
+<ul>
+<li><strong>Shorter videos</strong> without cutting context. The viewer still sees that a form was filled or a deploy ran.</li>
+<li><strong>Honest pacing.</strong> Unlike a jump cut, a fast-forward makes it clear that time passed.</li>
+<li><strong>Clear key moments.</strong> Important clicks stay at 1x, or even slower, so nobody misses them.</li>
+</ul>
+
+<h2>Speed up, cut or slow down? A quick guide</h2>
+<table>
+<thead><tr><th>Section</th><th>Suggested treatment</th><th>Why</th></tr></thead>
+<tbody>
+<tr><td>Loading spinner, build, upload progress</td><td>Speed up to 4x, or cut</td><td>Nothing to read; the viewer only needs to know it finished</td></tr>
+<tr><td>Typing long text or filling a form</td><td>Speed up to 2x to 3x</td><td>Shows what was entered without the wait</td></tr>
+<tr><td>Navigating familiar menus</td><td>Speed up to 1.5x to 2x</td><td>Keeps flow while staying followable</td></tr>
+<tr><td>The key step you are teaching</td><td>Leave at 1x</td><td>Viewers need to see exactly where you clicked</td></tr>
+<tr><td>Fast drag, hover menu or shortcut</td><td>Slow to 0.5x to 0.75x</td><td>Gives the eye time to catch it</td></tr>
+<tr><td>Mistakes and retries</td><td>Cut</td><td>Speeding up a mistake still shows a mistake</td></tr>
+</tbody>
+</table>
+<p>These ranges are starting points, not rules. Play the result back and trust your eye.</p>
+
+<h2>How to speed up a screen recording, step by step</h2>
+<p>These steps use the editor in <a href="/">Click &amp; Record</a>, a free Chrome extension, which opens automatically after you record. If you already have a video file from any recorder, <a href="/editor/editor.html">the free browser editor</a> does the same thing with no install and no upload.</p>
+<ol>
+<li><strong>Open the recording.</strong> Load your file or finish a take with the extension.</li>
+<li><strong>Find the slow sections.</strong> Play through once and note the timestamps where nothing important happens.</li>
+<li><strong>Split around each one.</strong> Put the playhead at the start of the slow part and split, then at the end and split again. The slow part is now its own clip.</li>
+<li><strong>Set the clip speed.</strong> Select the clip and choose a speed between 0.5x and 4x. Each clip has its own setting, so the rest of the video is unaffected.</li>
+<li><strong>Check the transitions.</strong> Play across each speed change. If the jump feels abrupt, move the split slightly so the change happens on a still frame.</li>
+<li><strong>Export.</strong> Choose MP4 or WebM and a quality preset. The export dialog shows the estimated file size up front.</li>
+</ol>
+<p>For more on splitting and deleting clips, see our guide to <a href="/blog/trim-and-split-video-in-browser">trimming and splitting video in the browser</a>.</p>
+
+<h2>Watch out for audio and zoom</h2>
+<h3>Narration</h3>
+<p>Audio speeds up with the video, so talking over a section you later play at 3x produces chipmunk-fast speech. Two ways to handle it:</p>
+<ul>
+<li>Plan ahead. When you reach a boring part while recording, stop talking, do the task, and pick the narration back up after.</li>
+<li>Keep narrated steps at 1x and only speed up silent stretches.</li>
+</ul>
+<h3>Zooms</h3>
+<p>If your recorder adds zooms on click, a sped-up section with many clicks can feel busy. In Click &amp; Record, zooms are keyframes you can edit after recording, so you can delete or weaken zooms inside a fast section and keep the camera calm. <a href="/blog/how-to-zoom-in-on-a-screen-recording">How to zoom in on a screen recording</a> explains how zoom keyframes work.</p>
+<h3>Subtitles</h3>
+<p>Generate subtitles after you finish speed changes so cue timings match what viewers see. Sped-up narration is also harder for speech models to transcribe, which is another reason to keep talking sections at normal speed.</p>
+
+<h2>Reduce the need for speed-ups while recording</h2>
+<p>The fastest edit is the one you do not need. A few habits cut dead time at the source:</p>
+<ul>
+<li><strong>Pre-fill what you can.</strong> Have test data ready to paste instead of typing it live.</li>
+<li><strong>Warm up the app.</strong> Load the pages once before recording so caches are warm and spinners are shorter.</li>
+<li><strong>Use pause.</strong> Pause the recording during a long wait and resume when it completes.</li>
+<li><strong>Rehearse once.</strong> Knowing where each menu is removes most hesitation.</li>
+</ul>
+<p>Our <a href="/blog/screen-recording-tips-for-crisp-video">screen recording tips for crisp video</a> cover more preparation habits.</p>
+
+<h2>Keep the viewer oriented</h2>
+<h3>A worked example</h3>
+<p>Say you recorded a three-minute walkthrough of creating an invoice. Forty seconds of it is you typing a customer address and line items, and fifteen seconds is a PDF generating. Split out both sections. Set the typing to 3x and the PDF wait to 4x, and the video gets more than half a minute shorter while every step remains visible. The click on Create invoice, the part you are actually teaching, stays at normal speed with its zoom intact.</p>
+<p>Speed changes work best when the viewer understands what is happening. Say something like "I will skip ahead while this finishes" before a fast section, or add a hand-written subtitle cue such as "Filling in test details (sped up)". Small signals like that keep a fast-forward from feeling like a glitch.</p>
+<p>Done well, speeding up a screen recording respects your viewer's time without hiding anything. Click &amp; Record gives every clip its own speed, alongside trimming, zoom editing and on-device subtitles, all free and local. For more on pacing a demo, see our <a href="/blog/saas-demo-video-best-practices">SaaS demo video best practices</a>.</p>

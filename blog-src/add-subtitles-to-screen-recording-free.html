@@ -1,0 +1,89 @@
+<!--meta
+{
+  "slug": "add-subtitles-to-screen-recording-free",
+  "title": "Add Subtitles to a Screen Recording Free (Step-by-Step)",
+  "h1": "How to add subtitles to a screen recording for free",
+  "description": "Add subtitles to a screen recording free: generate captions on your own computer, fix the timing, and export SRT or VTT files with no upload and no sign-up.",
+  "keyword": "add subtitles to screen recording",
+  "category": "Subtitles & editing",
+  "faq": [
+    {"q": "Can I add subtitles to a screen recording without paying?", "a": "Yes. A speech model that runs locally in your browser can transcribe your narration with no per-minute fee or API key. Click & Record ships one inside its editor and exports SRT or VTT files for free."},
+    {"q": "Do I need to upload my video to get subtitles?", "a": "Not if the transcription runs on your device. Click & Record runs its Whisper model inside the browser, so the audio never leaves your computer and it works offline."},
+    {"q": "Are the subtitles burned into the video?", "a": "Click & Record exports subtitles as separate SRT or VTT sidecar files. You upload the file alongside the video on YouTube, Vimeo, an LMS or your own player, and viewers can turn captions on or off."},
+    {"q": "How accurate are automatic subtitles for screen recordings?", "a": "Accuracy depends mostly on audio quality and vocabulary. Clear narration with a decent microphone transcribes well; product names, acronyms and code terms usually need a quick manual fix in the cue editor."}
+  ],
+  "related": ["offline-video-transcription-in-browser", "srt-vs-vtt-subtitles", "accessible-tutorial-videos-captions"]
+}
+-->
+<p>To add subtitles to a screen recording for free, run the narration through a speech-to-text model, correct the generated cues, and export them as an SRT or VTT file that you upload next to the video. You can do the whole thing in your browser without an account, an API key or uploading the recording anywhere.</p>
+<p>This guide walks through the workflow step by step, with the small fixes that make auto-generated captions actually readable.</p>
+
+<h2>Why add subtitles to screen recordings at all</h2>
+<p>Screen recordings are full of things that are hard to hear and easy to misread: feature names, menu paths, keyboard shortcuts, error messages. Subtitles help in a few concrete ways:</p>
+<ul>
+<li><strong>Muted autoplay.</strong> Videos in social feeds, docs pages and chat previews often start silent. Captions carry the message until someone turns the sound on.</li>
+<li><strong>Accessibility.</strong> Deaf and hard-of-hearing viewers need captions to follow a tutorial. If you publish training or public-facing content, captions are usually expected. See <a href="/blog/accessible-tutorial-videos-captions">our guide to accessible tutorial videos</a> for the details.</li>
+<li><strong>Non-native speakers.</strong> Reading along makes fast narration much easier to follow.</li>
+<li><strong>Searchability.</strong> Platforms like YouTube can index caption text, and a transcript doubles as written documentation.</li>
+</ul>
+
+<h2>What you need before you start</h2>
+<p>Good subtitles start with good audio. Before you worry about tools, check three things:</p>
+<ol>
+<li><strong>A clean narration track.</strong> A headset or USB mic a few inches from your mouth beats a laptop mic across the desk. Turn off fans and notifications.</li>
+<li><strong>A steady pace.</strong> Pause briefly between steps. Natural pauses give the transcription model clean boundaries for cue breaks.</li>
+<li><strong>A list of tricky words.</strong> Jot down product names, acronyms and code identifiers you say on camera. These are the words you will check first in the editor.</li>
+</ol>
+<p>If your recording has no narration at all, you can still add subtitles by writing cues by hand, which works well for short silent demos where you want on-screen captions explaining each step.</p>
+
+<h2>How to add subtitles to a screen recording, step by step</h2>
+<p>The steps below use <a href="/">Click &amp; Record</a>, a free Chrome extension whose editor includes an on-device Whisper speech model. If you already have a video file, <a href="/editor/editor.html">the free browser editor</a> does the same thing without installing anything.</p>
+<h3>1. Open your recording in the editor</h3>
+<p>If you recorded with the extension, the editor opens automatically when you stop. Otherwise, open the standalone editor and load any video file from your disk. The file is read locally; nothing is sent to a server.</p>
+<h3>2. Choose a model size and transcribe</h3>
+<p>Open the subtitles panel and pick one of the two model sizes: the faster one for quick drafts, or the more accurate one when the narration is fast, accented or full of jargon. The model runs inside the browser using WebAssembly, so there is no per-minute cost and it keeps working offline once loaded. Longer recordings take longer, so start transcription and keep editing other things while it runs.</p>
+<h3>3. Review and fix the cues</h3>
+<p>Transcription produces cues with word-level timings. Play through the video and fix:</p>
+<ul>
+<li>Misheard product names and technical terms</li>
+<li>Filler words you do not want on screen ("um", "so, yeah")</li>
+<li>Cues that are too long to read comfortably</li>
+<li>Punctuation, which makes a big difference to readability</li>
+</ul>
+<p>Every cue is editable, and you can add hand-written cues anywhere, for example to label a silent section where you are just clicking through a form.</p>
+<h3>4. Export SRT or VTT</h3>
+<p>Export the subtitles as an SRT or VTT sidecar file, then export the video itself as MP4 or WebM. Keep both files with the same base name, such as <code>onboarding-demo.mp4</code> and <code>onboarding-demo.srt</code>, so they stay paired. Not sure which format to choose? Our <a href="/blog/srt-vs-vtt-subtitles">SRT vs VTT comparison</a> covers where each one works.</p>
+
+<h2>Subtitle style guidelines that make captions readable</h2>
+<p>Automatic transcription gets you most of the way. These editing habits get you the rest, and they apply whatever tool you use. Treat the numbers as common practice rather than hard rules.</p>
+<table>
+<thead><tr><th>Guideline</th><th>Common practice</th><th>Why it matters</th></tr></thead>
+<tbody>
+<tr><td>Line length</td><td>Roughly 32–42 characters per line</td><td>Long lines force viewers to read instead of watch</td></tr>
+<tr><td>Lines per cue</td><td>One or two</td><td>Three lines cover too much of the screen</td></tr>
+<tr><td>Cue duration</td><td>About 1–7 seconds</td><td>Too short to read, or lingering after you have moved on</td></tr>
+<tr><td>Breaks</td><td>At natural phrase boundaries</td><td>"Click Settings / then Billing" reads better than a mid-phrase split</td></tr>
+<tr><td>Terms</td><td>Match on-screen spelling exactly</td><td>If the button says "Sign in", the caption should not say "log in"</td></tr>
+</tbody>
+</table>
+<p>Screen recordings have one extra concern: captions usually sit at the bottom of the frame, which is where status bars, chat widgets and cookie banners live. If an important UI element is down there, consider adding padding or a background in the editor so the video has some breathing room below the content.</p>
+
+<h2>Where to upload the subtitle file</h2>
+<p>Because the subtitles are a separate file, viewers can toggle them, and you can fix a typo without re-exporting the video. Most destinations accept one or both formats:</p>
+<ul>
+<li><strong>YouTube and Vimeo:</strong> upload the caption file in the video's subtitle settings.</li>
+<li><strong>Your own website:</strong> use a VTT file with the HTML <code>&lt;track&gt;</code> element. MDN's <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/track" rel="noopener">track element reference</a> shows the markup.</li>
+<li><strong>Learning platforms and video hosts:</strong> most accept SRT, VTT or both. Check the host's help docs.</li>
+<li><strong>Local playback:</strong> players like VLC pick up an SRT with the same file name automatically.</li>
+</ul>
+
+<h2>Common problems and quick fixes</h2>
+<ul>
+<li><strong>Captions drift out of sync after trimming.</strong> Generate or regenerate subtitles after your final cuts, or trim first and transcribe second.</li>
+<li><strong>Keyboard clicks show up as words.</strong> Delete the stray cues. A directional mic and a quieter keyboard help next time.</li>
+<li><strong>The model mangles a brand name every time.</strong> Fix the first instance, then scan the rest of the cues for the same error.</li>
+<li><strong>Background music drowns the voice.</strong> Transcribe the narration before adding music in another tool, or keep music quiet.</li>
+</ul>
+
+<h2>The short version</h2>
+<p>Record with clear audio, transcribe locally, spend a few minutes fixing names and line breaks, and export a sidecar file. Click &amp; Record handles the transcription and export in the same editor you use to trim and zoom, with no upload, no watermark and no account. If privacy is a big part of why you want local captions, read more about <a href="/blog/offline-video-transcription-in-browser">transcribing video offline in the browser</a>.</p>

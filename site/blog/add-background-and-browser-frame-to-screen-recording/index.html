@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<title>Add a Background and Browser Frame to a Screen Recording</title>
+<meta name="description" content="Add a screen recording background and a mock browser frame to make plain captures look polished. Padding, corner radius, shadow and URL tips, free." />
+<link rel="canonical" href="https://clickandrecord.tech/blog/add-background-and-browser-frame-to-screen-recording" />
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+<meta name="theme-color" content="#ffffff" />
+<meta name="color-scheme" content="light dark" />
+
+<meta property="og:type" content="article" />
+<meta property="og:site_name" content="Click &amp; Record" />
+<meta property="og:url" content="https://clickandrecord.tech/blog/add-background-and-browser-frame-to-screen-recording" />
+<meta property="og:title" content="Add a Background and Browser Frame to a Screen Recording" />
+<meta property="og:description" content="Add a screen recording background and a mock browser frame to make plain captures look polished. Padding, corner radius, shadow and URL tips, free." />
+<meta property="og:image" content="https://clickandrecord.tech/og-image.png" />
+<meta property="og:image:alt" content="Click &amp; Record" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Add a Background and Browser Frame to a Screen Recording" />
+<meta name="twitter:description" content="Add a screen recording background and a mock browser frame to make plain captures look polished. Padding, corner radius, shadow and URL tips, free." />
+<meta name="twitter:image" content="https://clickandrecord.tech/og-image.png" />
+
+<link rel="icon" href="/favicon.png" type="image/png" sizes="128x128" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<link rel="preload" href="/fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="stylesheet" href="/blog/blog.css" />
+<script src="/analytics.js" defer></script>
+
+<script>
+(function(){try{var t=localStorage.getItem('cr-theme');
+if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "BlogPosting",
+      "@id": "https://clickandrecord.tech/blog/add-background-and-browser-frame-to-screen-recording#article",
+      "headline": "How to add a background and browser frame to a screen recording",
+      "name": "Add a Background and Browser Frame to a Screen Recording",
+      "description": "Add a screen recording background and a mock browser frame to make plain captures look polished. Padding, corner radius, shadow and URL tips, free.",
+      "url": "https://clickandrecord.tech/blog/add-background-and-browser-frame-to-screen-recording",
+      "mainEntityOfPage": "https://clickandrecord.tech/blog/add-background-and-browser-frame-to-screen-recording",
+      "datePublished": "2026-10-10",
+      "dateModified": "2026-10-10",
+      "inLanguage": "en",
+      "articleSection": "Subtitles & editing",
+      "keywords": "screen recording background",
+      "wordCount": 955,
+      "image": "https://clickandrecord.tech/og-image.png",
+      "author": {
+        "@type": "Organization",
+        "name": "Click & Record",
+        "url": "https://clickandrecord.tech/"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "Click & Record",
+        "url": "https://clickandrecord.tech/",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://clickandrecord.tech/apple-touch-icon.png"
+        }
+      },
+      "about": {
+        "@type": "SoftwareApplication",
+        "name": "Click & Record",
+        "url": "https://clickandrecord.tech/"
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://clickandrecord.tech/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Blog",
+          "item": "https://clickandrecord.tech/blog"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "How to add a background and browser frame to a screen recording",
+          "item": "https://clickandrecord.tech/blog/add-background-and-browser-frame-to-screen-recording"
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Can I add a background to a screen recording after recording it?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. In the Click & Record editor, backgrounds, padding, corner radius, shadow and browser frames are editing settings, not part of the original capture, so you can add or change them on any recording, including files from other recorders opened in the free browser editor."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is a mock browser frame?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "It is a drawn browser window, with tabs, buttons and an address bar, placed around your recording. It makes a tab recording look like a clean browser window without your real toolbar, bookmarks or extensions."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I change the URL shown in the browser frame?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. The URL bar in Click & Record's mock frame is editable, so you can show a clean marketing URL, a shortened path, or hide a staging or internal address."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Will a background work for vertical video?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Choose 9:16, 1:1 or 4:5 on export and the background fills the extra space around the recording, which is often better than cropping the interface."
+          }
+        }
+      ]
+    }
+  ]
+}
+</script>
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+<header class="mast">
+  <div class="shell">
+    <a class="wordmark" href="/"><span class="dotrec" aria-hidden="true"></span> Click&nbsp;&amp;&nbsp;Record</a>
+    <nav aria-label="Primary">
+      <a href="/#zoom">Zoom</a>
+      <a href="/#subtitles">Subtitles</a>
+      <a href="/#evidence">Evidence</a>
+      <a href="/blog">Blog</a>
+      <a href="/editor/editor.html">Editor</a>
+      <button class="themer" id="themer" type="button" aria-pressed="false"
+              aria-label="Switch to dark theme" title="Switch theme">
+        <svg class="ico-sun" viewBox="0 0 20 20" width="16" height="16" fill="none" aria-hidden="true">
+          <circle cx="10" cy="10" r="3.6" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M10 1.8v2.1M10 16.1v2.1M18.2 10h-2.1M3.9 10H1.8M15.8 4.2l-1.5 1.5M5.7 14.3l-1.5 1.5M15.8 15.8l-1.5-1.5M5.7 5.7L4.2 4.2"
+                stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <svg class="ico-moon" viewBox="0 0 20 20" width="16" height="16" fill="none" aria-hidden="true">
+          <path d="M16.5 12.4A7 7 0 017.6 3.5a7 7 0 108.9 8.9z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <a class="btn btn-solid" href="https://chromewebstore.google.com/detail/lfpnagkdegnjjghefcbpeoblgoaklnnn" target="_blank" rel="noopener" data-cta="chrome-store">Add to Chrome</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <div class="shell post-head">
+    <nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a> <span aria-hidden="true">/</span> <a href="/blog">Blog</a> <span aria-hidden="true">/</span> <span>Subtitles &amp; editing</span></nav>
+    <p class="tc" data-mark="cue">Subtitles &amp; editing · 4 min read</p>
+    <h1>How to add a background and browser frame to a screen recording</h1>
+    <p class="updated">Published <time datetime="2026-10-10">October 10, 2026</time> · Click &amp; Record team</p>
+    <nav class="toc" aria-label="On this page">
+      <a href="#s1-why-a-plain-capture-looks-unfinished">Why a plain capture looks unfinished</a>
+      <a href="#s2-the-building-blocks-of-a-polished-frame">The building blocks of a polished frame</a>
+      <a href="#s3-choosing-a-screen-recording-background">Choosing a screen recording background</a>
+      <a href="#s4-using-a-mock-browser-frame-and-editing-the-url">Using a mock browser frame (and editing the URL)</a>
+      <a href="#s5-how-to-add-a-background-and-frame-step-by-step">How to add a background and frame step by step</a>
+      <a href="#s6-frames-zooms-and-vertical-formats">Frames, zooms and vertical formats</a>
+    </nav>
+  </div>
+
+  <div class="shell">
+    <article class="post">
+<p>To add a background and browser frame to a screen recording, open it in an editor that supports padding around the video, pick a gradient or image as the screen recording background, then wrap the capture in a mock browser window and set corner radius and shadow. It takes about a minute and turns a raw capture into something that looks at home on a landing page, in a launch post or a slide.</p>
+<p>Below are the design choices that matter, the settings that work well, and how to do it for free in the browser.</p>
+
+<h2 id="s1-why-a-plain-capture-looks-unfinished">Why a plain capture looks unfinished</h2>
+<p>A raw screen recording runs edge to edge. It shows your real browser chrome, your bookmarks bar, your extension icons and whatever happened to be in the tab strip. On a web page or in a social feed, it blends into the surrounding content with no clear edge.</p>
+<p>Adding a frame and background fixes several things at once:</p>
+<ul>
+<li><strong>Separation.</strong> Padding and a shadow lift the product off the page so it reads as a distinct object.</li>
+<li><strong>Consistency.</strong> Every video in a series gets the same look, even if recorded on different machines.</li>
+<li><strong>Clean chrome.</strong> A mock browser frame replaces your personal toolbar with a neutral one.</li>
+<li><strong>Brand fit.</strong> A background in your brand colors ties the video to the rest of your site.</li>
+</ul>
+
+<h2 id="s2-the-building-blocks-of-a-polished-frame">The building blocks of a polished frame</h2>
+<table>
+<thead><tr><th>Setting</th><th>What it does</th><th>A sensible starting point</th></tr></thead>
+<tbody>
+<tr><td>Background</td><td>Fills the canvas behind the recording</td><td>A soft two-color gradient, or a subtle brand image</td></tr>
+<tr><td>Inset / padding</td><td>Space between the recording and the canvas edge</td><td>Enough that the background reads as a border, not a sliver</td></tr>
+<tr><td>Corner radius</td><td>Rounds the recording's corners</td><td>Small to medium; large radii look toy-like on dense UIs</td></tr>
+<tr><td>Shadow</td><td>Adds depth under the recording</td><td>Soft and diffuse rather than hard and dark</td></tr>
+<tr><td>Browser frame</td><td>Draws a mock window around the capture</td><td>macOS or Windows style to match your audience</td></tr>
+<tr><td>Aspect ratio</td><td>Sets the output canvas shape</td><td>16:9 for sites and YouTube; 9:16, 1:1 or 4:5 for social</td></tr>
+</tbody>
+</table>
+
+<h2 id="s3-choosing-a-screen-recording-background">Choosing a screen recording background</h2>
+<p>The background should support the product, not compete with it. A few guidelines:</p>
+<ul>
+<li><strong>Low detail wins.</strong> Gradients and soft textures work. Busy photos pull attention away from the interface.</li>
+<li><strong>Contrast with the UI.</strong> A light app looks crisp on a mid-tone or dark background; a dark-mode app pops on a lighter or saturated one.</li>
+<li><strong>Use brand colors sparingly.</strong> A gradient between two brand-adjacent tones usually looks better than a flat primary color.</li>
+<li><strong>Match the destination.</strong> If the video will sit on a landing page, sample the page's colors so it feels native. See <a href="/blog/landing-page-hero-video">landing page hero video</a> tips for more.</li>
+</ul>
+
+<h2 id="s4-using-a-mock-browser-frame-and-editing-the-url">Using a mock browser frame (and editing the URL)</h2>
+<p>If you recorded a single browser tab, the video contains only the page content. A mock browser frame adds the familiar window around it, which tells viewers "this is a website" at a glance. It also hides everything personal about your real browser.</p>
+<p>The address bar is the detail people forget. Your real URL might show a staging subdomain, a localhost port, a long query string or an internal path. In Click &amp; Record's frame, the URL bar is editable, so you can:</p>
+<ul>
+<li>Show your public domain instead of <code>staging.</code> or <code>localhost:3000</code></li>
+<li>Shorten a long path to something readable like <code>app.example.com/reports</code></li>
+<li>Remove tracking parameters or IDs</li>
+<li>Leave it blank if the URL does not matter</li>
+</ul>
+<p>Pick the macOS or Windows frame style based on your audience. If you sell mostly to one platform's users, match it; otherwise either works.</p>
+
+<h2 id="s5-how-to-add-a-background-and-frame-step-by-step">How to add a background and frame step by step</h2>
+<p>These steps use <a href="/">Click &amp; Record</a>, a free Chrome extension whose editor opens after every recording. If you already have a video from another recorder, open it in <a href="/editor/editor.html">the free browser editor</a> instead; backgrounds and frames work the same way there, with no upload.</p>
+<ol>
+<li><strong>Crop first if needed.</strong> If the recording includes your real browser toolbar or black letterbox bars, crop to just the page content. The editor can detect letterboxing for you.</li>
+<li><strong>Choose a background.</strong> Pick a gradient or load your own image.</li>
+<li><strong>Set the inset.</strong> Increase padding until the background frames the recording evenly.</li>
+<li><strong>Round the corners and add shadow.</strong> Adjust corner radius and shadow until the recording looks like it sits above the background.</li>
+<li><strong>Add the browser frame.</strong> Choose macOS or Windows style and edit the URL bar text.</li>
+<li><strong>Pick the aspect ratio.</strong> 16:9 for most uses; 9:16, 1:1 or 4:5 for social feeds. The background fills the extra canvas.</li>
+<li><strong>Export.</strong> MP4 for broad compatibility or WebM for the web. The dialog shows resolution and estimated file size before you render.</li>
+</ol>
+
+<h2 id="s6-frames-zooms-and-vertical-formats">Frames, zooms and vertical formats</h2>
+<p>Backgrounds and frames combine with the editor's click zooms, so you keep the polished framing and still guide the eye to each action. Preview a few zooms before exporting to check the result suits your layout. If you plan to post vertically, a background is often better than cropping: the full interface stays visible in the middle of a 9:16 canvas, with room above and below for captions. Our guide to <a href="/blog/vertical-screen-recording-reels-shorts-tiktok">vertical screen recordings for Reels, Shorts and TikTok</a> covers that format in depth.</p>
+<p>One caution: a frame is cosmetic. Editing the URL bar hides the address, but it does not hide anything inside the page. If customer data or secrets appear in the content itself, read <a href="/blog/hide-sensitive-information-in-screen-recordings">how to hide sensitive information in screen recordings</a> before you publish.</p>
+<p>A good screen recording background and a clean browser frame are among the cheapest upgrades you can make to a demo. Click &amp; Record applies them in the same editor where you trim, zoom and caption, free and without a watermark.</p>
+
+    <section class="post-faq" id="faq">
+      <h2>Frequently asked questions</h2>
+      <div class="faq">
+        <details open>
+          <summary>Can I add a background to a screen recording after recording it?</summary>
+          <div><p>Yes. In the Click &amp; Record editor, backgrounds, padding, corner radius, shadow and browser frames are editing settings, not part of the original capture, so you can add or change them on any recording, including files from other recorders opened in the free browser editor.</p></div>
+        </details>
+        <details>
+          <summary>What is a mock browser frame?</summary>
+          <div><p>It is a drawn browser window, with tabs, buttons and an address bar, placed around your recording. It makes a tab recording look like a clean browser window without your real toolbar, bookmarks or extensions.</p></div>
+        </details>
+        <details>
+          <summary>Can I change the URL shown in the browser frame?</summary>
+          <div><p>Yes. The URL bar in Click &amp; Record's mock frame is editable, so you can show a clean marketing URL, a shortened path, or hide a staging or internal address.</p></div>
+        </details>
+        <details>
+          <summary>Will a background work for vertical video?</summary>
+          <div><p>Yes. Choose 9:16, 1:1 or 4:5 on export and the background fills the extra space around the recording, which is often better than cropping the interface.</p></div>
+        </details>
+      </div>
+    </section>
+    </article>
+    <aside class="cta" aria-label="Try Click &amp; Record">
+  <p class="tc" data-mark="rec">Free · No account · Nothing uploaded</p>
+  <h2>Record it once. Get the zooms for free.</h2>
+  <p>Click &amp; Record is a free Chrome extension that turns every click into a smooth zoom, transcribes subtitles on your own machine, and can capture network and console logs alongside the video.</p>
+  <div class="actions">
+    <a class="btn btn-solid" href="https://chromewebstore.google.com/detail/lfpnagkdegnjjghefcbpeoblgoaklnnn" target="_blank" rel="noopener" data-cta="chrome-store"><span class="dotrec" aria-hidden="true"></span> Add to Chrome</a>
+    <a class="btn btn-line" href="/editor/editor.html" data-cta="open-editor">Try the editor in your browser</a>
+  </div>
+</aside>
+  </div>
+
+  <section class="related shell" aria-labelledby="related-h">
+    <h2 id="related-h">Keep reading</h2>
+    <div class="cards">
+      <a class="card" href="/blog/landing-page-hero-video">
+        <span class="tc" data-mark="zoom">Product demos</span>
+        <h3>How to make a landing page hero video that loads fast and explains your product</h3>
+        <p>Make a landing page hero video that autoplays muted, loads fast and explains your product in seconds: what to show, how to record it, the HTML to embed it.</p>
+        <span class="more">4 min read →</span>
+      </a>
+      <a class="card" href="/blog/vertical-screen-recording-reels-shorts-tiktok">
+        <span class="tc" data-mark="zoom">Product demos</span>
+        <h3>Vertical screen recording: turn a widescreen demo into Reels, Shorts and TikTok</h3>
+        <p>How to make a vertical screen recording for Reels, Shorts and TikTok: record a narrow window, zoom on clicks, keep UI out of the safe zones, and export 9:16.</p>
+        <span class="more">5 min read →</span>
+      </a>
+      <a class="card" href="/blog/hide-sensitive-information-in-screen-recordings">
+        <span class="tc" data-mark="cue">Subtitles &amp; editing</span>
+        <h3>How to hide sensitive information in screen recordings</h3>
+        <p>Hide sensitive information in screen recordings by preparing a clean setup, recording one tab, then cropping, cutting and masking the URL before you share.</p>
+        <span class="more">4 min read →</span>
+      </a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="shell">
+    <div class="fcols">
+      <div>
+        <a class="wordmark" href="/"><span class="dotrec" aria-hidden="true"></span> Click&nbsp;&amp;&nbsp;Record</a>
+        <p style="margin-top:14px;max-width:32ch;color:var(--faint)">
+          The screen recorder that pushes in on every click — and can prove what the app was doing.
+        </p>
+      </div>
+      <div><h3>Product</h3><ul>
+        <li><a href="/#zoom">Automatic zoom</a></li>
+        <li><a href="/#subtitles">Subtitles</a></li>
+        <li><a href="/#evidence">Network &amp; console</a></li>
+        <li><a href="/editor/editor.html">Open the editor</a></li>
+      </ul></div>
+      <div><h3>Guides</h3><ul>
+        <li><a href="/blog/async-sales-demo-video">Async Sales Demo Video: Record Demos Prospects Watch</a></li>
+        <li><a href="/blog/changelog-release-notes-video">Release Notes Video: Turn Your Changelog Into Clips</a></li>
+        <li><a href="/blog/feature-announcement-video">Feature Announcement Video: A Simple 30-Second Formula</a></li>
+        <li><a href="/blog/how-to-make-a-product-demo-video">How to Make a Product Demo Video</a></li>
+      </ul></div>
+      <div><h3>More</h3><ul>
+        <li><a href="/blog">All articles</a></li>
+        <li><a href="/#faq">FAQ</a></li>
+        <li><a href="/privacy">Privacy</a></li>
+        <li><a href="/terms">Terms</a></li>
+      </ul></div>
+    </div>
+    <div class="rule">
+      <span>© 2026 Click &amp; Record</span>
+      <span>Built for people who make demos.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var root = document.documentElement;
+  var btn = document.getElementById('themer');
+  if (!btn) return;
+  function sync() {
+    var dark = root.getAttribute('data-theme') === 'dark';
+    btn.setAttribute('aria-pressed', String(dark));
+    btn.setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme');
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', dark ? '#0c0e13' : '#ffffff');
+  }
+  btn.addEventListener('click', function () {
+    var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('cr-theme', next); } catch (e) {}
+    sync();
+  });
+  sync();
+})();
+</script>
+
+</body>
+</html>

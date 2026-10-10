@@ -239,3 +239,18 @@ already adequate (~27 s for a short clip).
 - [ ] Subtitles generate (proves `vendor/` is reachable, if self-hosting)
 - [ ] Export produces a file
 - [ ] Save to Drive still works (its OAuth redirect is unrelated to this origin)
+
+## Blog
+
+Posts live in `blog-src/<slug>.html` (a `<!--meta {json} -->` block + body HTML; see
+`blog-src/_BRIEF.md`). After adding or editing one, run `node tools/build-blog.mjs` and
+commit the regenerated `site/blog/`, `site/sitemap.xml`, `site/llms.txt` and the home
+page's Guides block. The build fails on any internal link to a post that doesn't exist.
+
+## Analytics (PostHog)
+
+Marketing pages only (home + blog) load `site/analytics.js` — never `/editor/` or the
+extension. Set `POSTHOG_KEY` (the `phc_…` project key, same project as bravio-landing)
+in the Vercel project's environment variables; `buildCommand` in `site/vercel.json`
+injects it at deploy time, and the build log says whether it did. Ingestion is proxied
+through `/relay` (rewrites in `vercel.json`). Unset, analytics is simply off.

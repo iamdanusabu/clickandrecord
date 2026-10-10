@@ -1,0 +1,85 @@
+<!--meta
+{
+  "slug": "private-screen-recorder-no-upload",
+  "title": "Private Screen Recorder With No Upload: What to Look For",
+  "h1": "Private screen recorder with no upload: how to keep recordings on your machine",
+  "description": "A private screen recorder with no upload keeps video, audio and transcripts on your computer. Here is what to check before you trust one with your screen.",
+  "keyword": "private screen recorder",
+  "category": "Subtitles & editing",
+  "faq": [
+    {"q": "Do free screen recorders upload my videos?", "a": "Many do, because their business is hosting and sharing links. Others save locally. Check whether the tool requires an account, where the file goes when you stop, and what its privacy policy says about processing."},
+    {"q": "How can I tell if a Chrome extension uploads my recordings?", "a": "Read the privacy policy and permissions, then test: record with your network disconnected and see whether everything still works, or watch the Network panel of DevTools while recording and exporting."},
+    {"q": "Are automatic subtitles private?", "a": "Only if transcription runs on your device. Many caption tools send audio to a cloud API. Click & Record runs its Whisper model locally in the browser, so the audio never leaves your computer."},
+    {"q": "Can I still share a video recorded locally?", "a": "Yes. You get a normal MP4 or WebM file, so you decide where it goes: email, your company drive, a ticket, or a video host. Click & Record also has an optional Save to Google Drive button that only runs when you click it."}
+  ],
+  "related": ["offline-video-transcription-in-browser", "hide-sensitive-information-in-screen-recordings", "screen-recorder-no-account"]
+}
+-->
+<p>A private screen recorder captures, edits and exports video entirely on your own computer, so nothing is uploaded unless you choose to share the file yourself. The things to check are where the recording is stored, whether editing and subtitles run locally, and whether the tool needs an account or tracks you.</p>
+<p>This guide explains why that matters, how to verify a recorder's claims, and how to set up a workflow where your recordings never touch someone else's server by default.</p>
+
+<h2>Why upload-first recorders are a privacy risk</h2>
+<p>Many popular screen recorders are built around instant sharing: you stop recording and the video is already in the cloud, with a link on your clipboard. That is convenient, but it means every take, including the ones you would never share, ends up on a third-party server.</p>
+<p>Screen recordings are unusually sensitive because they capture whatever happened to be visible:</p>
+<ul>
+<li>Customer names, emails and order details in an admin panel</li>
+<li>Internal dashboards, revenue numbers and roadmaps</li>
+<li>Browser tabs, bookmarks and notification previews</li>
+<li>Tokens or keys in a URL, a terminal or a DevTools panel</li>
+<li>Your voice, and potentially your webcam</li>
+</ul>
+<p>Even when a vendor is trustworthy, uploading creates questions you then have to answer: who can access the file, how long it is retained, whether it is processed by sub-processors such as transcription APIs, and whether your company policy allows it at all.</p>
+
+<h2>What makes a private screen recorder</h2>
+<p>"Private" gets used loosely. Use this checklist to judge a tool on what it actually does:</p>
+<table>
+<thead><tr><th>Check</th><th>Private behavior</th><th>Red flag</th></tr></thead>
+<tbody>
+<tr><td>Storage</td><td>Recording saved to local disk</td><td>Recording streamed to a server as you record</td></tr>
+<tr><td>Account</td><td>None needed</td><td>Sign-in required before you can record</td></tr>
+<tr><td>Editing</td><td>Editor runs on your device</td><td>Edits only possible in a web app after upload</td></tr>
+<tr><td>Subtitles</td><td>Speech model runs locally</td><td>Audio sent to a cloud transcription API</td></tr>
+<tr><td>Export</td><td>File rendered and saved locally</td><td>Download only from the vendor's site</td></tr>
+<tr><td>Tracking</td><td>No analytics, no cookies</td><td>Third-party analytics in the recorder UI</td></tr>
+<tr><td>Sharing</td><td>Opt-in, per file</td><td>Automatic public or team link</td></tr>
+</tbody>
+</table>
+<p>Subtitles deserve special attention. A recorder can save video locally and still upload your audio for captions. If transcription matters to you, read <a href="/blog/offline-video-transcription-in-browser">how offline video transcription works in the browser</a>.</p>
+
+<h2>How to verify a recorder does not upload</h2>
+<p>Do not rely on marketing copy, including ours. You can check for yourself in a few minutes:</p>
+<ol>
+<li><strong>Read the privacy policy.</strong> Look for what is collected, where processing happens and which sub-processors are listed.</li>
+<li><strong>Review the extension's permissions</strong> on the Chrome Web Store listing and in <code>chrome://extensions</code>.</li>
+<li><strong>Go offline.</strong> Disconnect from the network, then record, edit, transcribe and export. A truly local tool keeps working.</li>
+<li><strong>Watch the network.</strong> Open DevTools on the recorder's editor page and watch the Network panel while you export. Chrome's <a href="https://developer.chrome.com/docs/devtools/network" rel="noopener">Network panel documentation</a> explains how.</li>
+<li><strong>Check where the file lands.</strong> You should end up with a normal video file in a folder you chose.</li>
+</ol>
+
+<h2>A private screen recording workflow with Click &amp; Record</h2>
+<p><a href="/">Click &amp; Record</a> is a free Chrome extension designed to work this way. Recording, editing, transcription and export all run locally in the browser. Nothing is uploaded unless you click Save to Google Drive, which uses the limited <code>drive.file</code> scope. There is no account, no analytics and no cookies.</p>
+<p>A typical private workflow looks like this:</p>
+<ol>
+<li><strong>Record</strong> a tab, a window or your whole screen, with optional mic and webcam. The take is written to local disk continuously, which also means a browser crash does not lose it; the popup offers to recover it.</li>
+<li><strong>Edit</strong> in the built-in editor: trim, split, adjust automatic zooms, add a background or browser frame.</li>
+<li><strong>Caption</strong> with the bundled Whisper model, which runs in the browser via WebAssembly. No API key and no upload.</li>
+<li><strong>Export</strong> MP4 or WebM to your disk, and share it through whatever channel your team already trusts.</li>
+</ol>
+<p>If you already have a video file, <a href="/editor/editor.html">the free browser editor</a> gives you the same local editing and subtitles without installing anything.</p>
+
+<h3>Local does not mean fragile</h3>
+<p>A common worry about local-only tools is losing work. Because the recording is saved to disk as it happens rather than held only in memory, a crashed tab or browser does not take the take with it. Keep your exports in a folder that your normal backup already covers, and you have the same safety net as a cloud tool without the exposure.</p>
+
+<h2>Privacy starts before you hit record</h2>
+<p>A local recorder protects the file. It cannot protect you from recording the wrong thing. Before sensitive takes:</p>
+<ul>
+<li>Use a demo account with fake data instead of real customer records.</li>
+<li>Record a single tab rather than your whole screen, so other windows stay out of frame.</li>
+<li>Turn on Do Not Disturb so message previews do not pop up.</li>
+<li>Close unrelated tabs and hide your bookmarks bar.</li>
+</ul>
+<p>Our guide to <a href="/blog/hide-sensitive-information-in-screen-recordings">hiding sensitive information in screen recordings</a> goes deeper, including what to do when something slips into a take.</p>
+
+<h2>When sharing is the goal</h2>
+<p>Local-first does not mean hard to share. You end up with a standard file, so you can attach it to a ticket, drop it in your company drive, or upload it to a host you have vetted. The difference is that sharing becomes a deliberate choice per video rather than the default for every take. If you also want to skip sign-ups entirely, see our guide to <a href="/blog/screen-recorder-no-account">screen recorders that need no account</a>.</p>
+<p>A private screen recorder gives you the convenience of modern tools, like auto-zoom, editing and subtitles, without handing your screen to anyone. Click &amp; Record keeps all of it on your machine.</p>

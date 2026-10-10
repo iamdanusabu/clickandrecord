@@ -1,0 +1,86 @@
+<!--meta
+{
+  "slug": "portfolio-project-demo-video",
+  "title": "Portfolio Project Demo Video: Show Your Work in 90s",
+  "h1": "How to make a portfolio project demo video that hiring managers watch",
+  "description": "How to make a portfolio project demo video for developers and designers: a 90-second structure, what to show, where to embed it, and how to record it free.",
+  "keyword": "portfolio project demo video",
+  "category": "Product demos",
+  "faq": [
+    {"q": "Do I need a demo video for my portfolio projects?", "a": "It is not required, but it helps. Live demos go down, free hosting sleeps, and reviewers often will not sign up for an account. A short video shows the project working regardless."},
+    {"q": "How long should a portfolio demo video be?", "a": "Aim for 60 to 120 seconds as a guideline. Reviewers skim many portfolios, so show the main feature quickly and keep technical detail for the README."},
+    {"q": "Can I put a demo video in a GitHub README?", "a": "Yes. GitHub supports video in Markdown files and issues when you upload them through the web editor, though there are file size limits, so check GitHub's current documentation. A GIF or a linked thumbnail are alternatives."},
+    {"q": "Should I talk in my portfolio demo video?", "a": "Narration helps, because it shows how you communicate and explain decisions. If you prefer not to, use captions to explain what is happening."}
+  ],
+  "related": ["video-for-developer-documentation", "how-to-record-a-software-demo", "free-screen-recorder-no-watermark"]
+}
+-->
+<p>A portfolio project demo video is a short screen recording, usually 60 to 120 seconds, that shows a side project, case study or bootcamp app actually working, with a sentence or two on what you built and why. It gives reviewers proof without making them clone a repo, wait for a sleeping free-tier server, or create an account. Here's what to include, a simple structure, and where to put the video so it gets seen.</p>
+
+<h2>Why a portfolio project demo video helps</h2>
+<p>People reviewing portfolios usually have many to get through. Every obstacle between them and your work costs you attention:</p>
+<ul>
+<li><strong>Live links break.</strong> Free hosting tiers spin down, APIs change, domains expire.</li>
+<li><strong>Sign-up walls.</strong> Few reviewers will create an account to try a to-do app.</li>
+<li><strong>Repos don't show behavior.</strong> Code shows how you write; it doesn't show what the product does.</li>
+<li><strong>Context gets lost.</strong> A video lets you say, in your own voice, what the hard part was.</li>
+</ul>
+<p>A demo video doesn't replace the repo or the live link. It's the thing that makes someone want to click them.</p>
+
+<h2>A 90-second structure</h2>
+<table>
+<thead><tr><th>Segment</th><th>Length</th><th>Content</th></tr></thead>
+<tbody>
+<tr><td>What it is</td><td>10 seconds</td><td>One sentence: what the project does and who it's for</td></tr>
+<tr><td>Main feature</td><td>40 to 50 seconds</td><td>The core flow, using realistic data</td></tr>
+<tr><td>The interesting part</td><td>20 to 30 seconds</td><td>A technical or design decision you're proud of, shown, not just described</td></tr>
+<tr><td>Wrap</td><td>5 to 10 seconds</td><td>Stack in one line, and where to find the code</td></tr>
+</tbody>
+</table>
+<h3>Show the interesting part</h3>
+<p>This segment is what separates your project from a tutorial clone. Pick one thing and make it visible:</p>
+<ul>
+<li>A real-time update arriving in two browser windows at once.</li>
+<li>Offline mode working with the network disabled.</li>
+<li>A search that stays fast over a large dataset.</li>
+<li>An accessibility detail, such as full keyboard navigation.</li>
+<li>For designers: the before-and-after of a flow you redesigned, with the reasoning.</li>
+</ul>
+<p>Then mention briefly how you did it. Save the deep explanation for the README or case study.</p>
+<h3>What to leave out</h3>
+<p>Skip the sign-up form, the settings page and the footer unless they are the point of the project. Skip a long tour of the folder structure too; reviewers who care about code will open the repo. And avoid apologizing on camera for unfinished parts. If something is incomplete, simply do not show it, and note known limitations in the README instead.</p>
+
+<h2>Recording your portfolio project demo video</h2>
+<h3>Prepare the project</h3>
+<ul>
+<li><strong>Seed realistic data.</strong> "Test test 123" makes a good app look unfinished.</li>
+<li><strong>Fix the obvious visual bugs</strong> on the screens you'll show. Reviewers notice.</li>
+<li><strong>Size the browser</strong> to about 1920 by 1080, or narrower with browser zoom at 110 to 125 percent so UI is readable.</li>
+<li><strong>Hide localhost.</strong> Either record on the deployed version or replace the URL bar in editing.</li>
+</ul>
+<h3>Record</h3>
+<p>For a web project, recording a single browser tab gives the cleanest result. For mobile or desktop apps, record the simulator or app window. Detailed capture setup is in <a href="/blog/how-to-record-a-software-demo">how to record a software demo</a>.</p>
+<p><a href="/">Click &amp; Record</a> is a good free fit for this: it's a Chrome extension with no account and no watermark, which matters when the video represents you professionally (see <a href="/blog/free-screen-recorder-no-watermark">free screen recorders with no watermark</a>). It records a tab, any window or the full screen, logs your clicks in web pages and turns them into zooms afterwards, so small UI details are readable. You can retime, adjust or delete each zoom, and add manual zooms for moments in non-browser apps, where automatic zoom isn't available.</p>
+<h3>Narrate, briefly</h3>
+<p>Your voice is part of the pitch: it shows how you explain technical work, which matters in interviews. Keep it conversational, and talk about decisions rather than narrating clicks: "I cached search results on the client so filtering feels instant" says more about you than "now I click the filter." If you'd rather not narrate, captions can carry the explanation. Click &amp; Record generates subtitles on your device, and you can also write your own cues.</p>
+
+<h2>Polish without overdoing it</h2>
+<ul>
+<li>Trim the start and end, and cut any fumbles.</li>
+<li>Speed up waits, like builds or slow API calls, with per-clip speed up to 4x.</li>
+<li>Add a background, padding, rounded corners and a browser frame. It's a small touch that makes a side project look intentional.</li>
+<li>If you include your webcam, keep it small. Click &amp; Record records it as a separate track, so you can resize or hide it after recording.</li>
+</ul>
+<p>Already have a raw recording? <a href="/editor/editor.html">The free browser editor</a> handles trimming, manual zooms, subtitles, backgrounds and export without installing anything.</p>
+
+<h2>Where to put the video</h2>
+<ol>
+<li><strong>Portfolio site:</strong> embed it at the top of each project page, above the write-up. Export MP4 for broad browser support, or WebM for smaller files; see <a href="/blog/mp4-vs-webm-screen-recording">MP4 vs WebM</a>.</li>
+<li><strong>GitHub README:</strong> GitHub lets you drag a video into a Markdown file in the web editor and renders a player. Upload size limits apply and can change, so check GitHub's current documentation. A short GIF or a thumbnail image linking to the video are alternatives.</li>
+<li><strong>Resume and applications:</strong> link to the video directly, not just the repo.</li>
+<li><strong>LinkedIn and social:</strong> export a square 1:1 or vertical 9:16 version so it fills the feed.</li>
+</ol>
+<p>For documentation-style videos in a repo, the guide to <a href="/blog/video-for-developer-documentation">video for developer documentation</a> goes further.</p>
+
+<h2>Summary</h2>
+<p>A portfolio project demo video gives reviewers a fast, reliable look at your work: what it does, the one thing that makes it interesting, and where to find the code. Keep it short, use real-looking data, and put it where reviewers land first. <a href="/">Click &amp; Record</a> lets you record and polish it for free, with no watermark and no account.</p>

@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<title>How to Trim and Split Video in Your Browser (No Upload)</title>
+<meta name="description" content="Trim and split video in your browser for free: cut the start and end, remove mistakes from the middle, join clips and export MP4 or WebM with no upload." />
+<link rel="canonical" href="https://clickandrecord.tech/blog/trim-and-split-video-in-browser" />
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+<meta name="theme-color" content="#ffffff" />
+<meta name="color-scheme" content="light dark" />
+
+<meta property="og:type" content="article" />
+<meta property="og:site_name" content="Click &amp; Record" />
+<meta property="og:url" content="https://clickandrecord.tech/blog/trim-and-split-video-in-browser" />
+<meta property="og:title" content="How to Trim and Split Video in Your Browser (No Upload)" />
+<meta property="og:description" content="Trim and split video in your browser for free: cut the start and end, remove mistakes from the middle, join clips and export MP4 or WebM with no upload." />
+<meta property="og:image" content="https://clickandrecord.tech/og-image.png" />
+<meta property="og:image:alt" content="Click &amp; Record" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="How to Trim and Split Video in Your Browser (No Upload)" />
+<meta name="twitter:description" content="Trim and split video in your browser for free: cut the start and end, remove mistakes from the middle, join clips and export MP4 or WebM with no upload." />
+<meta name="twitter:image" content="https://clickandrecord.tech/og-image.png" />
+
+<link rel="icon" href="/favicon.png" type="image/png" sizes="128x128" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<link rel="preload" href="/fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="stylesheet" href="/blog/blog.css" />
+<script src="/analytics.js" defer></script>
+
+<script>
+(function(){try{var t=localStorage.getItem('cr-theme');
+if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "BlogPosting",
+      "@id": "https://clickandrecord.tech/blog/trim-and-split-video-in-browser#article",
+      "headline": "How to trim and split video in your browser without uploading it",
+      "name": "How to Trim and Split Video in Your Browser (No Upload)",
+      "description": "Trim and split video in your browser for free: cut the start and end, remove mistakes from the middle, join clips and export MP4 or WebM with no upload.",
+      "url": "https://clickandrecord.tech/blog/trim-and-split-video-in-browser",
+      "mainEntityOfPage": "https://clickandrecord.tech/blog/trim-and-split-video-in-browser",
+      "datePublished": "2026-10-10",
+      "dateModified": "2026-10-10",
+      "inLanguage": "en",
+      "articleSection": "Subtitles & editing",
+      "keywords": "trim and split video",
+      "wordCount": 929,
+      "image": "https://clickandrecord.tech/og-image.png",
+      "author": {
+        "@type": "Organization",
+        "name": "Click & Record",
+        "url": "https://clickandrecord.tech/"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "Click & Record",
+        "url": "https://clickandrecord.tech/",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://clickandrecord.tech/apple-touch-icon.png"
+        }
+      },
+      "about": {
+        "@type": "SoftwareApplication",
+        "name": "Click & Record",
+        "url": "https://clickandrecord.tech/"
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://clickandrecord.tech/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Blog",
+          "item": "https://clickandrecord.tech/blog"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "How to trim and split video in your browser without uploading it",
+          "item": "https://clickandrecord.tech/blog/trim-and-split-video-in-browser"
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Can I trim a video in the browser without uploading it?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Some browser editors read the file locally and do all processing on your device. The free Click & Record editor opens a video from your disk and exports the edited file without sending it anywhere."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the difference between trimming and splitting?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Trimming removes footage from the start or end of a video. Splitting cuts the timeline into separate clips at a point, so you can delete, speed up or rearrange parts in the middle."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does trimming reduce video quality?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Editors that re-encode on export can introduce a small quality loss, which a high quality preset keeps minimal. Pick a preset that matches the resolution you recorded at."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I join two videos together in the browser?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "In the Click & Record editor you can append extra clips to the timeline, then trim and split them like the original before exporting a single file."
+          }
+        }
+      ]
+    }
+  ]
+}
+</script>
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+<header class="mast">
+  <div class="shell">
+    <a class="wordmark" href="/"><span class="dotrec" aria-hidden="true"></span> Click&nbsp;&amp;&nbsp;Record</a>
+    <nav aria-label="Primary">
+      <a href="/#zoom">Zoom</a>
+      <a href="/#subtitles">Subtitles</a>
+      <a href="/#evidence">Evidence</a>
+      <a href="/blog">Blog</a>
+      <a href="/editor/editor.html">Editor</a>
+      <button class="themer" id="themer" type="button" aria-pressed="false"
+              aria-label="Switch to dark theme" title="Switch theme">
+        <svg class="ico-sun" viewBox="0 0 20 20" width="16" height="16" fill="none" aria-hidden="true">
+          <circle cx="10" cy="10" r="3.6" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M10 1.8v2.1M10 16.1v2.1M18.2 10h-2.1M3.9 10H1.8M15.8 4.2l-1.5 1.5M5.7 14.3l-1.5 1.5M15.8 15.8l-1.5-1.5M5.7 5.7L4.2 4.2"
+                stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <svg class="ico-moon" viewBox="0 0 20 20" width="16" height="16" fill="none" aria-hidden="true">
+          <path d="M16.5 12.4A7 7 0 017.6 3.5a7 7 0 108.9 8.9z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <a class="btn btn-solid" href="https://chromewebstore.google.com/detail/lfpnagkdegnjjghefcbpeoblgoaklnnn" target="_blank" rel="noopener" data-cta="chrome-store">Add to Chrome</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <div class="shell post-head">
+    <nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a> <span aria-hidden="true">/</span> <a href="/blog">Blog</a> <span aria-hidden="true">/</span> <span>Subtitles &amp; editing</span></nav>
+    <p class="tc" data-mark="cue">Subtitles &amp; editing · 4 min read</p>
+    <h1>How to trim and split video in your browser without uploading it</h1>
+    <p class="updated">Published <time datetime="2026-10-10">October 10, 2026</time> · Click &amp; Record team</p>
+    <nav class="toc" aria-label="On this page">
+      <a href="#s1-trimming-vs-splitting-what-each-one-does">Trimming vs splitting: what each one does</a>
+      <a href="#s2-why-edit-in-the-browser-instead-of-uploading">Why edit in the browser instead of uploading</a>
+      <a href="#s3-how-to-trim-and-split-video-step-by-step">How to trim and split video step by step</a>
+      <a href="#s4-making-cuts-viewers-do-not-notice">Making cuts viewers do not notice</a>
+      <a href="#s5-edit-before-you-add-subtitles">Edit before you add subtitles</a>
+      <a href="#s6-wrapping-up">Wrapping up</a>
+    </nav>
+  </div>
+
+  <div class="shell">
+    <article class="post">
+<p>To trim and split video in your browser, open the file in a local browser editor, drag the start and end handles to trim, place the playhead where you want a cut and split, delete the clips you do not need, and export a new MP4 or WebM. With an editor that runs on your device, the video never leaves your computer and there is nothing to install or sign up for.</p>
+<p>This guide covers the editing moves you will actually use on screen recordings, and how to make cuts that viewers do not notice.</p>
+
+<h2 id="s1-trimming-vs-splitting-what-each-one-does">Trimming vs splitting: what each one does</h2>
+<p>The two terms get mixed up, but they solve different problems:</p>
+<table>
+<thead><tr><th>Edit</th><th>What it does</th><th>Typical use on a screen recording</th></tr></thead>
+<tbody>
+<tr><td>Trim</td><td>Removes footage from the start or end</td><td>Cut the moment you reach for the stop button, or the fumbling before you begin</td></tr>
+<tr><td>Split</td><td>Cuts the timeline into separate clips at the playhead</td><td>Isolate a mistake, a loading spinner or a tangent in the middle</td></tr>
+<tr><td>Delete section</td><td>Removes a clip created by splitting</td><td>Drop the mistake and close the gap</td></tr>
+<tr><td>Append</td><td>Adds another video to the end of the timeline</td><td>Join a second take or an intro clip</td></tr>
+</tbody>
+</table>
+<p>Most edits are a combination: split twice around a problem, delete the clip in between, and the timeline closes up.</p>
+
+<h2 id="s2-why-edit-in-the-browser-instead-of-uploading">Why edit in the browser instead of uploading</h2>
+<p>Many "online video trimmers" upload your file to a server, process it there and let you download the result, sometimes with a watermark or a file size cap. A browser editor that works locally avoids that:</p>
+<ul>
+<li><strong>Privacy.</strong> Screen recordings often show internal tools or customer data. Local editing keeps them off third-party servers. More on that in <a href="/blog/private-screen-recorder-no-upload">private screen recording with no upload</a>.</li>
+<li><strong>Speed.</strong> No waiting for a large file to upload and download again.</li>
+<li><strong>No install.</strong> It is just a web page, so it works on locked-down work laptops too.</li>
+</ul>
+
+<h2 id="s3-how-to-trim-and-split-video-step-by-step">How to trim and split video step by step</h2>
+<p>These steps use <a href="/editor/editor.html">the free browser editor</a> from Click &amp; Record. It opens any video file from your disk and runs entirely locally; no extension is required for editing. If you recorded with the <a href="/">Click &amp; Record</a> extension, the same editor opens automatically when you stop.</p>
+<h3>1. Open your video</h3>
+<p>Load an MP4 or WebM from your disk. You get a preview of the video and a timeline to work on.</p>
+<h3>2. Trim the start and end</h3>
+<p>Play from the beginning and find the first useful frame, usually just before your first action. Trim everything before it. Do the same at the end: stop shortly after the final result is visible, not when your mouse heads for the stop button.</p>
+<h3>3. Split around mistakes</h3>
+<p>Scrub to the start of a section you want to remove, split, then scrub to its end and split again. You now have a separate clip containing just the mistake.</p>
+<h3>4. Delete the unwanted clips</h3>
+<p>Select the clip and delete it. Play across the cut to check it feels natural. Repeat for each problem section.</p>
+<h3>5. Speed up instead of cutting, where it helps</h3>
+<p>Sometimes a section is boring but still needed, like a form being filled or a build running. Instead of deleting it, set that clip to a faster speed; each clip can run anywhere from 0.5x to 4x. Our guide to <a href="/blog/speed-up-screen-recording">speeding up a screen recording</a> covers when that works better than a cut.</p>
+<h3>6. Append extra clips if needed</h3>
+<p>To join a second take or a short intro, append it to the timeline and trim it the same way.</p>
+<h3>7. Export</h3>
+<p>Choose MP4 or WebM, a quality preset and an aspect ratio. The export dialog shows the resolution, bitrate and estimated file size before you commit, and rendering runs faster than real time in supported browsers.</p>
+
+<h2 id="s4-making-cuts-viewers-do-not-notice">Making cuts viewers do not notice</h2>
+<p>A jump cut in a screen recording is obvious when the cursor teleports or the page changes abruptly. These habits make edits smoother:</p>
+<ul>
+<li><strong>Cut on stillness.</strong> Place splits where the mouse is not moving and the page is static.</li>
+<li><strong>Cut between actions, not during them.</strong> Remove the whole fumbled attempt, from the moment before you started it to the moment before the clean retry.</li>
+<li><strong>Watch the audio.</strong> Split in the gaps between sentences so you do not chop a word in half.</li>
+<li><strong>Pause while recording.</strong> If you know a slow part is coming, pause the recording and resume when ready. Fewer cuts later.</li>
+<li><strong>Leave a beat at the end.</strong> Hold the final screen for a second or two so the result registers before the video ends.</li>
+</ul>
+
+<h2 id="s5-edit-before-you-add-subtitles">Edit before you add subtitles</h2>
+<p>Order matters. Trim and split first, then generate captions, so subtitle timings match the final cut and you are not correcting text you are about to delete. The editor includes an on-device speech model for this; see <a href="/blog/add-subtitles-to-screen-recording-free">how to add subtitles to a screen recording</a>.</p>
+<p>A good editing order for screen recordings:</p>
+<ol>
+<li>Trim the start and end</li>
+<li>Split and delete mistakes</li>
+<li>Adjust speed on slow sections</li>
+<li>Review zooms, background and frame</li>
+<li>Generate and correct subtitles</li>
+<li>Export</li>
+</ol>
+<p>If the exported file is bigger than you expected, our guide on <a href="/blog/reduce-screen-recording-file-size">reducing screen recording file size</a> explains which settings matter.</p>
+
+<h2 id="s6-wrapping-up">Wrapping up</h2>
+<p>Trimming removes the edges, splitting lets you work on the middle, and together they turn a rough take into something people will watch to the end. You can do both in a browser tab, on your own machine, for free. For the bigger picture on structuring the video itself, read <a href="/blog/how-to-make-a-product-demo-video">how to make a product demo video</a>.</p>
+
+    <section class="post-faq" id="faq">
+      <h2>Frequently asked questions</h2>
+      <div class="faq">
+        <details open>
+          <summary>Can I trim a video in the browser without uploading it?</summary>
+          <div><p>Yes. Some browser editors read the file locally and do all processing on your device. The free Click &amp; Record editor opens a video from your disk and exports the edited file without sending it anywhere.</p></div>
+        </details>
+        <details>
+          <summary>What is the difference between trimming and splitting?</summary>
+          <div><p>Trimming removes footage from the start or end of a video. Splitting cuts the timeline into separate clips at a point, so you can delete, speed up or rearrange parts in the middle.</p></div>
+        </details>
+        <details>
+          <summary>Does trimming reduce video quality?</summary>
+          <div><p>Editors that re-encode on export can introduce a small quality loss, which a high quality preset keeps minimal. Pick a preset that matches the resolution you recorded at.</p></div>
+        </details>
+        <details>
+          <summary>Can I join two videos together in the browser?</summary>
+          <div><p>In the Click &amp; Record editor you can append extra clips to the timeline, then trim and split them like the original before exporting a single file.</p></div>
+        </details>
+      </div>
+    </section>
+    </article>
+    <aside class="cta" aria-label="Try Click &amp; Record">
+  <p class="tc" data-mark="rec">Free · No account · Nothing uploaded</p>
+  <h2>Record it once. Get the zooms for free.</h2>
+  <p>Click &amp; Record is a free Chrome extension that turns every click into a smooth zoom, transcribes subtitles on your own machine, and can capture network and console logs alongside the video.</p>
+  <div class="actions">
+    <a class="btn btn-solid" href="https://chromewebstore.google.com/detail/lfpnagkdegnjjghefcbpeoblgoaklnnn" target="_blank" rel="noopener" data-cta="chrome-store"><span class="dotrec" aria-hidden="true"></span> Add to Chrome</a>
+    <a class="btn btn-line" href="/editor/editor.html" data-cta="open-editor">Try the editor in your browser</a>
+  </div>
+</aside>
+  </div>
+
+  <section class="related shell" aria-labelledby="related-h">
+    <h2 id="related-h">Keep reading</h2>
+    <div class="cards">
+      <a class="card" href="/blog/speed-up-screen-recording">
+        <span class="tc" data-mark="cue">Subtitles &amp; editing</span>
+        <h3>How to speed up a screen recording without making it unwatchable</h3>
+        <p>How to speed up a screen recording the smart way: split out slow sections, set per-clip speed from 0.5x to 4x, and keep key steps at normal pace.</p>
+        <span class="more">4 min read →</span>
+      </a>
+      <a class="card" href="/blog/reduce-screen-recording-file-size">
+        <span class="tc" data-mark="cue">Subtitles &amp; editing</span>
+        <h3>How to reduce screen recording file size without making it unreadable</h3>
+        <p>Reduce screen recording file size by cutting dead time, cropping, choosing the right resolution, codec and bitrate. Practical settings that keep text sharp.</p>
+        <span class="more">4 min read →</span>
+      </a>
+      <a class="card" href="/blog/how-to-make-a-product-demo-video">
+        <span class="tc" data-mark="zoom">Product demos</span>
+        <h3>How to make a product demo video that people actually finish</h3>
+        <p>Learn how to make a product demo video step by step: pick one outcome, script it, prep a clean demo account, record in one take, then zoom, trim and export.</p>
+        <span class="more">5 min read →</span>
+      </a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="shell">
+    <div class="fcols">
+      <div>
+        <a class="wordmark" href="/"><span class="dotrec" aria-hidden="true"></span> Click&nbsp;&amp;&nbsp;Record</a>
+        <p style="margin-top:14px;max-width:32ch;color:var(--faint)">
+          The screen recorder that pushes in on every click — and can prove what the app was doing.
+        </p>
+      </div>
+      <div><h3>Product</h3><ul>
+        <li><a href="/#zoom">Automatic zoom</a></li>
+        <li><a href="/#subtitles">Subtitles</a></li>
+        <li><a href="/#evidence">Network &amp; console</a></li>
+        <li><a href="/editor/editor.html">Open the editor</a></li>
+      </ul></div>
+      <div><h3>Guides</h3><ul>
+        <li><a href="/blog/async-sales-demo-video">Async Sales Demo Video: Record Demos Prospects Watch</a></li>
+        <li><a href="/blog/changelog-release-notes-video">Release Notes Video: Turn Your Changelog Into Clips</a></li>
+        <li><a href="/blog/feature-announcement-video">Feature Announcement Video: A Simple 30-Second Formula</a></li>
+        <li><a href="/blog/how-to-make-a-product-demo-video">How to Make a Product Demo Video</a></li>
+      </ul></div>
+      <div><h3>More</h3><ul>
+        <li><a href="/blog">All articles</a></li>
+        <li><a href="/#faq">FAQ</a></li>
+        <li><a href="/privacy">Privacy</a></li>
+        <li><a href="/terms">Terms</a></li>
+      </ul></div>
+    </div>
+    <div class="rule">
+      <span>© 2026 Click &amp; Record</span>
+      <span>Built for people who make demos.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var root = document.documentElement;
+  var btn = document.getElementById('themer');
+  if (!btn) return;
+  function sync() {
+    var dark = root.getAttribute('data-theme') === 'dark';
+    btn.setAttribute('aria-pressed', String(dark));
+    btn.setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme');
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', dark ? '#0c0e13' : '#ffffff');
+  }
+  btn.addEventListener('click', function () {
+    var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('cr-theme', next); } catch (e) {}
+    sync();
+  });
+  sync();
+})();
+</script>
+
+</body>
+</html>

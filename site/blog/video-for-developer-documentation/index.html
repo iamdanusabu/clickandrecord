@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<title>Video for Developer Documentation: When and How</title>
+<meta name="description" content="When to use video for developer documentation, how to record short clips that stay accurate, and how to embed them with captions and small file sizes." />
+<link rel="canonical" href="https://clickandrecord.tech/blog/video-for-developer-documentation" />
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+<meta name="theme-color" content="#ffffff" />
+<meta name="color-scheme" content="light dark" />
+
+<meta property="og:type" content="article" />
+<meta property="og:site_name" content="Click &amp; Record" />
+<meta property="og:url" content="https://clickandrecord.tech/blog/video-for-developer-documentation" />
+<meta property="og:title" content="Video for Developer Documentation: When and How" />
+<meta property="og:description" content="When to use video for developer documentation, how to record short clips that stay accurate, and how to embed them with captions and small file sizes." />
+<meta property="og:image" content="https://clickandrecord.tech/og-image.png" />
+<meta property="og:image:alt" content="Click &amp; Record" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Video for Developer Documentation: When and How" />
+<meta name="twitter:description" content="When to use video for developer documentation, how to record short clips that stay accurate, and how to embed them with captions and small file sizes." />
+<meta name="twitter:image" content="https://clickandrecord.tech/og-image.png" />
+
+<link rel="icon" href="/favicon.png" type="image/png" sizes="128x128" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<link rel="preload" href="/fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="stylesheet" href="/blog/blog.css" />
+<script src="/analytics.js" defer></script>
+
+<script>
+(function(){try{var t=localStorage.getItem('cr-theme');
+if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "BlogPosting",
+      "@id": "https://clickandrecord.tech/blog/video-for-developer-documentation#article",
+      "headline": "Video for developer documentation: when it helps and how to make it",
+      "name": "Video for Developer Documentation: When and How",
+      "description": "When to use video for developer documentation, how to record short clips that stay accurate, and how to embed them with captions and small file sizes.",
+      "url": "https://clickandrecord.tech/blog/video-for-developer-documentation",
+      "mainEntityOfPage": "https://clickandrecord.tech/blog/video-for-developer-documentation",
+      "datePublished": "2026-10-10",
+      "dateModified": "2026-10-10",
+      "inLanguage": "en",
+      "articleSection": "Comparisons & use cases",
+      "keywords": "video for developer documentation",
+      "wordCount": 915,
+      "image": "https://clickandrecord.tech/og-image.png",
+      "author": {
+        "@type": "Organization",
+        "name": "Click & Record",
+        "url": "https://clickandrecord.tech/"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "Click & Record",
+        "url": "https://clickandrecord.tech/",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://clickandrecord.tech/apple-touch-icon.png"
+        }
+      },
+      "about": {
+        "@type": "SoftwareApplication",
+        "name": "Click & Record",
+        "url": "https://clickandrecord.tech/"
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://clickandrecord.tech/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Blog",
+          "item": "https://clickandrecord.tech/blog"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Video for developer documentation: when it helps and how to make it",
+          "item": "https://clickandrecord.tech/blog/video-for-developer-documentation"
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Should developer docs use video or GIFs?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Short MP4 or WebM clips are usually a better choice than GIFs: they are typically much smaller for the same length, support captions and can be paused. Use a GIF only where your docs platform cannot embed video."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How long should a documentation video be?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Keep each clip focused on a single task, often well under a minute. Short clips are easier to re-record when the UI changes and do not force readers to scrub."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I add captions to a docs video?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Export a WebVTT file and reference it with a track element inside your video tag. Click & Record generates VTT captions locally in the browser, with no upload."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I hide localhost or staging URLs in docs recordings?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Click & Record's mock browser frame has an editable URL bar, so you can replace a local or staging address with your production domain or hide it."
+          }
+        }
+      ]
+    }
+  ]
+}
+</script>
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+<header class="mast">
+  <div class="shell">
+    <a class="wordmark" href="/"><span class="dotrec" aria-hidden="true"></span> Click&nbsp;&amp;&nbsp;Record</a>
+    <nav aria-label="Primary">
+      <a href="/#zoom">Zoom</a>
+      <a href="/#subtitles">Subtitles</a>
+      <a href="/#evidence">Evidence</a>
+      <a href="/blog">Blog</a>
+      <a href="/editor/editor.html">Editor</a>
+      <button class="themer" id="themer" type="button" aria-pressed="false"
+              aria-label="Switch to dark theme" title="Switch theme">
+        <svg class="ico-sun" viewBox="0 0 20 20" width="16" height="16" fill="none" aria-hidden="true">
+          <circle cx="10" cy="10" r="3.6" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M10 1.8v2.1M10 16.1v2.1M18.2 10h-2.1M3.9 10H1.8M15.8 4.2l-1.5 1.5M5.7 14.3l-1.5 1.5M15.8 15.8l-1.5-1.5M5.7 5.7L4.2 4.2"
+                stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <svg class="ico-moon" viewBox="0 0 20 20" width="16" height="16" fill="none" aria-hidden="true">
+          <path d="M16.5 12.4A7 7 0 017.6 3.5a7 7 0 108.9 8.9z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <a class="btn btn-solid" href="https://chromewebstore.google.com/detail/lfpnagkdegnjjghefcbpeoblgoaklnnn" target="_blank" rel="noopener" data-cta="chrome-store">Add to Chrome</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <div class="shell post-head">
+    <nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a> <span aria-hidden="true">/</span> <a href="/blog">Blog</a> <span aria-hidden="true">/</span> <span>Comparisons &amp; use cases</span></nav>
+    <p class="tc" data-mark="zoom">Comparisons &amp; use cases · 4 min read</p>
+    <h1>Video for developer documentation: when it helps and how to make it</h1>
+    <p class="updated">Published <time datetime="2026-10-10">October 10, 2026</time> · Click &amp; Record team</p>
+    <nav class="toc" aria-label="On this page">
+      <a href="#s1-when-video-helps-in-developer-docs-and-when-it-d">When video helps in developer docs, and when it does not</a>
+      <a href="#s2-recording-clips-that-stay-accurate">Recording clips that stay accurate</a>
+      <a href="#s3-making-video-for-developer-documentation-readabl">Making video for developer documentation readable</a>
+      <a href="#s4-file-size-and-format">File size and format</a>
+      <a href="#s5-embedding-video-with-captions">Embedding video with captions</a>
+      <a href="#s6-bonus-debugging-docs-from-the-same-recording">Bonus: debugging docs from the same recording</a>
+      <a href="#s7-a-docs-video-checklist">A docs video checklist</a>
+    </nav>
+  </div>
+
+  <div class="shell">
+    <article class="post">
+<p>Video for developer documentation works best as short, silent-friendly clips that show one UI task or flow, embedded next to the written steps rather than replacing them. Text stays the source of truth for commands, code and reference; video earns its place when the reader needs to see where something is or what a sequence of screens looks like.</p>
+
+<p>This guide covers when to use video in docs, how to record clips that do not go stale, and how to embed them with captions and small file sizes.</p>
+
+<h2 id="s1-when-video-helps-in-developer-docs-and-when-it-d">When video helps in developer docs, and when it does not</h2>
+
+<p>Developers skim, search and copy. Video cannot be searched or copied, so use it deliberately.</p>
+
+<table>
+<thead>
+<tr><th>Good fit for video</th><th>Better as text</th></tr>
+</thead>
+<tbody>
+<tr><td>Finding a setting buried in a dashboard</td><td>CLI commands and code snippets</td></tr>
+<tr><td>Multi-screen flows like OAuth app setup</td><td>API reference and parameters</td></tr>
+<tr><td>Showing what "success" looks like</td><td>Configuration values and environment variables</td></tr>
+<tr><td>Drag-and-drop or visual editors</td><td>Error messages people will search for</td></tr>
+<tr><td>Quickstart overviews</td><td>Anything that changes every release</td></tr>
+</tbody>
+</table>
+
+<p>A useful rule: if a reader would need a screenshot for each of several steps, a 20-second clip is often clearer than five screenshots. If they need to copy something, it must also be in text.</p>
+
+<h2 id="s2-recording-clips-that-stay-accurate">Recording clips that stay accurate</h2>
+
+<p>The biggest cost of docs video is maintenance. A UI change can make a clip wrong overnight. Reduce that cost up front:</p>
+
+<ul>
+<li><strong>One task per clip.</strong> When the settings page changes, you re-record 15 seconds, not a 6-minute tour.</li>
+<li><strong>No narration by default.</strong> Silent clips with captions or nearby text are faster to redo and work for readers in open offices. Add voice for longer conceptual walkthroughs.</li>
+<li><strong>Consistent window size.</strong> Record every clip at the same browser size so they look like a set.</li>
+<li><strong>Clean test data.</strong> Use a sandbox account with obviously fake names and keys.</li>
+<li><strong>Record the tab, not the screen.</strong> Tab recordings keep notifications, other windows and your desktop out of shot. See <a href="/blog/how-to-record-a-chrome-tab">how to record a Chrome tab</a>.</li>
+</ul>
+
+<h2 id="s3-making-video-for-developer-documentation-readabl">Making video for developer documentation readable</h2>
+
+<p>Docs clips are usually embedded at a fraction of the page width, so small UI text becomes unreadable fast. Two fixes:</p>
+
+<ol>
+<li><strong>Zoom on the action.</strong> Click &amp; Record logs each click during recording and turns it into an editable zoom afterward, so the clip moves in on the button or field you used. Remove any zoom that distracts, and add manual ones where needed.</li>
+<li><strong>Crop to the relevant area.</strong> If the task only involves a sidebar, crop to it.</li>
+</ol>
+
+<p>Then frame it. A mock browser frame signals "this is the web dashboard," and its URL bar is editable, so <code>localhost:3000</code> or a staging host can become your real domain. Cut loading spinners, and speed up waits to 2x or more.</p>
+
+<h2 id="s4-file-size-and-format">File size and format</h2>
+
+<p>Docs pages should stay fast. Some practical guidance:</p>
+
+<ul>
+<li><strong>Prefer video over GIF.</strong> An MP4 or WebM is usually far smaller than an equivalent GIF and supports pausing and captions.</li>
+<li><strong>Pick the format your platform handles.</strong> MP4 (H.264) plays almost everywhere. WebM (VP9) is well supported in modern browsers. The trade-offs are in <a href="/blog/mp4-vs-webm-screen-recording">MP4 vs WebM for screen recordings</a>.</li>
+<li><strong>Use a lower quality preset for short UI clips.</strong> Click &amp; Record's export dialog shows resolution, bitrate and estimated file size before you export, so you can check the cost first.</li>
+<li><strong>Trim hard.</strong> Every second you cut is bytes saved. More in <a href="/blog/reduce-screen-recording-file-size">reducing screen recording file size</a>.</li>
+</ul>
+
+<h2 id="s5-embedding-video-with-captions">Embedding video with captions</h2>
+
+<p>On a docs site you control, the HTML <code>video</code> element is the simplest embed. Add <code>controls</code> so readers can pause, <code>muted</code> and <code>playsinline</code> for silent clips, and <code>preload="metadata"</code> to avoid downloading the whole file up front. MDN's <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/video" target="_blank" rel="noopener">video element reference</a> lists every attribute.</p>
+
+<p>For captions, add a <code>track</code> element pointing to a WebVTT file; see MDN's <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/track" target="_blank" rel="noopener">track element reference</a>. Click &amp; Record transcribes speech locally with a built-in Whisper model, lets you edit cues or write your own for silent clips, and exports VTT or SRT.</p>
+
+<p>Some accessibility basics:</p>
+
+<ul>
+<li>Avoid autoplaying clips with sound.</li>
+<li>Keep the written steps next to the video, so the video is a supplement, not the only path.</li>
+<li>Describe what the clip shows in the surrounding text for readers who cannot watch.</li>
+</ul>
+
+<p>On GitHub, you can attach video to issues, pull requests and discussions; see GitHub Docs on <a href="https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/attaching-files" target="_blank" rel="noopener">attaching files</a> for current size limits.</p>
+
+<h2 id="s6-bonus-debugging-docs-from-the-same-recording">Bonus: debugging docs from the same recording</h2>
+
+<p>If you write API or integration docs, the clip you record can also capture what happened under the hood. For tab recordings, Click &amp; Record can optionally log network requests and console output against the video timeline, export a HAR file and copy any request as cURL. That is useful for checking the exact request a UI step makes before you document it, or for filing a bug when a docs flow breaks. The guide to <a href="/blog/screen-recorder-that-captures-network-requests">screen recording with network requests</a> shows how.</p>
+
+<h2 id="s7-a-docs-video-checklist">A docs video checklist</h2>
+
+<ol>
+<li>The clip covers one task and the written steps sit next to it.</li>
+<li>Window size and frame match your other clips.</li>
+<li>No real keys, emails or internal URLs are visible.</li>
+<li>UI text is readable at the embedded width.</li>
+<li>Captions or a text description are present.</li>
+<li>File size is reasonable for a docs page.</li>
+</ol>
+
+<p><a href="/">Click &amp; Record</a> is free, needs no account and keeps everything on your machine, which suits docs teams recording internal tools. Already have clips from another recorder? <a href="/editor/editor.html">The free browser editor</a> can crop, trim, add zooms and captions, and re-export them without installing anything.</p>
+
+    <section class="post-faq" id="faq">
+      <h2>Frequently asked questions</h2>
+      <div class="faq">
+        <details open>
+          <summary>Should developer docs use video or GIFs?</summary>
+          <div><p>Short MP4 or WebM clips are usually a better choice than GIFs: they are typically much smaller for the same length, support captions and can be paused. Use a GIF only where your docs platform cannot embed video.</p></div>
+        </details>
+        <details>
+          <summary>How long should a documentation video be?</summary>
+          <div><p>Keep each clip focused on a single task, often well under a minute. Short clips are easier to re-record when the UI changes and do not force readers to scrub.</p></div>
+        </details>
+        <details>
+          <summary>How do I add captions to a docs video?</summary>
+          <div><p>Export a WebVTT file and reference it with a track element inside your video tag. Click &amp; Record generates VTT captions locally in the browser, with no upload.</p></div>
+        </details>
+        <details>
+          <summary>Can I hide localhost or staging URLs in docs recordings?</summary>
+          <div><p>Yes. Click &amp; Record's mock browser frame has an editable URL bar, so you can replace a local or staging address with your production domain or hide it.</p></div>
+        </details>
+      </div>
+    </section>
+    </article>
+    <aside class="cta" aria-label="Try Click &amp; Record">
+  <p class="tc" data-mark="rec">Free · No account · Nothing uploaded</p>
+  <h2>Record it once. Get the zooms for free.</h2>
+  <p>Click &amp; Record is a free Chrome extension that turns every click into a smooth zoom, transcribes subtitles on your own machine, and can capture network and console logs alongside the video.</p>
+  <div class="actions">
+    <a class="btn btn-solid" href="https://chromewebstore.google.com/detail/lfpnagkdegnjjghefcbpeoblgoaklnnn" target="_blank" rel="noopener" data-cta="chrome-store"><span class="dotrec" aria-hidden="true"></span> Add to Chrome</a>
+    <a class="btn btn-line" href="/editor/editor.html" data-cta="open-editor">Try the editor in your browser</a>
+  </div>
+</aside>
+  </div>
+
+  <section class="related shell" aria-labelledby="related-h">
+    <h2 id="related-h">Keep reading</h2>
+    <div class="cards">
+      <a class="card" href="/blog/mp4-vs-webm-screen-recording">
+        <span class="tc" data-mark="rec">Recording techniques</span>
+        <h3>MP4 vs WebM for screen recordings: which format to export</h3>
+        <p>MP4 vs WebM for screen recordings: compatibility, quality, file size and where each plays. A simple rule for choosing, plus how to convert in your browser.</p>
+        <span class="more">4 min read →</span>
+      </a>
+      <a class="card" href="/blog/reduce-screen-recording-file-size">
+        <span class="tc" data-mark="cue">Subtitles &amp; editing</span>
+        <h3>How to reduce screen recording file size without making it unreadable</h3>
+        <p>Reduce screen recording file size by cutting dead time, cropping, choosing the right resolution, codec and bitrate. Practical settings that keep text sharp.</p>
+        <span class="more">4 min read →</span>
+      </a>
+      <a class="card" href="/blog/screen-recorder-that-captures-network-requests">
+        <span class="tc" data-mark="link">Bug reports &amp; QA</span>
+        <h3>Choosing a screen recorder that captures network requests</h3>
+        <p>What to look for in a screen recorder that captures network requests: timeline sync, HAR export, cURL, debugger banners, privacy, and how the options compare.</p>
+        <span class="more">5 min read →</span>
+      </a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="shell">
+    <div class="fcols">
+      <div>
+        <a class="wordmark" href="/"><span class="dotrec" aria-hidden="true"></span> Click&nbsp;&amp;&nbsp;Record</a>
+        <p style="margin-top:14px;max-width:32ch;color:var(--faint)">
+          The screen recorder that pushes in on every click — and can prove what the app was doing.
+        </p>
+      </div>
+      <div><h3>Product</h3><ul>
+        <li><a href="/#zoom">Automatic zoom</a></li>
+        <li><a href="/#subtitles">Subtitles</a></li>
+        <li><a href="/#evidence">Network &amp; console</a></li>
+        <li><a href="/editor/editor.html">Open the editor</a></li>
+      </ul></div>
+      <div><h3>Guides</h3><ul>
+        <li><a href="/blog/async-sales-demo-video">Async Sales Demo Video: Record Demos Prospects Watch</a></li>
+        <li><a href="/blog/changelog-release-notes-video">Release Notes Video: Turn Your Changelog Into Clips</a></li>
+        <li><a href="/blog/feature-announcement-video">Feature Announcement Video: A Simple 30-Second Formula</a></li>
+        <li><a href="/blog/how-to-make-a-product-demo-video">How to Make a Product Demo Video</a></li>
+      </ul></div>
+      <div><h3>More</h3><ul>
+        <li><a href="/blog">All articles</a></li>
+        <li><a href="/#faq">FAQ</a></li>
+        <li><a href="/privacy">Privacy</a></li>
+        <li><a href="/terms">Terms</a></li>
+      </ul></div>
+    </div>
+    <div class="rule">
+      <span>© 2026 Click &amp; Record</span>
+      <span>Built for people who make demos.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var root = document.documentElement;
+  var btn = document.getElementById('themer');
+  if (!btn) return;
+  function sync() {
+    var dark = root.getAttribute('data-theme') === 'dark';
+    btn.setAttribute('aria-pressed', String(dark));
+    btn.setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme');
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', dark ? '#0c0e13' : '#ffffff');
+  }
+  btn.addEventListener('click', function () {
+    var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('cr-theme', next); } catch (e) {}
+    sync();
+  });
+  sync();
+})();
+</script>
+
+</body>
+</html>

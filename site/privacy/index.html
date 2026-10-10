@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
 <title>Privacy Policy — Click &amp; Record</title>
-<meta name="description" content="How Click & Record handles data: recordings, subtitles and logs stay in your browser, nothing is uploaded unless you choose to, and nothing is tracked." />
+<meta name="description" content="How Click & Record handles data: recordings, subtitles and logs stay in your browser, nothing is uploaded unless you choose to, and the extension tracks nothing." />
 <link rel="canonical" href="https://clickandrecord.tech/privacy" />
 <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
 <meta name="theme-color" content="#ffffff" />
@@ -15,12 +15,12 @@
 <meta property="og:site_name" content="Click &amp; Record" />
 <meta property="og:url" content="https://clickandrecord.tech/privacy" />
 <meta property="og:title" content="Privacy Policy — Click &amp; Record" />
-<meta property="og:description" content="Recordings, subtitles and logs stay in your browser. Nothing is uploaded unless you choose to. Nothing is tracked." />
+<meta property="og:description" content="Recordings, subtitles and logs stay in your browser. Nothing is uploaded unless you choose to. The extension tracks nothing." />
 <meta property="og:image" content="https://clickandrecord.tech/og-image.png" />
 <meta property="og:image:alt" content="Click &amp; Record" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Privacy Policy — Click &amp; Record" />
-<meta name="twitter:description" content="Recordings, subtitles and logs stay in your browser. Nothing is uploaded unless you choose to. Nothing is tracked." />
+<meta name="twitter:description" content="Recordings, subtitles and logs stay in your browser. Nothing is uploaded unless you choose to. The extension tracks nothing." />
 <meta name="twitter:image" content="https://clickandrecord.tech/og-image.png" />
 
 <link rel="icon" href="/favicon.png" type="image/png" sizes="128x128" />
@@ -293,7 +293,7 @@ footer a:hover{color:var(--ink)}
   <div class="shell doc-head">
     <span class="tc" data-mark="link">Legal</span>
     <h1>Privacy Policy</h1>
-    <p class="updated">Effective and last updated <strong style="color:var(--ink)">July 28, 2026</strong>.</p>
+    <p class="updated">Effective and last updated <strong style="color:var(--ink)">October 10, 2026</strong>.</p>
     <p class="lede">
       Click &amp; Record is built so your recordings never have to leave your computer.
       This page explains, plainly, what the extension and this website store, where it
@@ -303,6 +303,7 @@ footer a:hover{color:var(--ink)}
     <nav class="toc" aria-label="On this page">
       <a href="#inventory">What's stored, and where</a>
       <a href="#not">What we don't do</a>
+      <a href="#website">Website analytics</a>
       <a href="#transcription">Transcription</a>
       <a href="#drive">Google Drive</a>
       <a href="#permissions">Permissions</a>
@@ -320,7 +321,8 @@ footer a:hover{color:var(--ink)}
       <dl class="facts">
         <div><dt>Recordings</dt><dd>Stay on your device, in the browser's local storage.</dd></div>
         <div><dt>Transcription</dt><dd>Runs on-device. Audio is never sent anywhere for it.</dd></div>
-        <div><dt>Analytics</dt><dd>None. No trackers, no cookies, no telemetry.</dd></div>
+        <div><dt>Extension analytics</dt><dd>None. The extension and editor have no trackers, cookies or telemetry.</dd></div>
+        <div><dt>Website analytics</dt><dd>The marketing pages (home and blog) use PostHog. <a class="inline" href="#website">Details</a>.</dd></div>
         <div><dt>Account</dt><dd>Not required. Nothing to sign up for.</dd></div>
         <div><dt>Sync</dt><dd><code>chrome.storage.sync</code> is never used.</dd></div>
         <div><dt>Cloud copy</dt><dd>Only if you explicitly click "Save to Drive."</dd></div>
@@ -358,11 +360,29 @@ footer a:hover{color:var(--ink)}
     <section id="not">
       <h2>What we don't do</h2>
       <ul class="points">
-        <li><b>No analytics or telemetry.</b> Nothing about how you use the extension is measured, logged, or transmitted anywhere.</li>
-        <li><b>No cookies</b> — on the extension or on this website.</li>
+        <li><b>No analytics or telemetry in the extension or the editor.</b> Nothing about how you use the extension or the video editor is measured, logged, or transmitted anywhere.</li>
+        <li><b>No cookies in the extension or the editor.</b> The marketing pages are the one exception — see <a class="inline" href="#website">Website analytics</a>.</li>
         <li><b>No account, sign-up, or login.</b> There's no server that identifies you as a user.</li>
         <li><b>No server-side copy of your recordings.</b> There is no backend that ever receives your video, audio, clicks, or transcripts.</li>
-        <li><b>No third-party requests from this website.</b> Fonts, styles and scripts are all self-hosted; nothing loads from an ad network, analytics provider, or CDN.</li>
+        <li><b>No ads, and nothing sold.</b> Fonts, styles and scripts are self-hosted; nothing loads from an ad network or CDN, and no data is sold or shared for advertising.</li>
+      </ul>
+    </section>
+
+    <section id="website">
+      <h2>Analytics on the marketing website</h2>
+      <p>
+        The marketing pages of clickandrecord.tech — the home page and the
+        <a class="inline" href="/blog">blog</a> — use <b>PostHog</b> to understand how
+        visitors find and use the site, so we can improve it. This applies only to those
+        pages. It does <b>not</b> apply to the Chrome extension, to the video editor at
+        <code>/editor/</code>, or to anything you record: none of those load analytics.
+      </p>
+      <ul class="points">
+        <li><b>What is collected:</b> pages viewed, referrer and campaign parameters, links and buttons clicked, scroll depth, time on page, page-performance timings, approximate location derived from your IP address, and browser, device and operating-system type.</li>
+        <li><b>Session replay:</b> PostHog may record a replay of how you interact with these pages (mouse movement, clicks, scrolling). Text typed into form fields is masked in the browser before anything is sent.</li>
+        <li><b>Cookies and storage:</b> PostHog sets a first-party cookie and <code>localStorage</code> entry holding a random visitor ID, so repeat visits can be counted. We do not create a profile tied to your name or email.</li>
+        <li><b>Where it goes:</b> requests are sent to <code>clickandrecord.tech/relay</code>, which forwards them to PostHog's cloud (PostHog, Inc., United States). PostHog processes the data on our behalf.</li>
+        <li><b>Opting out:</b> blocking cookies or scripts for clickandrecord.tech, or using a content blocker, stops it. The site works the same either way.</li>
       </ul>
     </section>
 

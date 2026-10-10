@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<title>Offline Video Transcription in Your Browser (No Upload)</title>
+<meta name="description" content="Offline video transcription in the browser lets you turn speech into timed text with a local Whisper model. No upload, no API key, no per-minute fees." />
+<link rel="canonical" href="https://clickandrecord.tech/blog/offline-video-transcription-in-browser" />
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+<meta name="theme-color" content="#ffffff" />
+<meta name="color-scheme" content="light dark" />
+
+<meta property="og:type" content="article" />
+<meta property="og:site_name" content="Click &amp; Record" />
+<meta property="og:url" content="https://clickandrecord.tech/blog/offline-video-transcription-in-browser" />
+<meta property="og:title" content="Offline Video Transcription in Your Browser (No Upload)" />
+<meta property="og:description" content="Offline video transcription in the browser lets you turn speech into timed text with a local Whisper model. No upload, no API key, no per-minute fees." />
+<meta property="og:image" content="https://clickandrecord.tech/og-image.png" />
+<meta property="og:image:alt" content="Click &amp; Record" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Offline Video Transcription in Your Browser (No Upload)" />
+<meta name="twitter:description" content="Offline video transcription in the browser lets you turn speech into timed text with a local Whisper model. No upload, no API key, no per-minute fees." />
+<meta name="twitter:image" content="https://clickandrecord.tech/og-image.png" />
+
+<link rel="icon" href="/favicon.png" type="image/png" sizes="128x128" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<link rel="preload" href="/fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="stylesheet" href="/blog/blog.css" />
+<script src="/analytics.js" defer></script>
+
+<script>
+(function(){try{var t=localStorage.getItem('cr-theme');
+if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "BlogPosting",
+      "@id": "https://clickandrecord.tech/blog/offline-video-transcription-in-browser#article",
+      "headline": "Offline video transcription in the browser: how it works and when to use it",
+      "name": "Offline Video Transcription in Your Browser (No Upload)",
+      "description": "Offline video transcription in the browser lets you turn speech into timed text with a local Whisper model. No upload, no API key, no per-minute fees.",
+      "url": "https://clickandrecord.tech/blog/offline-video-transcription-in-browser",
+      "mainEntityOfPage": "https://clickandrecord.tech/blog/offline-video-transcription-in-browser",
+      "datePublished": "2026-10-10",
+      "dateModified": "2026-10-10",
+      "inLanguage": "en",
+      "articleSection": "Subtitles & editing",
+      "keywords": "offline video transcription",
+      "wordCount": 926,
+      "image": "https://clickandrecord.tech/og-image.png",
+      "author": {
+        "@type": "Organization",
+        "name": "Click & Record",
+        "url": "https://clickandrecord.tech/"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "Click & Record",
+        "url": "https://clickandrecord.tech/",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://clickandrecord.tech/apple-touch-icon.png"
+        }
+      },
+      "about": {
+        "@type": "SoftwareApplication",
+        "name": "Click & Record",
+        "url": "https://clickandrecord.tech/"
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://clickandrecord.tech/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Blog",
+          "item": "https://clickandrecord.tech/blog"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Offline video transcription in the browser: how it works and when to use it",
+          "item": "https://clickandrecord.tech/blog/offline-video-transcription-in-browser"
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Can a browser really transcribe video without the internet?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Modern browsers can run speech models compiled to WebAssembly, so the audio is processed on your own CPU. Once the model is on your machine, no network connection is needed."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is offline transcription as accurate as cloud services?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "It depends on the model size and the audio. Larger local models are slower but more accurate, and clean narration transcribes well either way. Expect to correct names and jargon whichever route you choose."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How long does local transcription take?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "It scales with the length of the video, the model size and your computer's speed. A short screen recording finishes quickly on a recent laptop; a long recording on the larger model takes noticeably longer."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I get a plain text transcript instead of subtitles?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Export the cues as SRT or VTT, then open the file in any text editor. The spoken text sits between timestamp lines, so you can copy it out or strip the timings with a simple find and replace."
+          }
+        }
+      ]
+    }
+  ]
+}
+</script>
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+<header class="mast">
+  <div class="shell">
+    <a class="wordmark" href="/"><span class="dotrec" aria-hidden="true"></span> Click&nbsp;&amp;&nbsp;Record</a>
+    <nav aria-label="Primary">
+      <a href="/#zoom">Zoom</a>
+      <a href="/#subtitles">Subtitles</a>
+      <a href="/#evidence">Evidence</a>
+      <a href="/blog">Blog</a>
+      <a href="/editor/editor.html">Editor</a>
+      <button class="themer" id="themer" type="button" aria-pressed="false"
+              aria-label="Switch to dark theme" title="Switch theme">
+        <svg class="ico-sun" viewBox="0 0 20 20" width="16" height="16" fill="none" aria-hidden="true">
+          <circle cx="10" cy="10" r="3.6" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M10 1.8v2.1M10 16.1v2.1M18.2 10h-2.1M3.9 10H1.8M15.8 4.2l-1.5 1.5M5.7 14.3l-1.5 1.5M15.8 15.8l-1.5-1.5M5.7 5.7L4.2 4.2"
+                stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <svg class="ico-moon" viewBox="0 0 20 20" width="16" height="16" fill="none" aria-hidden="true">
+          <path d="M16.5 12.4A7 7 0 017.6 3.5a7 7 0 108.9 8.9z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <a class="btn btn-solid" href="https://chromewebstore.google.com/detail/lfpnagkdegnjjghefcbpeoblgoaklnnn" target="_blank" rel="noopener" data-cta="chrome-store">Add to Chrome</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <div class="shell post-head">
+    <nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a> <span aria-hidden="true">/</span> <a href="/blog">Blog</a> <span aria-hidden="true">/</span> <span>Subtitles &amp; editing</span></nav>
+    <p class="tc" data-mark="cue">Subtitles &amp; editing · 4 min read</p>
+    <h1>Offline video transcription in the browser: how it works and when to use it</h1>
+    <p class="updated">Published <time datetime="2026-10-10">October 10, 2026</time> · Click &amp; Record team</p>
+    <nav class="toc" aria-label="On this page">
+      <a href="#s1-what-offline-video-transcription-actually-means">What offline video transcription actually means</a>
+      <a href="#s2-cloud-vs-offline-transcription-compared">Cloud vs offline transcription compared</a>
+      <a href="#s3-when-you-should-keep-transcription-local">When you should keep transcription local</a>
+      <a href="#s4-how-to-transcribe-a-video-offline-in-your-browse">How to transcribe a video offline in your browser</a>
+      <a href="#s5-getting-the-most-accurate-offline-transcript">Getting the most accurate offline transcript</a>
+      <a href="#s6-what-to-do-with-the-transcript">What to do with the transcript</a>
+    </nav>
+  </div>
+
+  <div class="shell">
+    <article class="post">
+<p>Offline video transcription means converting the speech in a video to text entirely on your own computer, with no file sent to a server. Today you can do it inside a browser tab: a speech model such as Whisper runs locally through WebAssembly and returns timed text you can edit and export as subtitles.</p>
+<p>Here is how that works, what to expect from it, and when it beats a cloud transcription service.</p>
+
+<h2 id="s1-what-offline-video-transcription-actually-means">What offline video transcription actually means</h2>
+<p>Most transcription services follow the same pattern: you upload a file, a server runs a speech model, and you download the result. Offline transcription moves the model to your machine. The video is decoded locally, the audio is fed to the model on your CPU, and the text never leaves the device.</p>
+<p>Doing this in a browser rather than a desktop app has a few practical advantages:</p>
+<ul>
+<li><strong>Nothing to install system-wide.</strong> No Python environment, no command-line setup, no GPU drivers.</li>
+<li><strong>Sandboxed.</strong> The page can only read the files you explicitly open.</li>
+<li><strong>Cross-platform.</strong> The same tool runs on Windows, macOS, Linux and ChromeOS in a Chromium browser.</li>
+</ul>
+<p>The enabling technology is WebAssembly, which lets compiled code run in the browser at close to native speed. MDN's <a href="https://developer.mozilla.org/en-US/docs/WebAssembly" target="_blank" rel="noopener">WebAssembly overview</a> explains the basics if you are curious.</p>
+
+<h2 id="s2-cloud-vs-offline-transcription-compared">Cloud vs offline transcription compared</h2>
+<table>
+<thead><tr><th></th><th>Cloud service</th><th>Offline in the browser</th></tr></thead>
+<tbody>
+<tr><td>Where audio goes</td><td>Uploaded to a provider</td><td>Stays on your computer</td></tr>
+<tr><td>Cost model</td><td>Often per minute or subscription (check the provider)</td><td>No per-minute cost</td></tr>
+<tr><td>Account or API key</td><td>Usually required</td><td>Not required</td></tr>
+<tr><td>Works without internet</td><td>No</td><td>Yes</td></tr>
+<tr><td>Speed</td><td>Depends on upload and queue</td><td>Depends on your CPU and model size</td></tr>
+<tr><td>Extras</td><td>Some offer speaker labels, summaries, translation</td><td>Focused on accurate timed text</td></tr>
+</tbody>
+</table>
+<p>Cloud services still make sense for very long files on slow machines, or when you need features like speaker diarization. For screen recordings, tutorials and internal videos, local transcription covers most needs without the trade-offs.</p>
+
+<h2 id="s3-when-you-should-keep-transcription-local">When you should keep transcription local</h2>
+<p>Uploading a cat video for captions is harmless. Uploading a screen recording often is not, because the audio and the transcript describe whatever was on screen. Local processing is the safer default when the recording includes:</p>
+<ul>
+<li>Internal dashboards, customer records or admin panels</li>
+<li>Unreleased features, roadmaps or pricing discussions</li>
+<li>Support calls or bug walkthroughs that mention customer details</li>
+<li>Content covered by an NDA or a company policy on third-party processors</li>
+</ul>
+<p>It also helps on unreliable connections. If you are on a train or a locked-down corporate network, offline transcription simply keeps working. For a wider look at keeping the whole recording workflow on your machine, see <a href="/blog/private-screen-recorder-no-upload">private screen recording with no upload</a>.</p>
+
+<h2 id="s4-how-to-transcribe-a-video-offline-in-your-browse">How to transcribe a video offline in your browser</h2>
+<p><a href="/">Click &amp; Record</a> ships a Whisper speech model inside the extension, and the same transcription is available in <a href="/editor/editor.html">the free browser editor</a> for any video file you already have. The workflow:</p>
+<ol>
+<li><strong>Open the video.</strong> Either finish a recording with the extension, or open the standalone editor and load an MP4 or WebM from disk. The file is read locally.</li>
+<li><strong>Pick a model size.</strong> There are two: a faster model for quick drafts and a more accurate one for difficult audio. If you are unsure, try the faster one first and switch only if the result needs lots of corrections.</li>
+<li><strong>Run transcription.</strong> The model processes the audio in the browser. No API key, no sign-up, no upload. You can disconnect from the internet and it still runs.</li>
+<li><strong>Review the cues.</strong> The output comes with word-level timings, split into editable cues. Fix names, acronyms and punctuation, and add hand-written cues where needed.</li>
+<li><strong>Export.</strong> Save the result as an SRT or VTT file. Use it as a subtitle track, or open it in a text editor to pull out a plain transcript.</li>
+</ol>
+<p>If your end goal is captions on a published video, our step-by-step guide to <a href="/blog/add-subtitles-to-screen-recording-free">adding subtitles to a screen recording</a> covers styling and uploading in more detail.</p>
+
+<h2 id="s5-getting-the-most-accurate-offline-transcript">Getting the most accurate offline transcript</h2>
+<p>A local model is only as good as the audio you give it. These habits make a bigger difference than switching tools:</p>
+<h3>Improve the source audio</h3>
+<ul>
+<li>Use a headset or external mic close to your mouth.</li>
+<li>Record in a quiet room; keyboards and fans produce stray words.</li>
+<li>Avoid background music under narration.</li>
+</ul>
+<h3>Choose the right model for the job</h3>
+<p>The faster model is fine for clear, slow narration. Switch to the more accurate model for fast speakers, accents the faster model struggles with, or recordings dense with technical vocabulary.</p>
+<h3>Edit efficiently</h3>
+<ul>
+<li>Scan for the words most likely to be wrong first: product names, code identifiers, people's names.</li>
+<li>Fix one instance, then search the rest of the cues for the same mistake.</li>
+<li>Trim the video before transcribing so you are not correcting text you will cut anyway.</li>
+</ul>
+
+<h2 id="s6-what-to-do-with-the-transcript">What to do with the transcript</h2>
+<p>A timed transcript is useful well beyond captions:</p>
+<ul>
+<li><strong>Documentation.</strong> Turn a narrated walkthrough into written steps for a help center or README. Our post on <a href="/blog/video-for-developer-documentation">video for developer documentation</a> shows how the two work together.</li>
+<li><strong>Accessibility.</strong> Provide a transcript next to the video for people who prefer reading.</li>
+<li><strong>Search.</strong> Paste transcripts into your notes or wiki so recorded demos become findable.</li>
+<li><strong>Review.</strong> Skim a transcript to find the exact moment something was said, then jump to that timestamp.</li>
+</ul>
+<p>Offline video transcription used to mean a command-line setup and a decent GPU. Now it is a tab in your browser. Click &amp; Record bundles it with recording and editing, so you can go from raw take to captioned, exported video without anything leaving your computer.</p>
+
+    <section class="post-faq" id="faq">
+      <h2>Frequently asked questions</h2>
+      <div class="faq">
+        <details open>
+          <summary>Can a browser really transcribe video without the internet?</summary>
+          <div><p>Yes. Modern browsers can run speech models compiled to WebAssembly, so the audio is processed on your own CPU. Once the model is on your machine, no network connection is needed.</p></div>
+        </details>
+        <details>
+          <summary>Is offline transcription as accurate as cloud services?</summary>
+          <div><p>It depends on the model size and the audio. Larger local models are slower but more accurate, and clean narration transcribes well either way. Expect to correct names and jargon whichever route you choose.</p></div>
+        </details>
+        <details>
+          <summary>How long does local transcription take?</summary>
+          <div><p>It scales with the length of the video, the model size and your computer's speed. A short screen recording finishes quickly on a recent laptop; a long recording on the larger model takes noticeably longer.</p></div>
+        </details>
+        <details>
+          <summary>Can I get a plain text transcript instead of subtitles?</summary>
+          <div><p>Export the cues as SRT or VTT, then open the file in any text editor. The spoken text sits between timestamp lines, so you can copy it out or strip the timings with a simple find and replace.</p></div>
+        </details>
+      </div>
+    </section>
+    </article>
+    <aside class="cta" aria-label="Try Click &amp; Record">
+  <p class="tc" data-mark="rec">Free · No account · Nothing uploaded</p>
+  <h2>Record it once. Get the zooms for free.</h2>
+  <p>Click &amp; Record is a free Chrome extension that turns every click into a smooth zoom, transcribes subtitles on your own machine, and can capture network and console logs alongside the video.</p>
+  <div class="actions">
+    <a class="btn btn-solid" href="https://chromewebstore.google.com/detail/lfpnagkdegnjjghefcbpeoblgoaklnnn" target="_blank" rel="noopener" data-cta="chrome-store"><span class="dotrec" aria-hidden="true"></span> Add to Chrome</a>
+    <a class="btn btn-line" href="/editor/editor.html" data-cta="open-editor">Try the editor in your browser</a>
+  </div>
+</aside>
+  </div>
+
+  <section class="related shell" aria-labelledby="related-h">
+    <h2 id="related-h">Keep reading</h2>
+    <div class="cards">
+      <a class="card" href="/blog/private-screen-recorder-no-upload">
+        <span class="tc" data-mark="cue">Subtitles &amp; editing</span>
+        <h3>Private screen recorder with no upload: how to keep recordings on your machine</h3>
+        <p>A private screen recorder with no upload keeps video, audio and transcripts on your computer. Here is what to check before you trust one with your screen.</p>
+        <span class="more">4 min read →</span>
+      </a>
+      <a class="card" href="/blog/add-subtitles-to-screen-recording-free">
+        <span class="tc" data-mark="cue">Subtitles &amp; editing</span>
+        <h3>How to add subtitles to a screen recording for free</h3>
+        <p>Add subtitles to a screen recording free: generate captions on your own computer, fix the timing, and export SRT or VTT files with no upload and no sign-up.</p>
+        <span class="more">5 min read →</span>
+      </a>
+      <a class="card" href="/blog/srt-vs-vtt-subtitles">
+        <span class="tc" data-mark="cue">Subtitles &amp; editing</span>
+        <h3>SRT vs VTT: which subtitle format should you use?</h3>
+        <p>SRT vs VTT subtitles compared: syntax, styling, browser support and platform compatibility, plus a simple rule for picking the right caption file format.</p>
+        <span class="more">4 min read →</span>
+      </a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="shell">
+    <div class="fcols">
+      <div>
+        <a class="wordmark" href="/"><span class="dotrec" aria-hidden="true"></span> Click&nbsp;&amp;&nbsp;Record</a>
+        <p style="margin-top:14px;max-width:32ch;color:var(--faint)">
+          The screen recorder that pushes in on every click — and can prove what the app was doing.
+        </p>
+      </div>
+      <div><h3>Product</h3><ul>
+        <li><a href="/#zoom">Automatic zoom</a></li>
+        <li><a href="/#subtitles">Subtitles</a></li>
+        <li><a href="/#evidence">Network &amp; console</a></li>
+        <li><a href="/editor/editor.html">Open the editor</a></li>
+      </ul></div>
+      <div><h3>Guides</h3><ul>
+        <li><a href="/blog/async-sales-demo-video">Async Sales Demo Video: Record Demos Prospects Watch</a></li>
+        <li><a href="/blog/changelog-release-notes-video">Release Notes Video: Turn Your Changelog Into Clips</a></li>
+        <li><a href="/blog/feature-announcement-video">Feature Announcement Video: A Simple 30-Second Formula</a></li>
+        <li><a href="/blog/how-to-make-a-product-demo-video">How to Make a Product Demo Video</a></li>
+      </ul></div>
+      <div><h3>More</h3><ul>
+        <li><a href="/blog">All articles</a></li>
+        <li><a href="/#faq">FAQ</a></li>
+        <li><a href="/privacy">Privacy</a></li>
+        <li><a href="/terms">Terms</a></li>
+      </ul></div>
+    </div>
+    <div class="rule">
+      <span>© 2026 Click &amp; Record</span>
+      <span>Built for people who make demos.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var root = document.documentElement;
+  var btn = document.getElementById('themer');
+  if (!btn) return;
+  function sync() {
+    var dark = root.getAttribute('data-theme') === 'dark';
+    btn.setAttribute('aria-pressed', String(dark));
+    btn.setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme');
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', dark ? '#0c0e13' : '#ffffff');
+  }
+  btn.addEventListener('click', function () {
+    var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('cr-theme', next); } catch (e) {}
+    sync();
+  });
+  sync();
+})();
+</script>
+
+</body>
+</html>

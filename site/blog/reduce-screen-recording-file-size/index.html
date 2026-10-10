@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<title>How to Reduce Screen Recording File Size (Keep It Sharp)</title>
+<meta name="description" content="Reduce screen recording file size by cutting dead time, cropping, choosing the right resolution, codec and bitrate. Practical settings that keep text sharp." />
+<link rel="canonical" href="https://clickandrecord.tech/blog/reduce-screen-recording-file-size" />
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+<meta name="theme-color" content="#ffffff" />
+<meta name="color-scheme" content="light dark" />
+
+<meta property="og:type" content="article" />
+<meta property="og:site_name" content="Click &amp; Record" />
+<meta property="og:url" content="https://clickandrecord.tech/blog/reduce-screen-recording-file-size" />
+<meta property="og:title" content="How to Reduce Screen Recording File Size (Keep It Sharp)" />
+<meta property="og:description" content="Reduce screen recording file size by cutting dead time, cropping, choosing the right resolution, codec and bitrate. Practical settings that keep text sharp." />
+<meta property="og:image" content="https://clickandrecord.tech/og-image.png" />
+<meta property="og:image:alt" content="Click &amp; Record" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="How to Reduce Screen Recording File Size (Keep It Sharp)" />
+<meta name="twitter:description" content="Reduce screen recording file size by cutting dead time, cropping, choosing the right resolution, codec and bitrate. Practical settings that keep text sharp." />
+<meta name="twitter:image" content="https://clickandrecord.tech/og-image.png" />
+
+<link rel="icon" href="/favicon.png" type="image/png" sizes="128x128" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<link rel="preload" href="/fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="stylesheet" href="/blog/blog.css" />
+<script src="/analytics.js" defer></script>
+
+<script>
+(function(){try{var t=localStorage.getItem('cr-theme');
+if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "BlogPosting",
+      "@id": "https://clickandrecord.tech/blog/reduce-screen-recording-file-size#article",
+      "headline": "How to reduce screen recording file size without making it unreadable",
+      "name": "How to Reduce Screen Recording File Size (Keep It Sharp)",
+      "description": "Reduce screen recording file size by cutting dead time, cropping, choosing the right resolution, codec and bitrate. Practical settings that keep text sharp.",
+      "url": "https://clickandrecord.tech/blog/reduce-screen-recording-file-size",
+      "mainEntityOfPage": "https://clickandrecord.tech/blog/reduce-screen-recording-file-size",
+      "datePublished": "2026-10-10",
+      "dateModified": "2026-10-10",
+      "inLanguage": "en",
+      "articleSection": "Subtitles & editing",
+      "keywords": "reduce screen recording file size",
+      "wordCount": 941,
+      "image": "https://clickandrecord.tech/og-image.png",
+      "author": {
+        "@type": "Organization",
+        "name": "Click & Record",
+        "url": "https://clickandrecord.tech/"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "Click & Record",
+        "url": "https://clickandrecord.tech/",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://clickandrecord.tech/apple-touch-icon.png"
+        }
+      },
+      "about": {
+        "@type": "SoftwareApplication",
+        "name": "Click & Record",
+        "url": "https://clickandrecord.tech/"
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://clickandrecord.tech/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Blog",
+          "item": "https://clickandrecord.tech/blog"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "How to reduce screen recording file size without making it unreadable",
+          "item": "https://clickandrecord.tech/blog/reduce-screen-recording-file-size"
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Why are screen recordings so large?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Recorders often capture at high resolution and high bitrate so nothing is lost during recording. That raw file is meant for editing, not sharing, so re-exporting with sensible settings usually makes it much smaller."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is MP4 or WebM smaller for screen recordings?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "At the same visual quality, VP9 in WebM is often more efficient than H.264 in MP4, but results vary with the content. MP4 plays almost everywhere, so pick it when compatibility matters more than a few megabytes."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What resolution should I export a screen recording at?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "1080p is a good default for most tutorials and demos. Go lower only if the interface text stays readable, and keep higher resolutions for very dense UIs or when viewers will watch full screen on large displays."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does cropping reduce file size?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "It can. Cropping removes pixels that would otherwise be encoded, such as empty space or toolbars, and lets you export a smaller frame or use more of the bitrate on the content that matters."
+          }
+        }
+      ]
+    }
+  ]
+}
+</script>
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+<header class="mast">
+  <div class="shell">
+    <a class="wordmark" href="/"><span class="dotrec" aria-hidden="true"></span> Click&nbsp;&amp;&nbsp;Record</a>
+    <nav aria-label="Primary">
+      <a href="/#zoom">Zoom</a>
+      <a href="/#subtitles">Subtitles</a>
+      <a href="/#evidence">Evidence</a>
+      <a href="/blog">Blog</a>
+      <a href="/editor/editor.html">Editor</a>
+      <button class="themer" id="themer" type="button" aria-pressed="false"
+              aria-label="Switch to dark theme" title="Switch theme">
+        <svg class="ico-sun" viewBox="0 0 20 20" width="16" height="16" fill="none" aria-hidden="true">
+          <circle cx="10" cy="10" r="3.6" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M10 1.8v2.1M10 16.1v2.1M18.2 10h-2.1M3.9 10H1.8M15.8 4.2l-1.5 1.5M5.7 14.3l-1.5 1.5M15.8 15.8l-1.5-1.5M5.7 5.7L4.2 4.2"
+                stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <svg class="ico-moon" viewBox="0 0 20 20" width="16" height="16" fill="none" aria-hidden="true">
+          <path d="M16.5 12.4A7 7 0 017.6 3.5a7 7 0 108.9 8.9z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <a class="btn btn-solid" href="https://chromewebstore.google.com/detail/lfpnagkdegnjjghefcbpeoblgoaklnnn" target="_blank" rel="noopener" data-cta="chrome-store">Add to Chrome</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <div class="shell post-head">
+    <nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a> <span aria-hidden="true">/</span> <a href="/blog">Blog</a> <span aria-hidden="true">/</span> <span>Subtitles &amp; editing</span></nav>
+    <p class="tc" data-mark="cue">Subtitles &amp; editing · 4 min read</p>
+    <h1>How to reduce screen recording file size without making it unreadable</h1>
+    <p class="updated">Published <time datetime="2026-10-10">October 10, 2026</time> · Click &amp; Record team</p>
+    <nav class="toc" aria-label="On this page">
+      <a href="#s1-what-actually-determines-file-size">What actually determines file size</a>
+      <a href="#s2-step-1-make-the-video-shorter">Step 1: Make the video shorter</a>
+      <a href="#s3-step-2-crop-and-choose-the-right-resolution">Step 2: Crop and choose the right resolution</a>
+      <a href="#s4-step-3-pick-the-codec-and-format">Step 3: Pick the codec and format</a>
+      <a href="#s5-how-to-reduce-screen-recording-file-size-in-the-">How to reduce screen recording file size in the browser</a>
+      <a href="#s6-tips-for-specific-destinations">Tips for specific destinations</a>
+      <a href="#s7-avoid-these-size-traps">Avoid these size traps</a>
+    </nav>
+  </div>
+
+  <div class="shell">
+    <article class="post">
+<p>To reduce screen recording file size, cut dead time first, crop away empty areas, then re-export at a sensible resolution (often 1080p) with an efficient codec and a lower bitrate preset. File size is roughly bitrate multiplied by duration, so shortening the video and lowering bitrate are the two levers that matter most, and screen content compresses well when you choose the right settings.</p>
+<p>This guide explains which settings change size the most and how to shrink a file without turning small interface text into mush.</p>
+
+<h2 id="s1-what-actually-determines-file-size">What actually determines file size</h2>
+<p>Video file size comes down to a simple relationship:</p>
+<blockquote><p><strong>File size ≈ bitrate × duration</strong></p></blockquote>
+<p>A 3-minute video at 8 Mbps is about 180 MB; the same video at 4 Mbps is about 90 MB, and trimming it to 2 minutes brings that to about 60 MB. Everything else, such as resolution, frame rate and codec, matters because it changes how much bitrate you need for the picture to look good.</p>
+<table>
+<thead><tr><th>Factor</th><th>Effect on size</th><th>Effect on quality</th></tr></thead>
+<tbody>
+<tr><td>Duration</td><td>Direct: half the length, roughly half the size</td><td>None, if you cut the right parts</td></tr>
+<tr><td>Bitrate</td><td>Direct: the main size control</td><td>Too low causes blocky text and smearing during scrolls</td></tr>
+<tr><td>Resolution</td><td>Higher resolution needs more bitrate</td><td>Too low makes small text unreadable</td></tr>
+<tr><td>Codec</td><td>More efficient codecs need less bitrate for the same look</td><td>Affects compatibility more than quality</td></tr>
+<tr><td>Content</td><td>Static UIs compress well; scrolling and video playback do not</td><td>Fast motion shows artifacts first</td></tr>
+</tbody>
+</table>
+
+<h2 id="s2-step-1-make-the-video-shorter">Step 1: Make the video shorter</h2>
+<p>Duration is the easiest win and it makes the video better too.</p>
+<ul>
+<li>Trim the start and end.</li>
+<li>Split and delete mistakes, retries and tangents.</li>
+<li>Cut or speed up waits like loading spinners and builds.</li>
+</ul>
+<p>Our guides on <a href="/blog/trim-and-split-video-in-browser">trimming and splitting video in the browser</a> and <a href="/blog/speed-up-screen-recording">speeding up a screen recording</a> cover the techniques.</p>
+
+<h2 id="s3-step-2-crop-and-choose-the-right-resolution">Step 2: Crop and choose the right resolution</h2>
+<p>If you recorded your whole screen but only one area matters, crop to it. Fewer pixels to encode means less bitrate is needed for the same sharpness. Cropping also removes your taskbar, toolbar and other clutter.</p>
+<p>Then pick an export resolution that suits where the video will be watched:</p>
+<ul>
+<li><strong>1080p</strong> is a solid default for tutorials, demos and docs.</li>
+<li><strong>720p</strong> works for short clips in chat or tickets if the text stays readable. Check at full screen before you send.</li>
+<li><strong>1440p or 4K</strong> only when the interface is very dense and viewers will watch on large displays.</li>
+</ul>
+<p>Frame rate matters less than people think for interface demos. Most UI movement reads fine at 30 frames per second, and a lower frame rate leaves more of the bitrate for sharp text. Keep higher frame rates for content with fast animation or smooth scrolling that viewers need to follow closely.</p>
+<p>Readability is the test. Pause on a frame with the smallest text in the video. If you cannot read it, the resolution or bitrate is too low.</p>
+
+<h2 id="s4-step-3-pick-the-codec-and-format">Step 3: Pick the codec and format</h2>
+<p>The two common choices for screen recordings:</p>
+<ul>
+<li><strong>MP4 (H.264 + AAC)</strong> plays almost everywhere: browsers, phones, Slack, email, video editors.</li>
+<li><strong>WebM (VP9 + Opus)</strong> is often more efficient at the same quality and plays in modern browsers, but support in some apps and devices is weaker.</li>
+</ul>
+<p>If the file will be embedded on the web or attached somewhere you know handles WebM, try both and compare. When in doubt, MP4 is the safe choice. Our <a href="/blog/mp4-vs-webm-screen-recording">MP4 vs WebM comparison</a> goes deeper.</p>
+
+<h2 id="s5-how-to-reduce-screen-recording-file-size-in-the-">How to reduce screen recording file size in the browser</h2>
+<p><a href="/">Click &amp; Record</a>'s export dialog is designed for exactly this. It shows the resolution, bitrate and estimated file size before you export, so you can adjust settings and see the effect without rendering several versions. If your video came from another recorder, open it in <a href="/editor/editor.html">the free browser editor</a>; it runs locally, so even large files are not uploaded.</p>
+<ol>
+<li><strong>Open the recording</strong> in the editor.</li>
+<li><strong>Trim, split and speed up</strong> slow sections to cut duration.</li>
+<li><strong>Crop</strong> to the area that matters. The editor can also detect letterbox bars so you do not waste pixels on black borders.</li>
+<li><strong>Choose MP4 or WebM</strong> depending on where it is going.</li>
+<li><strong>Pick a quality preset</strong> and watch the estimated size update.</li>
+<li><strong>Choose the aspect ratio:</strong> source, 16:9, 9:16, 1:1 or 4:5.</li>
+<li><strong>Export</strong>, then open the file and check the smallest text at full screen.</li>
+</ol>
+<p>Export renders faster than real time in supported browsers, so trying a second preset is not a big time cost.</p>
+
+<h2 id="s6-tips-for-specific-destinations">Tips for specific destinations</h2>
+<ul>
+<li><strong>Bug reports and tickets:</strong> keep clips short and focused on the reproduction. Platforms often have attachment size limits, so check them first. See <a href="/blog/how-to-write-a-bug-report-with-video">how to write a bug report with video</a> for what to include.</li>
+<li><strong>Email:</strong> attachment limits are usually tight. A short 720p or 1080p MP4 at a lower preset often fits, or share via a drive link instead.</li>
+<li><strong>Website embeds:</strong> smaller files load faster. Consider a WebM with an MP4 fallback.</li>
+<li><strong>Video platforms:</strong> they re-encode anyway, so upload at good quality rather than squeezing the file.</li>
+</ul>
+
+<h2 id="s7-avoid-these-size-traps">Avoid these size traps</h2>
+<ul>
+<li><strong>Compressing twice.</strong> Each lossy re-encode loses detail. Keep your original and always export from it.</li>
+<li><strong>Exporting at a higher resolution than you recorded.</strong> Upscaling adds size without adding detail.</li>
+<li><strong>Recording things you do not need.</strong> Recording a single tab instead of a large display gives you a smaller, cleaner source from the start.</li>
+<li><strong>Leaving pauses in.</strong> Long silent stretches still cost bytes.</li>
+</ul>
+<p>Shorter, cropped and sensibly encoded beats heavily compressed every time. Click &amp; Record shows you the size before you export, so you can reduce screen recording file size by choice rather than by trial and error.</p>
+
+    <section class="post-faq" id="faq">
+      <h2>Frequently asked questions</h2>
+      <div class="faq">
+        <details open>
+          <summary>Why are screen recordings so large?</summary>
+          <div><p>Recorders often capture at high resolution and high bitrate so nothing is lost during recording. That raw file is meant for editing, not sharing, so re-exporting with sensible settings usually makes it much smaller.</p></div>
+        </details>
+        <details>
+          <summary>Is MP4 or WebM smaller for screen recordings?</summary>
+          <div><p>At the same visual quality, VP9 in WebM is often more efficient than H.264 in MP4, but results vary with the content. MP4 plays almost everywhere, so pick it when compatibility matters more than a few megabytes.</p></div>
+        </details>
+        <details>
+          <summary>What resolution should I export a screen recording at?</summary>
+          <div><p>1080p is a good default for most tutorials and demos. Go lower only if the interface text stays readable, and keep higher resolutions for very dense UIs or when viewers will watch full screen on large displays.</p></div>
+        </details>
+        <details>
+          <summary>Does cropping reduce file size?</summary>
+          <div><p>It can. Cropping removes pixels that would otherwise be encoded, such as empty space or toolbars, and lets you export a smaller frame or use more of the bitrate on the content that matters.</p></div>
+        </details>
+      </div>
+    </section>
+    </article>
+    <aside class="cta" aria-label="Try Click &amp; Record">
+  <p class="tc" data-mark="rec">Free · No account · Nothing uploaded</p>
+  <h2>Record it once. Get the zooms for free.</h2>
+  <p>Click &amp; Record is a free Chrome extension that turns every click into a smooth zoom, transcribes subtitles on your own machine, and can capture network and console logs alongside the video.</p>
+  <div class="actions">
+    <a class="btn btn-solid" href="https://chromewebstore.google.com/detail/lfpnagkdegnjjghefcbpeoblgoaklnnn" target="_blank" rel="noopener" data-cta="chrome-store"><span class="dotrec" aria-hidden="true"></span> Add to Chrome</a>
+    <a class="btn btn-line" href="/editor/editor.html" data-cta="open-editor">Try the editor in your browser</a>
+  </div>
+</aside>
+  </div>
+
+  <section class="related shell" aria-labelledby="related-h">
+    <h2 id="related-h">Keep reading</h2>
+    <div class="cards">
+      <a class="card" href="/blog/mp4-vs-webm-screen-recording">
+        <span class="tc" data-mark="rec">Recording techniques</span>
+        <h3>MP4 vs WebM for screen recordings: which format to export</h3>
+        <p>MP4 vs WebM for screen recordings: compatibility, quality, file size and where each plays. A simple rule for choosing, plus how to convert in your browser.</p>
+        <span class="more">4 min read →</span>
+      </a>
+      <a class="card" href="/blog/trim-and-split-video-in-browser">
+        <span class="tc" data-mark="cue">Subtitles &amp; editing</span>
+        <h3>How to trim and split video in your browser without uploading it</h3>
+        <p>Trim and split video in your browser for free: cut the start and end, remove mistakes from the middle, join clips and export MP4 or WebM with no upload.</p>
+        <span class="more">4 min read →</span>
+      </a>
+      <a class="card" href="/blog/how-to-write-a-bug-report-with-video">
+        <span class="tc" data-mark="link">Bug reports &amp; QA</span>
+        <h3>How to write a bug report with video that gets fixed fast</h3>
+        <p>Learn how to write a bug report with video: a copy-ready template, what to record, what to write, and how to attach logs so developers can fix it fast.</p>
+        <span class="more">5 min read →</span>
+      </a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="shell">
+    <div class="fcols">
+      <div>
+        <a class="wordmark" href="/"><span class="dotrec" aria-hidden="true"></span> Click&nbsp;&amp;&nbsp;Record</a>
+        <p style="margin-top:14px;max-width:32ch;color:var(--faint)">
+          The screen recorder that pushes in on every click — and can prove what the app was doing.
+        </p>
+      </div>
+      <div><h3>Product</h3><ul>
+        <li><a href="/#zoom">Automatic zoom</a></li>
+        <li><a href="/#subtitles">Subtitles</a></li>
+        <li><a href="/#evidence">Network &amp; console</a></li>
+        <li><a href="/editor/editor.html">Open the editor</a></li>
+      </ul></div>
+      <div><h3>Guides</h3><ul>
+        <li><a href="/blog/async-sales-demo-video">Async Sales Demo Video: Record Demos Prospects Watch</a></li>
+        <li><a href="/blog/changelog-release-notes-video">Release Notes Video: Turn Your Changelog Into Clips</a></li>
+        <li><a href="/blog/feature-announcement-video">Feature Announcement Video: A Simple 30-Second Formula</a></li>
+        <li><a href="/blog/how-to-make-a-product-demo-video">How to Make a Product Demo Video</a></li>
+      </ul></div>
+      <div><h3>More</h3><ul>
+        <li><a href="/blog">All articles</a></li>
+        <li><a href="/#faq">FAQ</a></li>
+        <li><a href="/privacy">Privacy</a></li>
+        <li><a href="/terms">Terms</a></li>
+      </ul></div>
+    </div>
+    <div class="rule">
+      <span>© 2026 Click &amp; Record</span>
+      <span>Built for people who make demos.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var root = document.documentElement;
+  var btn = document.getElementById('themer');
+  if (!btn) return;
+  function sync() {
+    var dark = root.getAttribute('data-theme') === 'dark';
+    btn.setAttribute('aria-pressed', String(dark));
+    btn.setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme');
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', dark ? '#0c0e13' : '#ffffff');
+  }
+  btn.addEventListener('click', function () {
+    var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('cr-theme', next); } catch (e) {}
+    sync();
+  });
+  sync();
+})();
+</script>
+
+</body>
+</html>

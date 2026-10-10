@@ -1,0 +1,86 @@
+<!--meta
+{
+  "slug": "zoom-on-click-screen-recorder-chrome",
+  "title": "Zoom-on-Click Screen Recorder for Chrome: Setup Guide",
+  "h1": "How to use a zoom-on-click screen recorder in Chrome",
+  "description": "Set up a free zoom on click screen recorder in Chrome, record a take that zooms well, and fine-tune each zoom afterwards. Step-by-step, no account needed.",
+  "keyword": "zoom on click screen recorder",
+  "category": "Recording techniques",
+  "faq": [
+    {"q": "Does zoom on click work when I record my whole screen?", "a": "Yes, for clicks inside web pages in Chrome. An extension cannot see clicks in other desktop apps, so those moments need a manual zoom added in the editor."},
+    {"q": "Will the zoom capture what I type?", "a": "No. Click & Record only records the timing of typing bursts so it can hold the zoom while you type. The actual keys are never recorded."},
+    {"q": "Can I record without any zoom?", "a": "Yes. Zooms are added after recording, so you can delete all of them and export the plain, full-frame video."},
+    {"q": "Which browsers does it work in?", "a": "Click & Record runs in Chrome, Edge and Brave on Chromium 116 or newer. It does not run in Firefox or Safari."}
+  ],
+  "related": ["what-is-an-auto-zoom-screen-recorder", "how-to-record-a-chrome-tab", "how-to-make-a-product-demo-video"]
+}
+-->
+<p>A zoom on click screen recorder for Chrome is a browser extension that records your screen and automatically zooms the video toward each click. With <a href="/">Click &amp; Record</a>, you install the extension, pick a tab, window or screen, record normally, and the editor opens with a zoom already placed on every click, each one adjustable or removable. It is free, needs no account, and adds no watermark.</p>
+<p>This is the hands-on guide: setup, how to perform a take so the zooms land well, and how to tune them afterwards.</p>
+
+<h2>Before you start: requirements</h2>
+<ul>
+<li><strong>Browser:</strong> Chrome, Edge or Brave, version 116 or newer (check at <code>chrome://settings/help</code>).</li>
+<li><strong>What gets zoomed:</strong> clicks inside web pages. You can record any window or your whole display, but clicks in non-browser apps produce no automatic zoom.</li>
+<li><strong>Optional:</strong> a microphone for narration and a webcam for a face bubble.</li>
+</ul>
+
+<h2>Set up a zoom on click screen recorder in Chrome</h2>
+<ol>
+<li><strong>Install the extension</strong> from the <a href="https://chromewebstore.google.com/detail/lfpnagkdegnjjghefcbpeoblgoaklnnn" rel="noopener">Chrome Web Store</a> and pin it to the toolbar so the icon is always one click away.</li>
+<li><strong>Open the page you want to demo.</strong> Log in, close stray tabs and dismiss cookie banners now, not mid-take.</li>
+<li><strong>Click the toolbar icon</strong> and choose the source: this tab, a window or a whole screen. For browser-only demos, a tab gives the cleanest result; see <a href="/blog/how-to-record-a-chrome-tab">how to record a Chrome tab</a>.</li>
+<li><strong>Turn on mic or webcam</strong> if you want them. The webcam is stored as its own track, so you can restyle or hide it later.</li>
+<li><strong>Start recording.</strong> A 3-2-1 count-in runs first and is not included in the file.</li>
+<li><strong>Stop</strong> from the toolbar icon or with <code>Alt+Shift+S</code>. The editor opens with zooms already generated.</li>
+</ol>
+
+<h2>How the click zoom behaves</h2>
+<p>Knowing the rules helps you record a take that needs little cleanup.</p>
+<table>
+<thead><tr><th>What you do</th><th>What the zoom does</th></tr></thead>
+<tbody>
+<tr><td>Single click</td><td>Eases in toward the click point, holds, eases out.</td></tr>
+<tr><td>Several clicks in quick succession</td><td>Clicks inside an in-flight zoom are skipped, so bursts do not stack into a jittery mess.</td></tr>
+<tr><td>Two clicks close together in time</td><td>The zooms link, and the camera pans from one point to the next while staying zoomed in.</td></tr>
+<tr><td>Click a field, then type</td><td>The zoom holds for the whole typing burst. Only timing is recorded, never the characters.</td></tr>
+<tr><td>Click in a desktop app (not a web page)</td><td>No automatic zoom. Add a manual zoom in the editor if needed.</td></tr>
+</tbody>
+</table>
+<p>Because the zooms are generated after you stop, recording itself is unaffected: the raw file is a normal full-frame capture, and the zooms are keyframes on top. For the concept in more depth, read <a href="/blog/what-is-an-auto-zoom-screen-recorder">what an auto-zoom screen recorder is</a>.</p>
+
+<h2>Recording technique for clean zooms</h2>
+<p>Zoom on click rewards a calm, intentional take. A few habits make a big difference.</p>
+<h3>Click with purpose</h3>
+<p>Every click is a candidate zoom. Avoid clicking empty space to "focus" a window or out of habit while you talk. If you need to focus a page, do it before you start recording.</p>
+<h3>Let each zoom land</h3>
+<p>After an important click, pause about a second before the next action. That gives the zoom time to ease in and the viewer time to see what changed.</p>
+<h3>Move the mouse less</h3>
+<p>Big sweeping cursor movements between clicks look busy when the frame is zoomed. Move directly to the next target.</p>
+<h3>Size the window sensibly</h3>
+<p>A 1280 to 1600 pixel wide browser window keeps UI elements large enough to stay sharp when zoomed, while still looking like a real desktop. Very large windows make text small; very small ones look cramped.</p>
+<h3>Use pause instead of retakes</h3>
+<p>If you need to look something up or wait for a slow process, pause the recording and resume when ready. If the browser crashes mid-take, the recording is written to disk continuously and the popup offers to recover it.</p>
+
+<h2>Fine-tune zooms in the editor</h2>
+<p>The generated zooms are a first draft. Spend a few minutes on one review pass:</p>
+<ul>
+<li><strong>Delete</strong> zooms on incidental clicks such as closing a tooltip or clicking into the address bar.</li>
+<li><strong>Retime</strong> a zoom that arrives late or leaves while the viewer is still reading.</li>
+<li><strong>Re-aim</strong> a zoom so it centers on the result, not the button, when the result is what matters.</li>
+<li><strong>Strengthen or weaken</strong> individual zooms: stronger for tiny icons, weaker for wide panels.</li>
+<li><strong>Add manual zooms</strong> for moments with no click, like a value updating or a notification appearing.</li>
+</ul>
+<p>Then trim the start and end, speed up slow sections (0.5x to 4x per clip), and optionally add a background, rounded corners and a browser frame. The mock frame has an editable URL bar, which is handy for hiding a staging URL.</p>
+
+<h2>Export settings that suit zoomed video</h2>
+<ul>
+<li><strong>Format:</strong> MP4 (H.264 + AAC) for maximum compatibility, or WebM (VP9 + Opus) for web embeds. See <a href="/blog/mp4-vs-webm-screen-recording">MP4 vs WebM for screen recordings</a>.</li>
+<li><strong>Aspect ratio:</strong> 16:9 for YouTube and docs, 9:16 for Shorts and Reels, 1:1 or 4:5 for feeds. Zooms matter even more in narrow frames.</li>
+<li><strong>Quality:</strong> the export dialog shows resolution, bitrate and estimated file size before you commit, so you can pick a preset that fits your upload limit.</li>
+</ul>
+<p>Everything, including export, runs locally in your browser. Nothing is uploaded unless you choose Save to Google Drive.</p>
+
+<h2>Where zoom on click fits best</h2>
+<p>Zoom on click shines for product demos, feature announcements, onboarding videos and tutorials, where each click is a step the viewer should follow. If you are planning a full demo, <a href="/blog/how-to-make-a-product-demo-video">how to make a product demo video</a> covers scripting and structure. For quick bug reports, you might delete the zooms and keep the full frame so developers see everything.</p>
+<p>Install the extension, record one short take of a real workflow, and review the zooms it produces. Most people find the first draft is close, and a two-minute cleanup gets it the rest of the way.</p>

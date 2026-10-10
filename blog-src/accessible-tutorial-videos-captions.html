@@ -1,0 +1,83 @@
+<!--meta
+{
+  "slug": "accessible-tutorial-videos-captions",
+  "title": "Accessible Tutorial Videos: Captions, Transcripts, More",
+  "h1": "How to make accessible tutorial videos: captions, transcripts and narration that work for everyone",
+  "description": "Make accessible tutorial videos with accurate captions, transcripts and descriptive narration. A practical checklist mapped to WCAG for screen recordings.",
+  "keyword": "accessible tutorial videos",
+  "category": "Subtitles & editing",
+  "faq": [
+    {"q": "Are auto-generated captions enough for accessibility?", "a": "Usually not on their own. Automatic captions are a strong first draft, but WCAG expects captions to be accurate, so review them and fix names, terms and punctuation before publishing."},
+    {"q": "What is the difference between captions and subtitles?", "a": "Captions assume the viewer cannot hear the audio, so they include meaningful sounds as well as speech. Subtitles usually assume the viewer can hear and only need the dialogue, often in another language. In everyday use the terms overlap."},
+    {"q": "Do tutorial videos need audio description?", "a": "If important information is only shown visually, WCAG asks for it to be available another way. The simplest fix for tutorials is to narrate what you do on screen, so the audio track already describes the visuals."},
+    {"q": "Should I provide a transcript as well as captions?", "a": "It is good practice. A transcript helps people who use screen readers or braille displays, people who prefer reading, and anyone searching for a specific step."}
+  ],
+  "related": ["add-subtitles-to-screen-recording-free", "srt-vs-vtt-subtitles", "screen-recording-for-teachers-and-online-courses"]
+}
+-->
+<p>Accessible tutorial videos have accurate captions, a text transcript, narration that describes what happens on screen, and visuals that are readable at a glance. Of those, captions do the most work, and you can generate them for free on your own computer and then correct them in a few minutes.</p>
+<p>This checklist is written for people making screen-recorded tutorials, onboarding videos and course content. It is practical guidance, not legal advice; if you have a specific compliance obligation, check the requirements that apply to you.</p>
+
+<h2>Who accessible tutorial videos are for</h2>
+<p>Accessibility is often framed around a single group, but a well-made tutorial helps a wide range of viewers:</p>
+<ul>
+<li><strong>Deaf and hard-of-hearing viewers</strong> rely on captions to follow narration.</li>
+<li><strong>Blind and low-vision viewers</strong> rely on narration that explains what is on screen, and on transcripts that work with screen readers.</li>
+<li><strong>People with cognitive or learning disabilities</strong> benefit from clear pacing, short segments and text they can reread.</li>
+<li><strong>Non-native speakers</strong> follow along more easily with captions.</li>
+<li><strong>Everyone in a noisy or quiet place</strong> where sound is not an option.</li>
+</ul>
+
+<h2>What WCAG asks of prerecorded video</h2>
+<p>The Web Content Accessibility Guidelines (WCAG) are the most widely referenced standard. For prerecorded video, the key success criteria are:</p>
+<table>
+<thead><tr><th>Criterion</th><th>Level</th><th>What it means for a tutorial</th></tr></thead>
+<tbody>
+<tr><td>1.2.2 Captions (Prerecorded)</td><td>A</td><td>Synchronized captions for all spoken content and meaningful sounds</td></tr>
+<tr><td>1.2.3 Audio Description or Media Alternative</td><td>A</td><td>Visual information available as audio description or a full text alternative</td></tr>
+<tr><td>1.2.5 Audio Description (Prerecorded)</td><td>AA</td><td>Important visual information described in the audio</td></tr>
+<tr><td>2.3.1 Three Flashes or Below Threshold</td><td>A</td><td>Nothing flashes more than three times per second</td></tr>
+</tbody>
+</table>
+<p>The W3C's <a href="https://www.w3.org/WAI/media/av/" rel="noopener">Making Audio and Video Media Accessible</a> guide explains each requirement in plain language and is worth bookmarking.</p>
+
+<h2>Captions: the biggest accessibility win</h2>
+<p>Captions are the first thing to get right. The good news is that you no longer need to type them out by hand or pay per minute for a service.</p>
+<h3>Generate a first draft</h3>
+<p>Use a speech-to-text tool to create timed cues from your narration. <a href="/">Click &amp; Record</a> includes an on-device Whisper model that transcribes in the browser with no upload and no API key, and <a href="/editor/editor.html">the free browser editor</a> does the same for any video file you already have. Our step-by-step guide to <a href="/blog/add-subtitles-to-screen-recording-free">adding subtitles to a screen recording for free</a> walks through the process.</p>
+<h3>Make the captions accurate</h3>
+<p>Automatic captions are a draft, not a finished product. Review every cue for:</p>
+<ul>
+<li><strong>Exact UI labels.</strong> If the button says "Save changes", the caption should say "Save changes", not "save the changes".</li>
+<li><strong>Names and jargon.</strong> Product names, acronyms and code identifiers are where speech models most often slip.</li>
+<li><strong>Punctuation and casing.</strong> They make captions far easier to read at speed.</li>
+<li><strong>Meaningful sounds.</strong> Add short cues like "[error chime]" or "[notification sound]" if the sound tells the viewer something.</li>
+</ul>
+<h3>Make them readable</h3>
+<p>Keep cues to one or two lines, break at natural phrases, and leave each cue up long enough to read. Common practice is roughly 32 to 42 characters per line. If captions would cover an important part of the interface at the bottom of the frame, add padding around the recording in the editor, or use VTT positioning on the web. See <a href="/blog/srt-vs-vtt-subtitles">SRT vs VTT</a> for which format supports what.</p>
+<h3>Ship them as a toggleable track</h3>
+<p>Export captions as an SRT or VTT sidecar file and upload them with the video, so viewers can turn them on, off, or adjust their appearance in the player.</p>
+
+<h2>Narration that describes the screen</h2>
+<p>For tutorials, the cleanest way to meet the audio description criteria is to narrate as you go, so the soundtrack already carries the visual information. A blind viewer should be able to follow along from the audio alone.</p>
+<ul>
+<li><strong>Say what you click, not just "click here".</strong> "Open the Settings menu in the top right, then choose Billing."</li>
+<li><strong>Read out important text.</strong> If an error message appears, read it aloud.</li>
+<li><strong>Describe results.</strong> "The invoice list now shows three rows, sorted by date."</li>
+<li><strong>Avoid silent stretches</strong> where something important happens without comment. If you need a quiet section, add a hand-written caption that explains it, and consider whether narration should be added too.</li>
+</ul>
+
+<h2>Visual design checks for screen recordings</h2>
+<p>Captions and narration cover hearing and sight, but the video itself also needs to be easy to read:</p>
+<ol>
+<li><strong>Make text large enough.</strong> Record at a sensible window size and zoom in on the area you are working in. Auto-zoom on click helps viewers see small controls; see <a href="/blog/how-to-zoom-in-on-a-screen-recording">how to zoom in on a screen recording</a>.</li>
+<li><strong>Keep contrast high.</strong> Use a light or dark theme with clear contrast, and avoid pale gray text on white.</li>
+<li><strong>Avoid flashing.</strong> Rapid flicker, strobing transitions or fast blinking cursors at large sizes can be a seizure risk.</li>
+<li><strong>Do not rely on color alone.</strong> "Click the green button" fails for colorblind viewers; "click Confirm" works for everyone.</li>
+<li><strong>Keep the pace humane.</strong> Slow down for complex steps. Speed up only the boring parts, like waiting for a page to load.</li>
+</ol>
+
+<h2>Transcripts and publishing</h2>
+<p>A transcript is a text version of the whole video. It helps screen reader and braille users, people who skim, and anyone searching for a step. An easy route is to export your corrected captions, open the file in a text editor, and turn it into a tidy document with headings for each step. Publish it on the same page as the video or link to it directly underneath.</p>
+<p>Finally, check that the player itself is accessible: it should be keyboard operable, have labeled controls, and expose the captions toggle. The native HTML <code>&lt;video&gt;</code> element with a <code>&lt;track&gt;</code> is a solid baseline.</p>
+<p>Accessible tutorial videos take a little more care, but most of the work happens in a few minutes of editing. Click &amp; Record keeps captioning in the same place as trimming and zooming, entirely on your device. If you teach or publish courses, our guide to <a href="/blog/screen-recording-for-teachers-and-online-courses">screen recording for teachers and online courses</a> covers the rest of the workflow.</p>

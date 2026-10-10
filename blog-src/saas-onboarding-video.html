@@ -1,0 +1,79 @@
+<!--meta
+{
+  "slug": "saas-onboarding-video",
+  "title": "SaaS Onboarding Video: Plan a Series That Activates Users",
+  "h1": "How to plan and record SaaS onboarding videos that get users to their first win",
+  "description": "Plan a SaaS onboarding video series: map videos to activation steps, keep each short and task-focused, caption them, and place them where users get stuck.",
+  "keyword": "SaaS onboarding video",
+  "category": "Product demos",
+  "faq": [
+    {"q": "What should a SaaS onboarding video cover?", "a": "Each video should cover one task on the path to a new user's first meaningful result, such as connecting data, inviting a teammate or creating a first project. A short welcome video can frame the series."},
+    {"q": "How long should onboarding videos be?", "a": "Keep each one to roughly one to three minutes and a single task. Short, focused videos are easier to place in context and easier to re-record when the UI changes."},
+    {"q": "Where should onboarding videos go?", "a": "Put them where the user needs them: the empty state of a feature, a welcome email, a checklist item or a help article. A video buried on a separate page is easy to miss."},
+    {"q": "Should onboarding videos have captions?", "a": "Yes. Captions help users who watch muted, non-native speakers and people with hearing loss, and they make it easier to skim. Exporting an SRT or VTT file also lets your help center player show them."}
+  ],
+  "related": ["accessible-tutorial-videos-captions", "how-to-record-a-website-walkthrough", "video-for-developer-documentation"]
+}
+-->
+<p>A SaaS onboarding video is a short, task-focused screen recording that helps a new user reach their first meaningful result in your product. The most effective approach is a small series rather than one long tour: map each video to a step on the path to activation, keep each to one to three minutes, caption it, and place it exactly where users get stuck, such as an empty state or a checklist item. Here is how to plan, record and maintain that series.</p>
+
+<h2>Start from activation, not from your feature list</h2>
+<p>Onboarding videos fail when they tour the interface. New users do not want to know where every menu is; they want to get one thing done. Begin by writing down your activation path: the few actions a new account needs to complete before the product becomes useful. For example, for a reporting tool:</p>
+<ol>
+<li>Connect a data source.</li>
+<li>Build a first chart.</li>
+<li>Share a dashboard with a teammate.</li>
+</ol>
+<p>Each step is one onboarding video. If your product analytics show where new accounts stall, start with the step that loses the most people. If you do not have that data yet, ask your support team which questions new customers ask most.</p>
+
+<h2>The SaaS onboarding video series, video by video</h2>
+<table>
+<thead><tr><th>Video</th><th>Length</th><th>Placement</th></tr></thead>
+<tbody>
+<tr><td>Welcome: what you will achieve</td><td>45 to 90 seconds</td><td>First login screen or welcome email</td></tr>
+<tr><td>Task 1: first setup step</td><td>1 to 2 minutes</td><td>Empty state of that feature</td></tr>
+<tr><td>Task 2: first real result</td><td>1 to 3 minutes</td><td>Onboarding checklist item</td></tr>
+<tr><td>Task 3: invite or share</td><td>1 minute</td><td>Next to the invite button, day-2 email</td></tr>
+<tr><td>Next steps: one advanced feature</td><td>1 to 2 minutes</td><td>After activation, week-1 email</td></tr>
+</tbody>
+</table>
+<p>Keep the welcome video personal. A founder or customer success lead on webcam saying what the user will be able to do by the end of the week sets expectations better than any feature list.</p>
+
+<h2>Scripting each onboarding video</h2>
+<p>Use the same three-part structure every time so users know what to expect:</p>
+<ul>
+<li><strong>Goal (one sentence):</strong> "In this video you'll connect your Stripe account so revenue shows up in your dashboard."</li>
+<li><strong>Steps (the bulk):</strong> Do the task at a natural pace, naming each action and what to watch out for.</li>
+<li><strong>Done state (one sentence):</strong> "You should now see last month's revenue here. Next, build your first chart."</li>
+</ul>
+<p>Mention the exact labels on buttons so users can follow along, and call out anything that commonly goes wrong ("If you don't see your account, check you're signed in as an admin").</p>
+
+<h2>Recording onboarding videos people can follow along with</h2>
+<p>Onboarding viewers often have your product open in another window, pausing and copying what you do. That changes how you record:</p>
+<ul>
+<li><strong>Use a fresh demo account</strong> that looks like what a new user sees, not your power-user workspace.</li>
+<li><strong>Do not skip steps.</strong> Speed up waiting if you like, but never cut a click the user needs to make.</li>
+<li><strong>Make every click visible.</strong> The user needs to see exactly which button you pressed.</li>
+<li><strong>Type slowly</strong> when entering values the user needs to copy.</li>
+</ul>
+<p>An auto-zoom recorder takes care of the visibility problem. <a href="/">Click &amp; Record</a> is a free Chrome extension that records each click's position and timing and turns it into a zoom after recording, so every button you press is shown up close. When you type into a field, it holds the zoom for the whole typing burst (it records only the timing, never what you typed). You can adjust or remove any zoom afterwards. It also records your webcam on a separate track, so you can keep a face in the welcome video and hide it in the task videos without re-recording.</p>
+<p>If your onboarding includes a desktop app or command line, Click &amp; Record can record any application window or the whole screen. Automatic zooms only follow clicks inside web pages, so add manual zooms in the editor for those parts.</p>
+
+<h2>Captions and accessibility</h2>
+<p>Onboarding videos are instructions, so everyone needs to be able to follow them. Caption every video. Captions help users in open offices, users whose first language is not yours, and users who are deaf or hard of hearing. The <a href="https://www.w3.org/WAI/media/av/captions/" rel="noopener">W3C's guidance on captions</a> is a good reference for what good captions include.</p>
+<p>Click &amp; Record transcribes your narration on your own computer with a built-in Whisper speech model: no upload, no API key, no per-minute fee. You get word-level timings, can edit any cue, and can export SRT or VTT to load into your help center's video player. For more, read <a href="/blog/accessible-tutorial-videos-captions">accessible tutorial videos with captions</a>.</p>
+
+<h2>Keeping onboarding videos up to date</h2>
+<p>Onboarding videos go stale faster than any other product video, because they show the exact screens new users see. A few habits keep maintenance cheap:</p>
+<ul>
+<li><strong>Keep videos short and single-task</strong> so a UI change means re-recording one minute, not ten.</li>
+<li><strong>Avoid showing dates and version numbers</strong> unless they matter.</li>
+<li><strong>Keep a simple inventory</strong>: video, placement, the screens it shows, last recorded date.</li>
+<li><strong>Review after each release</strong> that touches signup, setup or the activation path.</li>
+<li><strong>Use a consistent look</strong> (same background, frame and caption style) so a re-recorded video slots in without looking out of place.</li>
+</ul>
+<p>Because Click &amp; Record writes the recording to local disk continuously, a browser crash halfway through a long take does not cost you the footage; the popup offers to recover it.</p>
+
+<h2>Export, host and place</h2>
+<p>Export MP4 for the widest compatibility, at 16:9 for help centers and in-app modals. The export dialog shows resolution, bitrate and file size up front, which helps keep in-app videos light. Host the files wherever your help center or in-app guide tool expects them, and attach the caption file.</p>
+<p>Click &amp; Record is free, works in Chrome, Edge and Brave, and needs no account or watermark. If your team already has older onboarding recordings, open them in <a href="/editor/editor.html">the free browser editor</a> to trim, add zooms, captions and a consistent frame. For technical audiences, see <a href="/blog/video-for-developer-documentation">video for developer documentation</a>, and for site-level tours, see <a href="/blog/how-to-record-a-website-walkthrough">how to record a website walkthrough</a>.</p>

@@ -1,0 +1,89 @@
+<!--meta
+{
+  "slug": "how-to-write-a-bug-report-with-video",
+  "title": "How to Write a Bug Report With Video (Template)",
+  "h1": "How to write a bug report with video that gets fixed fast",
+  "description": "Learn how to write a bug report with video: a copy-ready template, what to record, what to write, and how to attach logs so developers can fix it fast.",
+  "keyword": "bug report with video",
+  "category": "Bug reports & QA",
+  "faq": [
+    {"q": "Should a bug report have a video or a screenshot?", "a": "Use a screenshot when the problem is a static visual defect, like a misaligned button. Use a video when the bug depends on a sequence of actions, timing, or something that changes on screen."},
+    {"q": "How long should a bug report video be?", "a": "As a rule of thumb, aim for under a minute. Start a few seconds before the first relevant action and stop right after the bug appears, then trim anything in between that does not matter."},
+    {"q": "Does a video replace written steps to reproduce?", "a": "No. The video shows what happened once, while written steps let someone repeat it and let people search the tracker later. Include both."},
+    {"q": "What should I do if the bug only happens sometimes?", "a": "Record every attempt until it happens, note how many tries it took, and capture network and console logs during the recording so the failing attempt carries technical evidence."}
+  ],
+  "related": ["screen-recorder-that-captures-network-requests", "customer-support-screen-recordings", "how-to-record-a-chrome-tab"]
+}
+-->
+<p>A good bug report with video combines a short recording of the bug happening with a written summary, steps to reproduce, expected versus actual result, and environment details. The video proves the bug and shows timing; the text makes it searchable and repeatable. Below is a template you can paste into any tracker, plus guidance on what to record so the developer does not have to ask follow-up questions.</p>
+
+<h2>Why a bug report with video gets fixed faster</h2>
+<p>Most back-and-forth on a bug ticket comes from missing context: "Which page?", "What did you click first?", "What browser?", "Can you show me?" A recording answers several of those at once. The developer sees the exact path you took, how long things took, what was on screen right before the failure, and whether there was an error message that flashed and disappeared.</p>
+<p>Video also catches details the reporter did not think were important. A double click instead of a single click, a filter left on from an earlier session, or a slow-loading spinner that you clicked through all show up in a recording, even when you would never think to write them down.</p>
+<p>What video does not do on its own is explain <em>why</em> the bug happened. That is where written context and, ideally, network and console logs come in.</p>
+
+<h2>The bug report template</h2>
+<p>Copy this structure into Jira, Linear, GitHub Issues or whatever tracker your team uses. Each field has a job.</p>
+<ol>
+<li><strong>Title:</strong> what broke, where, and under what condition. "Checkout total ignores discount code when cart has 2+ items" beats "Checkout broken".</li>
+<li><strong>Summary:</strong> one or two sentences in plain language. What you were trying to do and what went wrong.</li>
+<li><strong>Steps to reproduce:</strong> numbered, one action per step, starting from a known state (logged out, fresh page, specific account).</li>
+<li><strong>Expected result:</strong> what should have happened.</li>
+<li><strong>Actual result:</strong> what did happen, including any exact error text.</li>
+<li><strong>Video:</strong> the recording, with a timestamp for the moment the bug occurs (for example "bug at 0:23").</li>
+<li><strong>Logs:</strong> console errors and network requests from the same session, if you have them.</li>
+<li><strong>Environment:</strong> browser and version, OS, device, account or role, app version or URL, feature flags.</li>
+<li><strong>Frequency:</strong> always, sometimes (for example 3 out of 10 tries), or once.</li>
+<li><strong>Severity or impact:</strong> who is affected and whether there is a workaround.</li>
+</ol>
+<p>For steps to reproduce, write one action per line and include the boring parts: which account, which page you started on, and what you typed. If you can only reproduce the bug some of the time, say so and say how many attempts it took.</p>
+
+<h2>What to record (and what to leave out)</h2>
+<p>The best bug videos are short and boring in a good way: they show the minimum path to the failure and nothing else.</p>
+<h3>Before you hit record</h3>
+<ul>
+<li>Reset to a clean starting point: reload the page, log in as the test account, close unrelated tabs.</li>
+<li>Close anything sensitive. Personal email, customer data and API dashboards should not be visible. See <a href="/blog/hide-sensitive-information-in-screen-recordings">how to hide sensitive information in screen recordings</a>.</li>
+<li>Decide what to capture: a single browser tab is usually enough for web app bugs and keeps the recording focused. See <a href="/blog/how-to-record-a-chrome-tab">how to record a Chrome tab</a>.</li>
+</ul>
+<h3>While recording</h3>
+<ul>
+<li>Move deliberately. Pause briefly before each click so viewers can see where the cursor is going.</li>
+<li>If you use a microphone, narrate what you expect: "I'm applying the code, the total should drop to 40."</li>
+<li>Let the failure sit on screen for two or three seconds before stopping so error messages are readable.</li>
+<li>If the bug is intermittent, keep recording through multiple attempts rather than starting and stopping.</li>
+</ul>
+<h3>After recording</h3>
+<ul>
+<li>Trim dead time at the start and end.</li>
+<li>Note the timestamp where the bug happens and put it in the report.</li>
+<li>Export at a size your tracker accepts. MP4 is the safest choice for playback everywhere.</li>
+</ul>
+
+<h2>Add logs so the video explains itself</h2>
+<p>A video shows the symptom. Logs show the cause. If a button does nothing, the recording tells you the click happened, but only the network panel tells you the request returned a 500, and only the console tells you a JavaScript error was thrown.</p>
+<p>You can collect these manually with Chrome DevTools: open the Network and Console panels before you reproduce, then export a HAR file and save the console output. The catch is that you need to remember to open DevTools first, and the logs end up in separate files with no link to the video timeline. A <a href="/blog/screen-recorder-that-captures-network-requests">screen recorder that captures network requests</a> solves both problems by logging everything during the take.</p>
+<p>One caution: HAR files and copied requests can contain cookies, auth headers and tokens. Review them before attaching to a ticket that many people can read.</p>
+
+<h2>Recording a bug report with Click &amp; Record</h2>
+<p><a href="/">Click &amp; Record</a> is a free Chrome extension that was built partly for this job. When you record a tab, you can turn on network and console capture. Every request and console line is timestamped against the video, and clicking a row in the editor seeks the video to that moment, so a developer can jump straight from "POST /api/cart 500" to what was on screen when it fired.</p>
+<p>From the same take you can export a standard HAR 1.2 file that opens in Chrome DevTools, or use "Copy as cURL" on a single request so the developer can replay it in a terminal. Capture does not use the Chrome debugger API, so there is no "is debugging this browser" banner and DevTools stays available if you want it.</p>
+<p>Clicks are also logged and turned into automatic zooms after recording, which helps on high-resolution screens where a small dropdown would otherwise be unreadable. Each zoom can be adjusted or deleted in the editor. Everything runs locally; nothing is uploaded unless you choose Save to Google Drive.</p>
+
+<h2>Bug report checklist</h2>
+<table>
+<thead><tr><th>Check</th><th>Why it matters</th></tr></thead>
+<tbody>
+<tr><td>Title names the feature and the condition</td><td>Makes duplicates easy to spot</td></tr>
+<tr><td>Steps start from a known state</td><td>Someone else can follow them cold</td></tr>
+<tr><td>Expected and actual are both stated</td><td>Avoids "works as designed" confusion</td></tr>
+<tr><td>Video is under about a minute, with a timestamp</td><td>Reviewers watch it immediately</td></tr>
+<tr><td>Console and network logs attached and reviewed</td><td>Points to the cause, not just the symptom</td></tr>
+<tr><td>Environment listed</td><td>Rules out browser or account differences</td></tr>
+<tr><td>Frequency noted</td><td>Sets expectations for reproducing</td></tr>
+</tbody>
+</table>
+<p>If the report comes from a customer rather than a teammate, the same principles apply with less jargon; see <a href="/blog/customer-support-screen-recordings">screen recordings for customer support</a>.</p>
+
+<h2>Putting it together</h2>
+<p>A bug report with video works best when the recording and the text do different jobs: the video shows exactly what happened once, the written steps let anyone repeat it, and the logs explain why. Whatever tool you use, keep the recording short, start from a clean state, and timestamp the failure. If you want the video, the network requests and the console output to come from one take and line up automatically, <a href="/">Click &amp; Record</a> does that for free, with no account.</p>

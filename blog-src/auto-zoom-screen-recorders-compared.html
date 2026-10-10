@@ -1,0 +1,110 @@
+<!--meta
+{
+  "slug": "auto-zoom-screen-recorders-compared",
+  "title": "Auto-Zoom Screen Recorders Compared: 6 Key Differences",
+  "h1": "Auto-zoom screen recorders compared: what actually differs between them",
+  "description": "Auto-zoom screen recorders compared on platform, zoom editing, privacy and extras, to help you choose between Screen Studio, Cursorful and Click & Record.",
+  "keyword": "auto-zoom screen recorders",
+  "category": "Comparisons & use cases",
+  "faq": [
+    {"q": "Which auto-zoom screen recorder is best?", "a": "There is no single winner. Screen Studio is the strongest choice for macOS-native polish, while browser-based tools like Cursorful and Click & Record work on any operating system with a Chromium browser. Click & Record adds on-device subtitles and network logs, free and without an account."},
+    {"q": "Are zooms baked into the video?", "a": "It depends on the tool. In Click & Record, zooms are generated after recording from logged clicks, so each one can be retimed, re-aimed, weakened or deleted before export. Check how other tools handle editing before you rely on them."},
+    {"q": "Do auto-zoom recorders work with desktop apps?", "a": "Native apps such as Screen Studio can see clicks across the system. Browser extensions only see clicks inside web pages, so in other desktop apps you add zooms manually."},
+    {"q": "Can I add auto zoom to a video I already recorded?", "a": "Automatic zoom needs click data captured during recording. For existing footage, you can add manual zooms in the free Click & Record browser editor without installing anything."}
+  ],
+  "related": ["what-is-an-auto-zoom-screen-recorder", "cursorful-alternative", "screen-studio-alternative-windows-chrome"]
+}
+-->
+<p>Auto-zoom screen recorders all promise the same headline feature, a camera that zooms toward your clicks, but they differ in six ways that matter: where they run, how much you can edit each zoom, how the camera behaves during bursts of clicks, where your video is processed, what else they capture, and how they are priced. This comparison walks through each so you can match a tool to your work.</p>
+
+<p>Tools covered include Screen Studio, Cursorful, Zumie and Click &amp; Record. Competitor details are limited to well-known, stable facts; check each tool's site for current features and pricing. If you are new to the category, start with <a href="/blog/what-is-an-auto-zoom-screen-recorder">what an auto-zoom screen recorder is</a>.</p>
+
+<h2>1. Platform: native app or browser</h2>
+
+<p>This is the first filter, because it rules tools in or out immediately.</p>
+
+<ul>
+<li><strong>Native desktop apps</strong> such as Screen Studio (macOS) can see clicks anywhere on the system, in any app. That is a real advantage if your demos jump between native tools.</li>
+<li><strong>Browser extensions</strong> such as Cursorful and Click &amp; Record run wherever a Chromium browser runs, on Windows, macOS or Linux. An extension only sees clicks inside web pages, so auto zoom covers web apps, not native ones.</li>
+</ul>
+
+<p>Click &amp; Record can still record any application window or a whole display; you just place zooms manually for clicks outside the browser. The broader trade-offs are in <a href="/blog/chrome-extension-screen-recorder-vs-desktop-app">extension vs desktop app recorders</a>.</p>
+
+<h2>2. How editable the zooms are</h2>
+
+<p>No auto-zoom recorder guesses right every time. A zoom fires on a click you did not mean to emphasize, or arrives a beat too late. What you can do about it separates the tools.</p>
+
+<p>Questions to ask of any auto-zoom screen recorder:</p>
+
+<ul>
+<li>Can you delete a single zoom without affecting the others?</li>
+<li>Can you change when it starts and how long it holds?</li>
+<li>Can you change how far it zooms?</li>
+<li>Can you re-aim it at a different spot?</li>
+<li>Can you add a zoom where there was no click?</li>
+</ul>
+
+<p>In Click &amp; Record, the answer to all five is yes, because zooms are a post-process. During recording it only logs each click's position and timestamp; afterward, those become keyframes you edit freely. Test the others with the same list.</p>
+
+<h2>3. Camera behavior during bursts</h2>
+
+<p>The hardest part of auto zoom is not the single click; it is what happens when you click five times in three seconds, or type into a form. Naive implementations zoom in and out on every click and the video feels seasick.</p>
+
+<p>Watch for these behaviors in a test recording:</p>
+
+<ol>
+<li><strong>Stacking.</strong> Does a click during an in-progress zoom start a new zoom? Click &amp; Record skips clicks inside an in-flight zoom so bursts do not stack.</li>
+<li><strong>Pulsing.</strong> Do two nearby clicks zoom out and back in? Click &amp; Record links nearby zooms so the camera pans while staying zoomed.</li>
+<li><strong>Typing.</strong> Does the view drift while you fill a field? Click &amp; Record holds the zoom during typing bursts, recording only the timing, never the keys.</li>
+</ol>
+
+<p>Screen Studio is widely praised for smooth motion; for others, record a fast form-fill and see for yourself.</p>
+
+<h2>4. Privacy and where processing happens</h2>
+
+<p>If you record internal dashboards or customer data, ask where the video goes. Some tools process or host video in the cloud; others keep everything on your machine. Click &amp; Record runs recording, editing, transcription and export locally and uploads nothing unless you click Save to Google Drive. It has no analytics and no cookies. For other tools, read their privacy documentation.</p>
+
+<h2>5. What else the recording captures</h2>
+
+<p>Auto-zoom recorders are built for polished video, and most stop there. Bug-report recorders like Jam or Bird Eats Bug capture logs but produce plain video. Click &amp; Record tries to do both from one take:</p>
+
+<ul>
+<li><strong>Network and console capture</strong> for tab recordings, timestamped against the video, with HAR export and Copy as cURL.</li>
+<li><strong>On-device subtitles</strong> from a Whisper model running in the browser, offline.</li>
+<li><strong>A separate webcam track</strong> you can move, resize or hide after recording.</li>
+<li><strong>Crash recovery</strong>, since the take is written to disk continuously.</li>
+</ul>
+
+<p>If you only make marketing demos, these extras may not matter. If the same person records demos and files bug reports, they save a second tool.</p>
+
+<h2>6. Pricing and accounts</h2>
+
+<p>Pricing models in this category range from free to subscriptions to one-time licenses, and they change. Check each pricing page rather than trusting a blog table, including this one. Click &amp; Record is free, with no account and no watermark.</p>
+
+<h2>Auto-zoom screen recorders side by side, and how to choose</h2>
+
+<table>
+<thead>
+<tr><th>Feature</th><th>Screen Studio</th><th>Cursorful</th><th>Click &amp; Record</th></tr>
+</thead>
+<tbody>
+<tr><td>Platform</td><td>macOS app</td><td>Chrome extension</td><td>Chrome, Edge, Brave extension</td></tr>
+<tr><td>Auto zoom in native apps</td><td>Yes</td><td>Browser clicks</td><td>Browser clicks; manual zooms elsewhere</td></tr>
+<tr><td>Per-zoom editing</td><td>Check their site</td><td>Check their site</td><td>Retime, re-aim, strength, delete, add</td></tr>
+<tr><td>Subtitles</td><td>Check their site</td><td>Check their site</td><td>On-device Whisper, SRT or VTT</td></tr>
+<tr><td>Network and console logs</td><td>Not its focus</td><td>Not its focus</td><td>Optional, HAR 1.2 export</td></tr>
+<tr><td>Account</td><td>Check their site</td><td>Check their site</td><td>None</td></tr>
+<tr><td>Price</td><td>See pricing page</td><td>See pricing page</td><td>Free, no watermark</td></tr>
+</tbody>
+</table>
+
+<p>Zumie is another auto-zoom recorder worth a look; check its site for platform and features, as they were not verified for this table.</p>
+
+<ul>
+<li><strong>On a Mac, demoing native apps, polish above all:</strong> Screen Studio.</li>
+<li><strong>Already happy with Cursorful:</strong> stay unless you need something it lacks. See <a href="/blog/cursorful-alternative">our Cursorful alternative comparison</a>.</li>
+<li><strong>On Windows or Linux, recording web apps:</strong> a browser tool. See <a href="/blog/screen-studio-alternative-windows-chrome">Screen Studio alternatives for Windows</a>.</li>
+<li><strong>Need captions, logs or zero accounts:</strong> <a href="/">Click &amp; Record</a>.</li>
+</ul>
+
+<p>Already have footage? <a href="/editor/editor.html">The free browser editor</a> adds manual zooms, backgrounds and subtitles to any video file, no install needed.</p>

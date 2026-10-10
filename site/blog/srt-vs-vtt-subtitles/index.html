@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<title>SRT vs VTT Subtitles: Differences and Which to Use</title>
+<meta name="description" content="SRT vs VTT subtitles compared: syntax, styling, browser support and platform compatibility, plus a simple rule for picking the right caption file format." />
+<link rel="canonical" href="https://clickandrecord.tech/blog/srt-vs-vtt-subtitles" />
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+<meta name="theme-color" content="#ffffff" />
+<meta name="color-scheme" content="light dark" />
+
+<meta property="og:type" content="article" />
+<meta property="og:site_name" content="Click &amp; Record" />
+<meta property="og:url" content="https://clickandrecord.tech/blog/srt-vs-vtt-subtitles" />
+<meta property="og:title" content="SRT vs VTT Subtitles: Differences and Which to Use" />
+<meta property="og:description" content="SRT vs VTT subtitles compared: syntax, styling, browser support and platform compatibility, plus a simple rule for picking the right caption file format." />
+<meta property="og:image" content="https://clickandrecord.tech/og-image.png" />
+<meta property="og:image:alt" content="Click &amp; Record" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="SRT vs VTT Subtitles: Differences and Which to Use" />
+<meta name="twitter:description" content="SRT vs VTT subtitles compared: syntax, styling, browser support and platform compatibility, plus a simple rule for picking the right caption file format." />
+<meta name="twitter:image" content="https://clickandrecord.tech/og-image.png" />
+
+<link rel="icon" href="/favicon.png" type="image/png" sizes="128x128" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<link rel="preload" href="/fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="stylesheet" href="/blog/blog.css" />
+<script src="/analytics.js" defer></script>
+
+<script>
+(function(){try{var t=localStorage.getItem('cr-theme');
+if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "BlogPosting",
+      "@id": "https://clickandrecord.tech/blog/srt-vs-vtt-subtitles#article",
+      "headline": "SRT vs VTT: which subtitle format should you use?",
+      "name": "SRT vs VTT Subtitles: Differences and Which to Use",
+      "description": "SRT vs VTT subtitles compared: syntax, styling, browser support and platform compatibility, plus a simple rule for picking the right caption file format.",
+      "url": "https://clickandrecord.tech/blog/srt-vs-vtt-subtitles",
+      "mainEntityOfPage": "https://clickandrecord.tech/blog/srt-vs-vtt-subtitles",
+      "datePublished": "2026-10-10",
+      "dateModified": "2026-10-10",
+      "inLanguage": "en",
+      "articleSection": "Subtitles & editing",
+      "keywords": "srt vs vtt",
+      "wordCount": 1008,
+      "image": "https://clickandrecord.tech/og-image.png",
+      "author": {
+        "@type": "Organization",
+        "name": "Click & Record",
+        "url": "https://clickandrecord.tech/"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "Click & Record",
+        "url": "https://clickandrecord.tech/",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://clickandrecord.tech/apple-touch-icon.png"
+        }
+      },
+      "about": {
+        "@type": "SoftwareApplication",
+        "name": "Click & Record",
+        "url": "https://clickandrecord.tech/"
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://clickandrecord.tech/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Blog",
+          "item": "https://clickandrecord.tech/blog"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "SRT vs VTT: which subtitle format should you use?",
+          "item": "https://clickandrecord.tech/blog/srt-vs-vtt-subtitles"
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Is VTT better than SRT?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Neither is better overall. VTT is the native format for HTML5 video and supports positioning and styling, while SRT is simpler and accepted almost everywhere. Choose based on where the video will play."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I convert SRT to VTT?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Add a WEBVTT header line and change the comma before the milliseconds in each timestamp to a period. Cue numbers can stay. Many tools also export both formats directly."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Which subtitle format does YouTube accept?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "YouTube accepts both SRT and VTT, along with several other formats. Check YouTube's help pages for the current list."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Why do my VTT captions not show in the browser?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The most common causes are a missing WEBVTT header, commas instead of periods in timestamps, or the file being served from another origin without the right CORS headers. Also make sure the track element has a srclang and the track is enabled."
+          }
+        }
+      ]
+    }
+  ]
+}
+</script>
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+<header class="mast">
+  <div class="shell">
+    <a class="wordmark" href="/"><span class="dotrec" aria-hidden="true"></span> Click&nbsp;&amp;&nbsp;Record</a>
+    <nav aria-label="Primary">
+      <a href="/#zoom">Zoom</a>
+      <a href="/#subtitles">Subtitles</a>
+      <a href="/#evidence">Evidence</a>
+      <a href="/blog">Blog</a>
+      <a href="/editor/editor.html">Editor</a>
+      <button class="themer" id="themer" type="button" aria-pressed="false"
+              aria-label="Switch to dark theme" title="Switch theme">
+        <svg class="ico-sun" viewBox="0 0 20 20" width="16" height="16" fill="none" aria-hidden="true">
+          <circle cx="10" cy="10" r="3.6" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M10 1.8v2.1M10 16.1v2.1M18.2 10h-2.1M3.9 10H1.8M15.8 4.2l-1.5 1.5M5.7 14.3l-1.5 1.5M15.8 15.8l-1.5-1.5M5.7 5.7L4.2 4.2"
+                stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <svg class="ico-moon" viewBox="0 0 20 20" width="16" height="16" fill="none" aria-hidden="true">
+          <path d="M16.5 12.4A7 7 0 017.6 3.5a7 7 0 108.9 8.9z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <a class="btn btn-solid" href="https://chromewebstore.google.com/detail/lfpnagkdegnjjghefcbpeoblgoaklnnn" target="_blank" rel="noopener" data-cta="chrome-store">Add to Chrome</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <div class="shell post-head">
+    <nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a> <span aria-hidden="true">/</span> <a href="/blog">Blog</a> <span aria-hidden="true">/</span> <span>Subtitles &amp; editing</span></nav>
+    <p class="tc" data-mark="cue">Subtitles &amp; editing · 4 min read</p>
+    <h1>SRT vs VTT: which subtitle format should you use?</h1>
+    <p class="updated">Published <time datetime="2026-10-10">October 10, 2026</time> · Click &amp; Record team</p>
+    <nav class="toc" aria-label="On this page">
+      <a href="#s1-what-srt-and-vtt-files-are">What SRT and VTT files are</a>
+      <a href="#s2-srt-vs-vtt-syntax-side-by-side">SRT vs VTT syntax, side by side</a>
+      <a href="#s3-where-each-format-works">Where each format works</a>
+      <a href="#s4-how-to-convert-srt-to-vtt-and-back">How to convert SRT to VTT (and back)</a>
+      <a href="#s5-generating-srt-and-vtt-files-without-manual-typi">Generating SRT and VTT files without manual typing</a>
+      <a href="#s6-a-simple-rule-for-choosing">A simple rule for choosing</a>
+      <a href="#s7-common-mistakes-with-either-format">Common mistakes with either format</a>
+    </nav>
+  </div>
+
+  <div class="shell">
+    <article class="post">
+<p>In the SRT vs VTT choice, the short answer is: use VTT (WebVTT) for video embedded on web pages with the HTML5 player, and SRT for uploads to platforms, video editors and desktop players. Both are plain-text files of timed captions; VTT adds a header, a few syntax differences and optional styling and positioning.</p>
+<p>Below you will find the exact differences, side-by-side examples, and how to convert between them.</p>
+
+<h2 id="s1-what-srt-and-vtt-files-are">What SRT and VTT files are</h2>
+<p>Both formats are <em>sidecar</em> subtitle files: a separate text file that sits next to your video and tells the player which text to show and when. Because captions are not burned into the pixels, viewers can turn them on or off, and you can fix a typo without re-exporting the video.</p>
+<ul>
+<li><strong>SRT (SubRip Subtitle)</strong> dates back to a DVD-ripping tool and became a de facto standard because it is so simple. It has no formal specification body, which is part of why minor variations exist.</li>
+<li><strong>VTT (WebVTT)</strong> is a W3C format designed for the web. It is the format the HTML <code>&lt;track&gt;</code> element expects. The <a href="https://www.w3.org/TR/webvtt1/" target="_blank" rel="noopener">WebVTT specification</a> defines it formally.</li>
+</ul>
+
+<h2 id="s2-srt-vs-vtt-syntax-side-by-side">SRT vs VTT syntax, side by side</h2>
+<p>Here is the same caption in each format. An SRT cue:</p>
+<blockquote>
+<p><code>1</code></p>
+<p><code>00:00:04,200 --&gt; 00:00:07,800</code></p>
+<p><code>Click Settings, then open Billing.</code></p>
+</blockquote>
+<p>The same cue in VTT:</p>
+<blockquote>
+<p><code>WEBVTT</code></p>
+<p><code>00:00:04.200 --&gt; 00:00:07.800</code></p>
+<p><code>Click Settings, then open Billing.</code></p>
+</blockquote>
+<p>In a real file, a blank line separates the header from the first cue and each cue from the next.</p>
+<p>The differences are small but they matter, because a player that expects one format may reject the other:</p>
+<table>
+<thead><tr><th>Feature</th><th>SRT</th><th>VTT</th></tr></thead>
+<tbody>
+<tr><td>File header</td><td>None</td><td>Must start with <code>WEBVTT</code></td></tr>
+<tr><td>Millisecond separator</td><td>Comma (<code>00:00:04,200</code>)</td><td>Period (<code>00:00:04.200</code>)</td></tr>
+<tr><td>Cue numbers</td><td>Expected</td><td>Optional cue identifiers</td></tr>
+<tr><td>Hours in timestamp</td><td>Always included</td><td>Optional for short videos</td></tr>
+<tr><td>Positioning</td><td>Not standardized</td><td>Cue settings for line, position, alignment</td></tr>
+<tr><td>Styling</td><td>Basic tags in some players</td><td>Bold, italic, classes, voice tags, CSS via <code>::cue</code></td></tr>
+<tr><td>Comments and metadata</td><td>No</td><td><code>NOTE</code> blocks, chapters and metadata tracks</td></tr>
+<tr><td>Native HTML5 support</td><td>No</td><td>Yes</td></tr>
+</tbody>
+</table>
+
+<h2 id="s3-where-each-format-works">Where each format works</h2>
+<p>Compatibility is the deciding factor for most people, so here is a practical summary. Platform support changes, so treat this as a guide and check each platform's help pages.</p>
+<h3>Use VTT for</h3>
+<ul>
+<li>Videos on your own website using the native <code>&lt;video&gt;</code> element and <code>&lt;track&gt;</code>. MDN has a clear <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebVTT_API" target="_blank" rel="noopener">WebVTT API guide</a>.</li>
+<li>Web players and many video hosts that are built on HTML5 video.</li>
+<li>Cases where you need captions positioned somewhere other than the bottom, for example to avoid covering a toolbar in a screen recording.</li>
+</ul>
+<h3>Use SRT for</h3>
+<ul>
+<li>Uploading to video platforms and course hosts, which very commonly accept SRT.</li>
+<li>Desktop video editors and players such as VLC, which load an SRT with the same base name as the video.</li>
+<li>Handing captions to someone else to edit or translate, since SRT is the most widely understood format.</li>
+</ul>
+<p>Many platforms, including YouTube, accept both. If you are not sure, export both files; they are tiny.</p>
+
+<h2 id="s4-how-to-convert-srt-to-vtt-and-back">How to convert SRT to VTT (and back)</h2>
+<p>Because the formats are so close, conversion is straightforward for basic captions.</p>
+<h3>SRT to VTT</h3>
+<ol>
+<li>Add <code>WEBVTT</code> as the first line, followed by a blank line.</li>
+<li>Replace the comma before the milliseconds in every timestamp with a period.</li>
+<li>Keep or remove the cue numbers; VTT treats them as identifiers.</li>
+<li>Save with a <code>.vtt</code> extension and UTF-8 encoding.</li>
+</ol>
+<h3>VTT to SRT</h3>
+<ol>
+<li>Delete the <code>WEBVTT</code> header and any <code>NOTE</code>, <code>STYLE</code> or <code>REGION</code> blocks.</li>
+<li>Number each cue sequentially, starting at 1.</li>
+<li>Make sure every timestamp includes hours and uses a comma before the milliseconds.</li>
+<li>Remove cue settings after the timestamps (like <code>line:10%</code>) and any VTT-only tags.</li>
+</ol>
+<p>Styling and positioning do not survive the trip to SRT, so keep the VTT as your master copy if you rely on them.</p>
+
+<h2 id="s5-generating-srt-and-vtt-files-without-manual-typi">Generating SRT and VTT files without manual typing</h2>
+<p>Writing timestamps by hand is tedious. A transcription tool can generate the cues for you, and you only fix the text. <a href="/">Click &amp; Record</a> includes an on-device Whisper model that transcribes your narration with word-level timings, lets you edit or add cues, and exports either SRT or VTT. It runs in the browser, so nothing is uploaded, and <a href="/editor/editor.html">the free browser editor</a> does this for any video file without installing the extension. Our walkthrough on <a href="/blog/add-subtitles-to-screen-recording-free">adding subtitles to a screen recording for free</a> covers the full process.</p>
+
+<h2 id="s6-a-simple-rule-for-choosing">A simple rule for choosing</h2>
+<p>If you only remember one thing from this SRT vs VTT comparison, make it this decision order:</p>
+<ol>
+<li><strong>Is the video going on a web page you control, using the native player?</strong> Use VTT.</li>
+<li><strong>Do you need captions positioned or styled?</strong> Use VTT, and confirm the destination player respects cue settings.</li>
+<li><strong>Is it going to a platform, editor or someone else for translation?</strong> Use SRT unless the destination asks for VTT.</li>
+<li><strong>Still unsure?</strong> Export both and keep them next to the video with the same base name.</li>
+</ol>
+<p>For screen recordings in particular, positioning can be worth the switch to VTT: captions at the bottom of the frame can cover a status bar, a chat widget or the exact button you are clicking.</p>
+
+<h2 id="s7-common-mistakes-with-either-format">Common mistakes with either format</h2>
+<ul>
+<li><strong>Wrong encoding.</strong> Save as UTF-8, or accented characters and non-Latin scripts turn into garbage.</li>
+<li><strong>Mismatched separators.</strong> A single comma in a VTT timestamp can make a browser skip the cue or the whole file.</li>
+<li><strong>Overlapping cues.</strong> Some players handle overlaps poorly. Make each cue end before the next starts unless overlap is intentional.</li>
+<li><strong>Captions out of sync after editing.</strong> If you trim the video after exporting captions, timings shift. Re-export subtitles after your final cut.</li>
+<li><strong>Missing language info.</strong> On the web, set <code>srclang</code> and <code>label</code> on the track so players and assistive tech present it correctly.</li>
+</ul>
+<p>Pick VTT for the open web and SRT for everywhere else, and you will rarely go wrong. If captions are part of an accessibility commitment, read <a href="/blog/accessible-tutorial-videos-captions">how to make tutorial videos accessible with captions</a> next. And if you are also deciding on a video container, see <a href="/blog/mp4-vs-webm-screen-recording">MP4 vs WebM for screen recordings</a>.</p>
+
+    <section class="post-faq" id="faq">
+      <h2>Frequently asked questions</h2>
+      <div class="faq">
+        <details open>
+          <summary>Is VTT better than SRT?</summary>
+          <div><p>Neither is better overall. VTT is the native format for HTML5 video and supports positioning and styling, while SRT is simpler and accepted almost everywhere. Choose based on where the video will play.</p></div>
+        </details>
+        <details>
+          <summary>Can I convert SRT to VTT?</summary>
+          <div><p>Yes. Add a WEBVTT header line and change the comma before the milliseconds in each timestamp to a period. Cue numbers can stay. Many tools also export both formats directly.</p></div>
+        </details>
+        <details>
+          <summary>Which subtitle format does YouTube accept?</summary>
+          <div><p>YouTube accepts both SRT and VTT, along with several other formats. Check YouTube's help pages for the current list.</p></div>
+        </details>
+        <details>
+          <summary>Why do my VTT captions not show in the browser?</summary>
+          <div><p>The most common causes are a missing WEBVTT header, commas instead of periods in timestamps, or the file being served from another origin without the right CORS headers. Also make sure the track element has a srclang and the track is enabled.</p></div>
+        </details>
+      </div>
+    </section>
+    </article>
+    <aside class="cta" aria-label="Try Click &amp; Record">
+  <p class="tc" data-mark="rec">Free · No account · Nothing uploaded</p>
+  <h2>Record it once. Get the zooms for free.</h2>
+  <p>Click &amp; Record is a free Chrome extension that turns every click into a smooth zoom, transcribes subtitles on your own machine, and can capture network and console logs alongside the video.</p>
+  <div class="actions">
+    <a class="btn btn-solid" href="https://chromewebstore.google.com/detail/lfpnagkdegnjjghefcbpeoblgoaklnnn" target="_blank" rel="noopener" data-cta="chrome-store"><span class="dotrec" aria-hidden="true"></span> Add to Chrome</a>
+    <a class="btn btn-line" href="/editor/editor.html" data-cta="open-editor">Try the editor in your browser</a>
+  </div>
+</aside>
+  </div>
+
+  <section class="related shell" aria-labelledby="related-h">
+    <h2 id="related-h">Keep reading</h2>
+    <div class="cards">
+      <a class="card" href="/blog/add-subtitles-to-screen-recording-free">
+        <span class="tc" data-mark="cue">Subtitles &amp; editing</span>
+        <h3>How to add subtitles to a screen recording for free</h3>
+        <p>Add subtitles to a screen recording free: generate captions on your own computer, fix the timing, and export SRT or VTT files with no upload and no sign-up.</p>
+        <span class="more">5 min read →</span>
+      </a>
+      <a class="card" href="/blog/accessible-tutorial-videos-captions">
+        <span class="tc" data-mark="cue">Subtitles &amp; editing</span>
+        <h3>How to make accessible tutorial videos: captions, transcripts and narration that work for everyone</h3>
+        <p>Make accessible tutorial videos with accurate captions, transcripts and descriptive narration. A practical checklist mapped to WCAG for screen recordings.</p>
+        <span class="more">4 min read →</span>
+      </a>
+      <a class="card" href="/blog/mp4-vs-webm-screen-recording">
+        <span class="tc" data-mark="rec">Recording techniques</span>
+        <h3>MP4 vs WebM for screen recordings: which format to export</h3>
+        <p>MP4 vs WebM for screen recordings: compatibility, quality, file size and where each plays. A simple rule for choosing, plus how to convert in your browser.</p>
+        <span class="more">4 min read →</span>
+      </a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="shell">
+    <div class="fcols">
+      <div>
+        <a class="wordmark" href="/"><span class="dotrec" aria-hidden="true"></span> Click&nbsp;&amp;&nbsp;Record</a>
+        <p style="margin-top:14px;max-width:32ch;color:var(--faint)">
+          The screen recorder that pushes in on every click — and can prove what the app was doing.
+        </p>
+      </div>
+      <div><h3>Product</h3><ul>
+        <li><a href="/#zoom">Automatic zoom</a></li>
+        <li><a href="/#subtitles">Subtitles</a></li>
+        <li><a href="/#evidence">Network &amp; console</a></li>
+        <li><a href="/editor/editor.html">Open the editor</a></li>
+      </ul></div>
+      <div><h3>Guides</h3><ul>
+        <li><a href="/blog/async-sales-demo-video">Async Sales Demo Video: Record Demos Prospects Watch</a></li>
+        <li><a href="/blog/changelog-release-notes-video">Release Notes Video: Turn Your Changelog Into Clips</a></li>
+        <li><a href="/blog/feature-announcement-video">Feature Announcement Video: A Simple 30-Second Formula</a></li>
+        <li><a href="/blog/how-to-make-a-product-demo-video">How to Make a Product Demo Video</a></li>
+      </ul></div>
+      <div><h3>More</h3><ul>
+        <li><a href="/blog">All articles</a></li>
+        <li><a href="/#faq">FAQ</a></li>
+        <li><a href="/privacy">Privacy</a></li>
+        <li><a href="/terms">Terms</a></li>
+      </ul></div>
+    </div>
+    <div class="rule">
+      <span>© 2026 Click &amp; Record</span>
+      <span>Built for people who make demos.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var root = document.documentElement;
+  var btn = document.getElementById('themer');
+  if (!btn) return;
+  function sync() {
+    var dark = root.getAttribute('data-theme') === 'dark';
+    btn.setAttribute('aria-pressed', String(dark));
+    btn.setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme');
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', dark ? '#0c0e13' : '#ffffff');
+  }
+  btn.addEventListener('click', function () {
+    var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('cr-theme', next); } catch (e) {}
+    sync();
+  });
+  sync();
+})();
+</script>
+
+</body>
+</html>

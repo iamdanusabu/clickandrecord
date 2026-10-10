@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<title>How to Hide Sensitive Information in Screen Recordings</title>
+<meta name="description" content="Hide sensitive information in screen recordings by preparing a clean setup, recording one tab, then cropping, cutting and masking the URL before you share." />
+<link rel="canonical" href="https://clickandrecord.tech/blog/hide-sensitive-information-in-screen-recordings" />
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+<meta name="theme-color" content="#ffffff" />
+<meta name="color-scheme" content="light dark" />
+
+<meta property="og:type" content="article" />
+<meta property="og:site_name" content="Click &amp; Record" />
+<meta property="og:url" content="https://clickandrecord.tech/blog/hide-sensitive-information-in-screen-recordings" />
+<meta property="og:title" content="How to Hide Sensitive Information in Screen Recordings" />
+<meta property="og:description" content="Hide sensitive information in screen recordings by preparing a clean setup, recording one tab, then cropping, cutting and masking the URL before you share." />
+<meta property="og:image" content="https://clickandrecord.tech/og-image.png" />
+<meta property="og:image:alt" content="Click &amp; Record" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="How to Hide Sensitive Information in Screen Recordings" />
+<meta name="twitter:description" content="Hide sensitive information in screen recordings by preparing a clean setup, recording one tab, then cropping, cutting and masking the URL before you share." />
+<meta name="twitter:image" content="https://clickandrecord.tech/og-image.png" />
+
+<link rel="icon" href="/favicon.png" type="image/png" sizes="128x128" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<link rel="preload" href="/fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="stylesheet" href="/blog/blog.css" />
+<script src="/analytics.js" defer></script>
+
+<script>
+(function(){try{var t=localStorage.getItem('cr-theme');
+if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "BlogPosting",
+      "@id": "https://clickandrecord.tech/blog/hide-sensitive-information-in-screen-recordings#article",
+      "headline": "How to hide sensitive information in screen recordings",
+      "name": "How to Hide Sensitive Information in Screen Recordings",
+      "description": "Hide sensitive information in screen recordings by preparing a clean setup, recording one tab, then cropping, cutting and masking the URL before you share.",
+      "url": "https://clickandrecord.tech/blog/hide-sensitive-information-in-screen-recordings",
+      "mainEntityOfPage": "https://clickandrecord.tech/blog/hide-sensitive-information-in-screen-recordings",
+      "datePublished": "2026-10-10",
+      "dateModified": "2026-10-10",
+      "inLanguage": "en",
+      "articleSection": "Subtitles & editing",
+      "keywords": "hide sensitive information in screen recordings",
+      "wordCount": 994,
+      "image": "https://clickandrecord.tech/og-image.png",
+      "author": {
+        "@type": "Organization",
+        "name": "Click & Record",
+        "url": "https://clickandrecord.tech/"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "Click & Record",
+        "url": "https://clickandrecord.tech/",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://clickandrecord.tech/apple-touch-icon.png"
+        }
+      },
+      "about": {
+        "@type": "SoftwareApplication",
+        "name": "Click & Record",
+        "url": "https://clickandrecord.tech/"
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://clickandrecord.tech/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Blog",
+          "item": "https://clickandrecord.tech/blog"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "How to hide sensitive information in screen recordings",
+          "item": "https://clickandrecord.tech/blog/hide-sensitive-information-in-screen-recordings"
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Can Click & Record blur parts of a video?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. Click & Record does not have a blur or redaction tool. You can crop, trim, split and delete sections, hide the webcam, and change the URL shown in the mock browser frame, but blurring a region requires a separate video editor."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the safest way to avoid leaking data in a screen recording?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Prevent it from appearing in the first place. Use a demo account with fake data, record a single tab, close unrelated tabs and turn on Do Not Disturb before you start."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is blurring enough to hide passwords or API keys?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Treat a leaked secret as compromised. Light blur or pixelation on short text can sometimes be reversed, so use a solid box if you must mask, and rotate any key or password that appeared on screen."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does recording a single tab protect other windows?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. A tab recording captures only that tab's content, so other tabs, desktop apps and system notifications stay out of the video. Notifications rendered inside the page itself are still captured."
+          }
+        }
+      ]
+    }
+  ]
+}
+</script>
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+<header class="mast">
+  <div class="shell">
+    <a class="wordmark" href="/"><span class="dotrec" aria-hidden="true"></span> Click&nbsp;&amp;&nbsp;Record</a>
+    <nav aria-label="Primary">
+      <a href="/#zoom">Zoom</a>
+      <a href="/#subtitles">Subtitles</a>
+      <a href="/#evidence">Evidence</a>
+      <a href="/blog">Blog</a>
+      <a href="/editor/editor.html">Editor</a>
+      <button class="themer" id="themer" type="button" aria-pressed="false"
+              aria-label="Switch to dark theme" title="Switch theme">
+        <svg class="ico-sun" viewBox="0 0 20 20" width="16" height="16" fill="none" aria-hidden="true">
+          <circle cx="10" cy="10" r="3.6" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M10 1.8v2.1M10 16.1v2.1M18.2 10h-2.1M3.9 10H1.8M15.8 4.2l-1.5 1.5M5.7 14.3l-1.5 1.5M15.8 15.8l-1.5-1.5M5.7 5.7L4.2 4.2"
+                stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <svg class="ico-moon" viewBox="0 0 20 20" width="16" height="16" fill="none" aria-hidden="true">
+          <path d="M16.5 12.4A7 7 0 017.6 3.5a7 7 0 108.9 8.9z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <a class="btn btn-solid" href="https://chromewebstore.google.com/detail/lfpnagkdegnjjghefcbpeoblgoaklnnn" target="_blank" rel="noopener" data-cta="chrome-store">Add to Chrome</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <div class="shell post-head">
+    <nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a> <span aria-hidden="true">/</span> <a href="/blog">Blog</a> <span aria-hidden="true">/</span> <span>Subtitles &amp; editing</span></nav>
+    <p class="tc" data-mark="cue">Subtitles &amp; editing · 4 min read</p>
+    <h1>How to hide sensitive information in screen recordings</h1>
+    <p class="updated">Published <time datetime="2026-10-10">October 10, 2026</time> · Click &amp; Record team</p>
+    <nav class="toc" aria-label="On this page">
+      <a href="#s1-what-typically-leaks-in-a-screen-recording">What typically leaks in a screen recording</a>
+      <a href="#s2-prepare-first-the-best-way-to-hide-sensitive-inf">Prepare first: the best way to hide sensitive information in screen recordings</a>
+      <a href="#s3-record-only-what-you-need">Record only what you need</a>
+      <a href="#s4-remove-sensitive-information-after-recording">Remove sensitive information after recording</a>
+      <a href="#s5-when-you-need-to-blur-use-another-tool">When you need to blur: use another tool</a>
+      <a href="#s6-a-final-review-checklist">A final review checklist</a>
+    </nav>
+  </div>
+
+  <div class="shell">
+    <article class="post">
+<p>The most reliable way to hide sensitive information in screen recordings is to keep it off screen in the first place: use a demo account, record a single tab, and silence notifications. After recording, crop out sensitive areas, cut sections where something leaked, and replace the visible URL. Blurring a specific region is a last resort and usually needs a dedicated video editor.</p>
+<p>This guide goes through each layer of protection in order, from preparation to final review, and is honest about what each one can and cannot do.</p>
+
+<h2 id="s1-what-typically-leaks-in-a-screen-recording">What typically leaks in a screen recording</h2>
+<p>Most leaks are not dramatic. They are small things in the corner of the frame that nobody notices until the video is public:</p>
+<ul>
+<li>Customer names, emails and order numbers in tables</li>
+<li>API keys, tokens or session IDs in URLs, terminals or DevTools</li>
+<li>Notification previews from chat or email apps</li>
+<li>Other tabs, bookmarks and browser profile names</li>
+<li>Internal hostnames such as staging or admin subdomains</li>
+<li>Autofill suggestions that reveal your email or address</li>
+<li>Revenue figures, roadmap items or calendar entries</li>
+</ul>
+
+<h2 id="s2-prepare-first-the-best-way-to-hide-sensitive-inf">Prepare first: the best way to hide sensitive information in screen recordings</h2>
+<p>Preparation beats editing every time. Nothing can leak if it was never captured, and you avoid trusting a blur to hold up.</p>
+<h3>Use a demo environment</h3>
+<p>Record in a demo or sandbox account seeded with realistic fake data. Names like "Acme Corp" and "jane@example.com" make the video look real without exposing anyone. If you must use production, filter tables to records you created for the purpose.</p>
+<h3>Clean up the browser</h3>
+<ul>
+<li>Close every tab you do not need.</li>
+<li>Hide the bookmarks bar, or use a separate browser profile just for recording.</li>
+<li>Clear or disable autofill suggestions for the fields you will type into.</li>
+<li>Sign out of personal accounts in that profile.</li>
+</ul>
+<h3>Silence the system</h3>
+<p>Turn on Do Not Disturb or Focus mode in your operating system, and quit chat apps. A single message preview can reveal more than the whole demo.</p>
+<h3>Handle secrets deliberately</h3>
+<p>Never paste a real API key or password on camera. Use a throwaway key that you revoke right after recording, or a placeholder value.</p>
+
+<h2 id="s3-record-only-what-you-need">Record only what you need</h2>
+<p>What you choose to capture matters as much as what is on screen.</p>
+<table>
+<thead><tr><th>Source</th><th>What it captures</th><th>Leak risk</th></tr></thead>
+<tbody>
+<tr><td>Single browser tab</td><td>Only the page content of that tab</td><td>Lowest: no other tabs, apps or OS notifications</td></tr>
+<tr><td>Application window</td><td>One app's window</td><td>Medium: anything inside that app, including its sidebars</td></tr>
+<tr><td>Entire display</td><td>Everything on the screen</td><td>Highest: notifications, taskbar, other windows</td></tr>
+</tbody>
+</table>
+<p>For browser demos, recording one tab is the strongest default. Our guide to <a href="/blog/how-to-record-a-chrome-tab">recording a Chrome tab</a> walks through it. If you use a webcam, remember the camera can show your room too; in <a href="/">Click &amp; Record</a> the webcam is a separate track, so you can hide it after recording if something in the background should not be there.</p>
+<p>Use pause as you go. If you need to open something sensitive mid-demo, pause the recording, do it, navigate back to a safe screen, and resume.</p>
+
+<h2 id="s4-remove-sensitive-information-after-recording">Remove sensitive information after recording</h2>
+<p>If something did slip into the take, these edits handle most cases. Click &amp; Record's editor, also available as <a href="/editor/editor.html">the free browser editor</a> for any video file, supports all of them locally without uploading the footage.</p>
+<h3>Crop the frame</h3>
+<p>If the sensitive content sits in a fixed area, like a sidebar with account names or a status bar at the bottom, crop it out for the whole video. Cropping removes those pixels from the export entirely.</p>
+<h3>Cut the section</h3>
+<p>If a notification popped up or you briefly opened the wrong record, split the timeline before and after that moment and delete the clip. A short jump cut is far better than a leak. See <a href="/blog/trim-and-split-video-in-browser">how to trim and split video in the browser</a>.</p>
+<h3>Replace the visible URL</h3>
+<p>URLs often contain internal hostnames, IDs or tokens. Add the mock browser frame and edit its URL bar to show a clean public address instead. This only covers the address bar, so pair it with a tab recording or a crop that removes your real browser toolbar. More on frames in <a href="/blog/add-background-and-browser-frame-to-screen-recording">adding a background and browser frame</a>.</p>
+<h3>Check subtitles and audio too</h3>
+<p>If you generated captions, read them. A name you said out loud ends up in the subtitle file as text. Edit or delete the cue, and cut the audio section if needed.</p>
+
+<h2 id="s5-when-you-need-to-blur-use-another-tool">When you need to blur: use another tool</h2>
+<p>To be clear: Click &amp; Record does not include a blur, pixelate or redaction tool. If sensitive content appears in the middle of the frame and moves around, and you cannot crop or cut it, you will need a video editor that supports masking or blur, applied after you export.</p>
+<p>If you go that route:</p>
+<ul>
+<li><strong>Prefer solid boxes over blur</strong> for text such as keys, emails and account numbers. Weak blur on short text can be easier to reverse than people expect.</li>
+<li><strong>Track the content.</strong> If the page scrolls, the mask must follow it in every frame.</li>
+<li><strong>Rotate exposed secrets anyway.</strong> Treat any credential that appeared on screen as compromised.</li>
+</ul>
+<p>Honestly, most of the time it is quicker to re-record with a demo account than to mask a moving region.</p>
+
+<h2 id="s6-a-final-review-checklist">A final review checklist</h2>
+<ol>
+<li>Watch the full export at normal speed, then scrub through frame by frame around any risky moments.</li>
+<li>Pause on every table, form and URL and read it.</li>
+<li>Check the corners: status bars, avatars, tab titles.</li>
+<li>Read the subtitle file if you are publishing one.</li>
+<li>Have a colleague watch it with fresh eyes before it goes public.</li>
+</ol>
+<p>Keeping the workflow local also helps: a recorder that never uploads means rough takes with mistakes in them do not sit on someone else's server. Read more in <a href="/blog/private-screen-recorder-no-upload">private screen recording with no upload</a>. Click &amp; Record gives you tab recording, cropping, cutting and an editable URL bar in one free tool; for blur, pair it with an editor that has masking.</p>
+
+    <section class="post-faq" id="faq">
+      <h2>Frequently asked questions</h2>
+      <div class="faq">
+        <details open>
+          <summary>Can Click &amp; Record blur parts of a video?</summary>
+          <div><p>No. Click &amp; Record does not have a blur or redaction tool. You can crop, trim, split and delete sections, hide the webcam, and change the URL shown in the mock browser frame, but blurring a region requires a separate video editor.</p></div>
+        </details>
+        <details>
+          <summary>What is the safest way to avoid leaking data in a screen recording?</summary>
+          <div><p>Prevent it from appearing in the first place. Use a demo account with fake data, record a single tab, close unrelated tabs and turn on Do Not Disturb before you start.</p></div>
+        </details>
+        <details>
+          <summary>Is blurring enough to hide passwords or API keys?</summary>
+          <div><p>Treat a leaked secret as compromised. Light blur or pixelation on short text can sometimes be reversed, so use a solid box if you must mask, and rotate any key or password that appeared on screen.</p></div>
+        </details>
+        <details>
+          <summary>Does recording a single tab protect other windows?</summary>
+          <div><p>Yes. A tab recording captures only that tab's content, so other tabs, desktop apps and system notifications stay out of the video. Notifications rendered inside the page itself are still captured.</p></div>
+        </details>
+      </div>
+    </section>
+    </article>
+    <aside class="cta" aria-label="Try Click &amp; Record">
+  <p class="tc" data-mark="rec">Free · No account · Nothing uploaded</p>
+  <h2>Record it once. Get the zooms for free.</h2>
+  <p>Click &amp; Record is a free Chrome extension that turns every click into a smooth zoom, transcribes subtitles on your own machine, and can capture network and console logs alongside the video.</p>
+  <div class="actions">
+    <a class="btn btn-solid" href="https://chromewebstore.google.com/detail/lfpnagkdegnjjghefcbpeoblgoaklnnn" target="_blank" rel="noopener" data-cta="chrome-store"><span class="dotrec" aria-hidden="true"></span> Add to Chrome</a>
+    <a class="btn btn-line" href="/editor/editor.html" data-cta="open-editor">Try the editor in your browser</a>
+  </div>
+</aside>
+  </div>
+
+  <section class="related shell" aria-labelledby="related-h">
+    <h2 id="related-h">Keep reading</h2>
+    <div class="cards">
+      <a class="card" href="/blog/private-screen-recorder-no-upload">
+        <span class="tc" data-mark="cue">Subtitles &amp; editing</span>
+        <h3>Private screen recorder with no upload: how to keep recordings on your machine</h3>
+        <p>A private screen recorder with no upload keeps video, audio and transcripts on your computer. Here is what to check before you trust one with your screen.</p>
+        <span class="more">4 min read →</span>
+      </a>
+      <a class="card" href="/blog/how-to-record-a-chrome-tab">
+        <span class="tc" data-mark="rec">Recording techniques</span>
+        <h3>How to record a Chrome tab, step by step</h3>
+        <p>How to record a Chrome tab for free: pick the tab, handle audio, keep notifications and other windows out of the shot, and export a clean MP4 in minutes.</p>
+        <span class="more">4 min read →</span>
+      </a>
+      <a class="card" href="/blog/add-background-and-browser-frame-to-screen-recording">
+        <span class="tc" data-mark="cue">Subtitles &amp; editing</span>
+        <h3>How to add a background and browser frame to a screen recording</h3>
+        <p>Add a screen recording background and a mock browser frame to make plain captures look polished. Padding, corner radius, shadow and URL tips, free.</p>
+        <span class="more">4 min read →</span>
+      </a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="shell">
+    <div class="fcols">
+      <div>
+        <a class="wordmark" href="/"><span class="dotrec" aria-hidden="true"></span> Click&nbsp;&amp;&nbsp;Record</a>
+        <p style="margin-top:14px;max-width:32ch;color:var(--faint)">
+          The screen recorder that pushes in on every click — and can prove what the app was doing.
+        </p>
+      </div>
+      <div><h3>Product</h3><ul>
+        <li><a href="/#zoom">Automatic zoom</a></li>
+        <li><a href="/#subtitles">Subtitles</a></li>
+        <li><a href="/#evidence">Network &amp; console</a></li>
+        <li><a href="/editor/editor.html">Open the editor</a></li>
+      </ul></div>
+      <div><h3>Guides</h3><ul>
+        <li><a href="/blog/async-sales-demo-video">Async Sales Demo Video: Record Demos Prospects Watch</a></li>
+        <li><a href="/blog/changelog-release-notes-video">Release Notes Video: Turn Your Changelog Into Clips</a></li>
+        <li><a href="/blog/feature-announcement-video">Feature Announcement Video: A Simple 30-Second Formula</a></li>
+        <li><a href="/blog/how-to-make-a-product-demo-video">How to Make a Product Demo Video</a></li>
+      </ul></div>
+      <div><h3>More</h3><ul>
+        <li><a href="/blog">All articles</a></li>
+        <li><a href="/#faq">FAQ</a></li>
+        <li><a href="/privacy">Privacy</a></li>
+        <li><a href="/terms">Terms</a></li>
+      </ul></div>
+    </div>
+    <div class="rule">
+      <span>© 2026 Click &amp; Record</span>
+      <span>Built for people who make demos.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var root = document.documentElement;
+  var btn = document.getElementById('themer');
+  if (!btn) return;
+  function sync() {
+    var dark = root.getAttribute('data-theme') === 'dark';
+    btn.setAttribute('aria-pressed', String(dark));
+    btn.setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme');
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', dark ? '#0c0e13' : '#ffffff');
+  }
+  btn.addEventListener('click', function () {
+    var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('cr-theme', next); } catch (e) {}
+    sync();
+  });
+  sync();
+})();
+</script>
+
+</body>
+</html>

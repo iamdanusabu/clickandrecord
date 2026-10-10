@@ -4,6 +4,8 @@
   "rewrites": [
     { "source": "/", "destination": "/index.html" },
     { "source": "/privacy", "destination": "/privacy/index.html" },
-    { "source": "/terms", "destination": "/terms/index.html" }
+    { "source": "/terms", "destination": "/terms/index.html" },
+    { "source": "/blog", "destination": "/blog/index.html" },
+    { "source": "/blog/:slug", "destination": "/blog/:slug/index.html" }
   ]
 }
